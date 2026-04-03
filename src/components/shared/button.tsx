@@ -20,7 +20,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "rounded-2xl px-4 py-2.5 text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-60",
         variant === "primary" && "bg-brand text-white hover:bg-brand-strong",
         variant === "ghost" && "bg-transparent text-app-text border border-surface-accent",
         variant === "danger" && "bg-danger text-white hover:brightness-95",

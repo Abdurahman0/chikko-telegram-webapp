@@ -44,9 +44,14 @@ export function ProductCard({
             {product.shortDescription || product.description || detailsLabel}
           </p>
         </Link>
-        <div className="mt-2 flex h-8 items-center justify-between gap-2">
-          <p className="whitespace-nowrap text-base font-bold leading-none">
-            {formatCurrency(product.price, locale)} {currencyLabel}
+        <div className="mt-2 flex h-12 items-start justify-between gap-2">
+          <p className="text-base font-bold leading-none">
+            <span className="block whitespace-nowrap">
+              {formatCurrency(product.price, locale)}
+            </span>
+            <span className="mt-0.5 block whitespace-nowrap text-[0.92rem]">
+              {currencyLabel}
+            </span>
           </p>
           <p
             className={`whitespace-nowrap text-xs font-medium ${

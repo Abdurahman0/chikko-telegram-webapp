@@ -43,14 +43,38 @@ export function CartLineItem({
       </div>
       <div className="mt-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Button variant="soft" className="h-9 w-9 rounded-lg px-0 text-base" onClick={onDecrement}>
-            -
+          <Button
+            variant="soft"
+            className="h-9 w-9 rounded-lg px-0"
+            onClick={onDecrement}
+            aria-label="Decrease quantity"
+          >
+            <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+              <path
+                d="M4 10h12"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
           </Button>
           <span className="inline-flex h-9 min-w-8 items-center justify-center text-center text-sm font-semibold">
             {item.quantity}
           </span>
-          <Button variant="soft" className="h-9 w-9 rounded-lg px-0 text-base" onClick={onIncrement}>
-            +
+          <Button
+            variant="soft"
+            className="h-9 w-9 rounded-lg px-0"
+            onClick={onIncrement}
+            aria-label="Increase quantity"
+          >
+            <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+              <path
+                d="M10 4v12M4 10h12"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
           </Button>
         </div>
         <Button
