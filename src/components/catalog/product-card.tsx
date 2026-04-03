@@ -29,7 +29,7 @@ export function ProductCard({
   const isOut = typeof product.stock === "number" && product.stock <= 0;
 
   return (
-    <div className="flex h-full flex-col rounded-3xl bg-surface p-3 shadow-soft">
+    <div className="flex h-full min-h-[18.8rem] flex-col rounded-3xl bg-surface p-3 shadow-soft">
       <Link href={`/${locale}/product/${product.id}`}>
         <ProductImage
           src={product.image}
@@ -38,18 +38,18 @@ export function ProductCard({
         />
       </Link>
       <div className="mt-3 flex flex-1 flex-col">
-        <Link href={`/${locale}/product/${product.id}`} className="block">
-          <p className="truncate text-sm font-semibold">{product.name}</p>
-          <p className="truncate-2 mt-1 min-h-10 text-xs text-app-muted">
+        <Link href={`/${locale}/product/${product.id}`} className="block min-h-[3.45rem]">
+          <p className="truncate text-sm font-semibold leading-5">{product.name}</p>
+          <p className="truncate-2 mt-1 h-8 text-xs leading-4 text-app-muted">
             {product.shortDescription || product.description || detailsLabel}
           </p>
         </Link>
-        <div className="mt-2 flex items-start justify-between gap-2">
-          <p className="text-sm font-bold leading-tight">
+        <div className="mt-2 flex h-8 items-center justify-between gap-2">
+          <p className="whitespace-nowrap text-base font-bold leading-none">
             {formatCurrency(product.price, locale)} {currencyLabel}
           </p>
           <p
-            className={`text-xs font-medium whitespace-nowrap ${
+            className={`whitespace-nowrap text-xs font-medium ${
               isOut ? "text-danger" : "text-brand-strong"
             }`}
           >
@@ -58,7 +58,7 @@ export function ProductCard({
         </div>
         <Button
           fullWidth
-          className="mt-3 h-10 rounded-2xl"
+          className="mt-3 h-9 rounded-2xl"
           onClick={() => onAddToCart(product)}
           disabled={isOut}
         >

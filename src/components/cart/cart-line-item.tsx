@@ -42,22 +42,24 @@ export function CartLineItem({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="soft" className="h-10 w-10 rounded-xl px-0" onClick={onDecrement}>
+        <div className="flex items-center gap-1.5">
+          <Button variant="soft" className="h-9 w-9 rounded-lg px-0 text-base" onClick={onDecrement}>
             -
           </Button>
-          <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
-          <Button variant="soft" className="h-10 w-10 rounded-xl px-0" onClick={onIncrement}>
+          <span className="inline-flex h-9 min-w-8 items-center justify-center text-center text-sm font-semibold">
+            {item.quantity}
+          </span>
+          <Button variant="soft" className="h-9 w-9 rounded-lg px-0 text-base" onClick={onIncrement}>
             +
           </Button>
         </div>
         <Button
           variant="ghost"
-          className="h-10 w-10 rounded-xl border-danger/20 px-0 text-danger"
+          className="h-9 w-9 rounded-lg border-danger/20 px-0 text-danger"
           onClick={onRemove}
           aria-label="Remove item"
         >
-          <svg viewBox="0 0 24 24" className="mx-auto h-4 w-4" fill="none" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="mx-auto h-3.5 w-3.5" fill="none" aria-hidden="true">
             <path
               d="M9 4h6m-8 3h10m-1 0-.4 11a2 2 0 0 1-2 1.9h-2.2a2 2 0 0 1-2-1.9L8 7m2 3v6m4-6v6"
               stroke="currentColor"
