@@ -86,3 +86,19 @@ a {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes cart-pop {
+  0% {
+    transform: scale(0.7);
+  }
+  55% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-cart-pop {
+  animation: cart-pop 260ms ease-out;
+}

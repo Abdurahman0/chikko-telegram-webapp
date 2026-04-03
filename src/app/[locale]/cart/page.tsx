@@ -36,7 +36,7 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
         subtitle={messages.cart.subtitle}
         right={
           !isEmpty ? (
-            <Button variant="ghost" onClick={clear}>
+            <Button variant="danger" onClick={clear}>
               {messages.cart.clear}
             </Button>
           ) : null

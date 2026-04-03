@@ -79,7 +79,7 @@ export function CartLineItem({
         </div>
         <Button
           variant="ghost"
-          className="h-8 w-8 rounded-lg border-danger/20 px-0 text-[#d14b4b]"
+          className="h-8 w-8 rounded-lg border-red-200 bg-red-50/70 px-0 text-red-600"
           onClick={onRemove}
           aria-label="Remove item"
         >

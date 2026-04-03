@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { CategoryChips } from "@/components/catalog/category-chips";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -12,7 +11,6 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCatalog } from "@/features/catalog/use-catalog";
-import { useCart } from "@/features/cart/use-cart";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
@@ -50,21 +48,28 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
   const initData = useBootstrapStore((state) => state.initData);
   const addItem = useCartStore((state) => state.addItem);
-  const cart = useCart();
-  const cartLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const decrement = useCartStore((state) => state.decrement);
+  const cartItems = useCartStore((state) => state.items);
   const [flyItems, setFlyItems] = useState<FlyItem[]>([]);
 
   const hasProducts = useMemo(() => products.length > 0, [products.length]);
 
-  const handleAddToCart = (product: (typeof products)[number], sourceElement: HTMLElement | null) => {
+  const handleAddToCart = (
+    product: (typeof products)[number],
+    sourceElement: HTMLElement | null,
+  ) => {
     addItem(product);
 
-    if (!sourceElement || !cartLinkRef.current) {
+    const cartFooterTarget = document.querySelector(
+      '[data-cart-target="true"]',
+    ) as HTMLElement | null;
+
+    if (!sourceElement || !cartFooterTarget) {
       return;
     }
 
     const sourceRect = sourceElement.getBoundingClientRect();
-    const targetRect = cartLinkRef.current.getBoundingClientRect();
+    const targetRect = cartFooterTarget.getBoundingClientRect();
     const id =
       typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
@@ -98,19 +103,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   return (
     <div>
       <div className="sticky top-0 z-20 space-y-4 bg-app-bg/95 pb-3 backdrop-blur-md">
-        <SectionHeader
-          title={messages.catalog.title}
-          subtitle={messages.catalog.subtitle}
-          right={
-            <Link
-              ref={cartLinkRef}
-              href={`/${locale}/cart`}
-              className="rounded-xl bg-brand-soft px-3 py-2 text-xs font-semibold text-brand-strong"
-            >
-              {messages.nav.cart}: {cart.totals.quantity}
-            </Link>
-          }
-        />
+        <SectionHeader title={messages.catalog.title} subtitle={messages.catalog.subtitle} />
 
         <Input
           value={search}
@@ -168,7 +161,9 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                 inStockLabel={messages.catalog.inStock}
                 detailsLabel={messages.catalog.details}
                 currencyLabel={messages.common.som}
-                onAddToCart={handleAddToCart}
+                quantity={cartItems[product.id]?.quantity ?? 0}
+                onIncrement={handleAddToCart}
+                onDecrement={decrement}
               />
             ))}
           </div>

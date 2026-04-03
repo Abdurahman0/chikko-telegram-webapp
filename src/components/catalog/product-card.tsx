@@ -15,7 +15,9 @@ export function ProductCard({
   inStockLabel,
   detailsLabel,
   currencyLabel,
-  onAddToCart,
+  quantity,
+  onIncrement,
+  onDecrement,
 }: {
   locale: AppLocale;
   product: Product;
@@ -24,7 +26,9 @@ export function ProductCard({
   inStockLabel: string;
   detailsLabel: string;
   currencyLabel: string;
-  onAddToCart: (product: Product, sourceElement: HTMLElement | null) => void;
+  quantity: number;
+  onIncrement: (product: Product, sourceElement: HTMLElement | null) => void;
+  onDecrement: (productId: string) => void;
 }) {
   const isOut = typeof product.stock === "number" && product.stock <= 0;
 
@@ -61,16 +65,40 @@ export function ProductCard({
             {isOut ? outOfStockLabel : inStockLabel}
           </p>
         </div>
-        <Button
-          fullWidth
-          className="mt-3 h-9 rounded-2xl"
-          onClick={(event) =>
-            onAddToCart(product, event.currentTarget as HTMLElement)
-          }
-          disabled={isOut}
-        >
-          {addToCartLabel}
-        </Button>
+        {quantity > 0 ? (
+          <div className="mt-3 flex h-9 items-center justify-between rounded-2xl bg-brand-soft px-2">
+            <button
+              type="button"
+              aria-label="Decrease quantity"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white text-brand-strong"
+              onClick={() => onDecrement(product.id)}
+            >
+              -
+            </button>
+            <span className="text-sm font-bold text-brand-strong">{quantity}</span>
+            <button
+              type="button"
+              aria-label="Increase quantity"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white text-brand-strong"
+              onClick={(event) =>
+                onIncrement(product, event.currentTarget as HTMLElement)
+              }
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <Button
+            fullWidth
+            className="mt-3 h-9 rounded-2xl"
+            onClick={(event) =>
+              onIncrement(product, event.currentTarget as HTMLElement)
+            }
+            disabled={isOut}
+          >
+            {addToCartLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

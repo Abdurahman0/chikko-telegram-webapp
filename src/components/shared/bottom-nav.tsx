@@ -30,14 +30,18 @@ export function BottomNav({ locale }: { locale: string }) {
             <Link
               key={item.href}
               href={item.href}
+              data-cart-target={item.isCart ? "true" : undefined}
               className={cn(
-                "relative rounded-xl px-3 py-2 text-xs font-semibold",
+                "relative rounded-xl px-3 py-2 text-xs font-semibold transition-transform",
                 active ? "bg-brand-soft text-brand-strong" : "text-app-muted",
               )}
             >
               {item.label}
               {item.isCart && cartQuantity > 0 ? (
-                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
+                <span
+                  key={cartQuantity}
+                  className="animate-cart-pop absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white"
+                >
                   {cartQuantity > 99 ? "99+" : cartQuantity}
                 </span>
               ) : null}
