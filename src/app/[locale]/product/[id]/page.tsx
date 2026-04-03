@@ -82,9 +82,9 @@ function ProductScreen({
   return (
     <div className="space-y-4 pt-12">
       <Link
-        href={`/${locale}/cart`}
+        href={`/${locale}/catalog`}
         className="fixed left-4 top-4 z-40 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-strong shadow-soft ring-1 ring-surface-accent"
-        aria-label={messages.nav.cart}
+        aria-label="Go back"
       >
         <svg
           viewBox="0 0 24 24"
@@ -93,14 +93,12 @@ function ProductScreen({
           aria-hidden="true"
         >
           <path
-            d="M4 6h2l1.2 8.4a1.2 1.2 0 0 0 1.2 1h7.6a1.2 1.2 0 0 0 1.2-1L19 8H7.2"
+            d="M15 6 9 12l6 6"
             stroke="currentColor"
-            strokeWidth="1.9"
+            strokeWidth="2.1"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx="10" cy="18.5" r="1.2" fill="currentColor" />
-          <circle cx="16" cy="18.5" r="1.2" fill="currentColor" />
         </svg>
       </Link>
 

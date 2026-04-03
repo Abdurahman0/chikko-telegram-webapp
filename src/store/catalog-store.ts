@@ -13,6 +13,9 @@ type CatalogStore = {
   activeCategory: string;
   search: string;
   status: CatalogStatus;
+  lastQueryKey: string | null;
+  loadingQueryKey: string | null;
+  lastFetchedAt: number;
   errorCode: "forbidden" | "bad_request" | "network" | "unknown" | null;
   errorMessage: string | null;
   setCategory: (category: string) => void;
@@ -24,29 +27,46 @@ type CatalogStore = {
   }) => Promise<void>;
 };
 
+function createCatalogQueryKey(params: { category?: string; search?: string }) {
+  return `category=${params.category ?? ""};search=${params.search ?? ""}`;
+}
+
 export const useCatalogStore = create<CatalogStore>((set) => ({
   categories: [],
   products: [],
   activeCategory: "",
   search: "",
   status: "idle",
+  lastQueryKey: null,
+  loadingQueryKey: null,
+  lastFetchedAt: 0,
   errorCode: null,
   errorMessage: null,
   setCategory: (category) => set({ activeCategory: category }),
   setSearch: (search) => set({ search }),
   loadCatalog: async ({ initData, category, search }) => {
-    set({ status: "loading", errorCode: null, errorMessage: null });
+    const queryKey = createCatalogQueryKey({ category, search });
+    set({
+      status: "loading",
+      loadingQueryKey: queryKey,
+      errorCode: null,
+      errorMessage: null,
+    });
     try {
       const data = await getCatalog(initData, { category, search });
       set({
         categories: data.categories,
         products: data.products,
         status: "success",
+        lastQueryKey: queryKey,
+        loadingQueryKey: null,
+        lastFetchedAt: Date.now(),
       });
     } catch (error) {
       if (error instanceof TelegramApiError) {
         set({
           status: "error",
+          loadingQueryKey: null,
           errorCode: error.code,
           errorMessage: error.message,
         });
@@ -54,6 +74,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       }
       set({
         status: "error",
+        loadingQueryKey: null,
         errorCode: "unknown",
         errorMessage: "Unknown error",
       });
