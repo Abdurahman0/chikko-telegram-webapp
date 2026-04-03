@@ -45,15 +45,15 @@ export function CartLineItem({
         <div className="flex items-center gap-1.5">
           <Button
             variant="soft"
-            className="h-8 w-8 rounded-lg px-0"
+            className="h-8 w-8 rounded-lg px-0 text-[#0f6d4f]"
             onClick={onDecrement}
             aria-label="Decrease quantity"
           >
-            <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" fill="none" aria-hidden="true">
+            <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" aria-hidden="true">
               <path
                 d="M4 10h12"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.2"
                 strokeLinecap="round"
               />
             </svg>
@@ -63,15 +63,15 @@ export function CartLineItem({
           </span>
           <Button
             variant="soft"
-            className="h-8 w-8 rounded-lg px-0"
+            className="h-8 w-8 rounded-lg px-0 text-[#0f6d4f]"
             onClick={onIncrement}
             aria-label="Increase quantity"
           >
-            <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" fill="none" aria-hidden="true">
+            <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" aria-hidden="true">
               <path
                 d="M10 4v12M4 10h12"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.2"
                 strokeLinecap="round"
               />
             </svg>
@@ -79,11 +79,11 @@ export function CartLineItem({
         </div>
         <Button
           variant="ghost"
-          className="h-8 w-8 rounded-lg border-danger/20 px-0 text-danger"
+          className="h-8 w-8 rounded-lg border-danger/20 px-0 text-[#d14b4b]"
           onClick={onRemove}
           aria-label="Remove item"
         >
-          <svg viewBox="0 0 24 24" className="mx-auto h-4.5 w-4.5" fill="none" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="mx-auto h-4 w-4 shrink-0" fill="none" aria-hidden="true">
             <path
               d="M9 4h6m-8 3h10m-1 0-.4 11a2 2 0 0 1-2 1.9h-2.2a2 2 0 0 1-2-1.9L8 7m2 3v6m4-6v6"
               stroke="currentColor"
