@@ -70,6 +70,14 @@ a {
   outline-offset: 1px;
 }
 
+.truncate-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+}
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

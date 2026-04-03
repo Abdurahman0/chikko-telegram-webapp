@@ -63,6 +63,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder={messages.catalog.searchPlaceholder}
+        className="rounded-[18px] bg-white shadow-[0_1px_0_rgba(17,49,39,0.04)]"
       />
 
       <CategoryChips
@@ -101,7 +102,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
       ) : null}
 
       {status === "success" && hasProducts ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 items-stretch gap-3">
           {products.map((product) => (
             <ProductCard
               key={product.id}
