@@ -36,7 +36,9 @@ export async function telegramApiRequest<T>({
   body?: unknown;
   schema: ZodSchema<T>;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const baseUrl = path.startsWith("/api/telegram-webapp/")
+    ? ""
+    : process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const url = `${baseUrl}${path}`;
   const headers = new Headers({
     "Content-Type": "application/json",

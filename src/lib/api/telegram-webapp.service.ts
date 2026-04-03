@@ -18,7 +18,7 @@ import type {
 
 export async function getBootstrap(initData: string): Promise<BootstrapData> {
   const raw = await telegramApiRequest({
-    path: "/api/integrations/telegram/webapp/bootstrap/",
+    path: "/api/telegram-webapp/bootstrap/",
     method: "GET",
     initData,
     schema: bootstrapResponseSchema,
@@ -40,7 +40,7 @@ export async function getCatalog(
   const suffix = query.toString().length > 0 ? `?${query}` : "";
 
   const raw = await telegramApiRequest({
-    path: `/api/integrations/telegram/webapp/catalog/${suffix}`,
+    path: `/api/telegram-webapp/catalog/${suffix}`,
     method: "GET",
     initData,
     schema: catalogResponseSchema,
@@ -53,7 +53,7 @@ export async function checkout(
   payload: CheckoutPayload,
 ): Promise<CheckoutData> {
   const raw = await telegramApiRequest({
-    path: "/api/integrations/telegram/webapp/checkout/",
+    path: "/api/telegram-webapp/checkout/",
     method: "POST",
     initData,
     body: payload,
