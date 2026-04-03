@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { CategoryChips } from "@/components/catalog/category-chips";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -28,6 +28,16 @@ export default function CatalogPage() {
 }
 
 function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
+  type FlyItem = {
+    id: string;
+    image: string | null;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    started: boolean;
+  };
+
   const { messages } = useI18n();
   useCatalog();
   const status = useCatalogStore((state) => state.status);
@@ -41,83 +51,149 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const initData = useBootstrapStore((state) => state.initData);
   const addItem = useCartStore((state) => state.addItem);
   const cart = useCart();
+  const cartLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const [flyItems, setFlyItems] = useState<FlyItem[]>([]);
 
   const hasProducts = useMemo(() => products.length > 0, [products.length]);
 
+  const handleAddToCart = (product: (typeof products)[number], sourceElement: HTMLElement | null) => {
+    addItem(product);
+
+    if (!sourceElement || !cartLinkRef.current) {
+      return;
+    }
+
+    const sourceRect = sourceElement.getBoundingClientRect();
+    const targetRect = cartLinkRef.current.getBoundingClientRect();
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`;
+
+    const next: FlyItem = {
+      id,
+      image: product.image ?? product.images[0] ?? null,
+      startX: sourceRect.left + sourceRect.width / 2,
+      startY: sourceRect.top + sourceRect.height / 2,
+      endX: targetRect.left + targetRect.width / 2,
+      endY: targetRect.top + targetRect.height / 2,
+      started: false,
+    };
+
+    setFlyItems((prev) => [...prev, next]);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setFlyItems((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, started: true } : item)),
+        );
+      });
+    });
+
+    setTimeout(() => {
+      setFlyItems((prev) => prev.filter((item) => item.id !== id));
+    }, 700);
+  };
+
   return (
-    <div className="space-y-4">
-      <SectionHeader
-        title={messages.catalog.title}
-        subtitle={messages.catalog.subtitle}
-        right={
-          <Link
-            href={`/${locale}/cart`}
-            className="rounded-xl bg-brand-soft px-3 py-2 text-xs font-semibold text-brand-strong"
-          >
-            {messages.nav.cart}: {cart.totals.quantity}
-          </Link>
-        }
-      />
-
-      <Input
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder={messages.catalog.searchPlaceholder}
-        className="rounded-[18px] bg-white shadow-[0_1px_0_rgba(17,49,39,0.04)]"
-      />
-
-      <CategoryChips
-        categories={categories}
-        activeCategory={activeCategory}
-        allLabel={messages.catalog.allCategories}
-        onSelect={setCategory}
-      />
-
-      {status === "loading" ? <ProductSkeletonGrid /> : null}
-
-      {status === "error" ? (
-        <StateCard
-          title={messages.checkout.failed}
-          action={
-            <Button
-              onClick={() =>
-                void loadCatalog({
-                  initData,
-                  category: activeCategory || undefined,
-                  search: search || undefined,
-                })
-              }
+    <div>
+      <div className="sticky top-0 z-20 space-y-4 bg-app-bg/95 pb-3 backdrop-blur-md">
+        <SectionHeader
+          title={messages.catalog.title}
+          subtitle={messages.catalog.subtitle}
+          right={
+            <Link
+              ref={cartLinkRef}
+              href={`/${locale}/cart`}
+              className="rounded-xl bg-brand-soft px-3 py-2 text-xs font-semibold text-brand-strong"
             >
-              {messages.common.retry}
-            </Button>
+              {messages.nav.cart}: {cart.totals.quantity}
+            </Link>
           }
         />
-      ) : null}
 
-      {status === "success" && !hasProducts ? (
-        <StateCard
-          title={messages.catalog.emptyTitle}
-          description={messages.catalog.emptyDescription}
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder={messages.catalog.searchPlaceholder}
+          className="rounded-[18px] bg-white shadow-[0_1px_0_rgba(17,49,39,0.04)]"
         />
-      ) : null}
+      </div>
 
-      {status === "success" && hasProducts ? (
-        <div className="grid grid-cols-2 items-stretch gap-3">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              locale={locale}
-              product={product}
-              addToCartLabel={messages.catalog.addToCart}
-              outOfStockLabel={messages.catalog.outOfStock}
-              inStockLabel={messages.catalog.inStock}
-              detailsLabel={messages.catalog.details}
-              currencyLabel={messages.common.som}
-              onAddToCart={addItem}
-            />
-          ))}
-        </div>
-      ) : null}
+      <div className="space-y-4 pt-2">
+        <CategoryChips
+          categories={categories}
+          activeCategory={activeCategory}
+          allLabel={messages.catalog.allCategories}
+          onSelect={setCategory}
+        />
+
+        {status === "loading" ? <ProductSkeletonGrid /> : null}
+
+        {status === "error" ? (
+          <StateCard
+            title={messages.checkout.failed}
+            action={
+              <Button
+                onClick={() =>
+                  void loadCatalog({
+                    initData,
+                    category: activeCategory || undefined,
+                    search: search || undefined,
+                  })
+                }
+              >
+                {messages.common.retry}
+              </Button>
+            }
+          />
+        ) : null}
+
+        {status === "success" && !hasProducts ? (
+          <StateCard
+            title={messages.catalog.emptyTitle}
+            description={messages.catalog.emptyDescription}
+          />
+        ) : null}
+
+        {status === "success" && hasProducts ? (
+          <div className="grid grid-cols-2 items-stretch gap-3">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                locale={locale}
+                product={product}
+                addToCartLabel={messages.catalog.addToCart}
+                outOfStockLabel={messages.catalog.outOfStock}
+                inStockLabel={messages.catalog.inStock}
+                detailsLabel={messages.catalog.details}
+                currencyLabel={messages.common.som}
+                onAddToCart={handleAddToCart}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="pointer-events-none fixed inset-0 z-40">
+        {flyItems.map((item) => (
+          <div
+            key={item.id}
+            className="absolute h-6 w-6 overflow-hidden rounded-full border border-white bg-brand-soft shadow-md"
+            style={{
+              left: item.started ? item.endX : item.startX,
+              top: item.started ? item.endY : item.startY,
+              opacity: item.started ? 0.35 : 1,
+              transform: `translate(-50%, -50%) scale(${item.started ? 0.58 : 1})`,
+              transition:
+                "left 620ms cubic-bezier(0.22, 1, 0.36, 1), top 620ms cubic-bezier(0.22, 1, 0.36, 1), transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease",
+              backgroundImage: item.image ? `url(${item.image})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

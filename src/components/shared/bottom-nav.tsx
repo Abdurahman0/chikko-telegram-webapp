@@ -4,13 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
+import { useCartStore } from "@/store/cart-store";
 
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
   const { messages } = useI18n();
+  const cartItems = useCartStore((state) => state.items);
+  const cartQuantity = Object.values(cartItems).reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
   const items = [
     { href: `/${locale}/catalog`, label: messages.nav.catalog },
-    { href: `/${locale}/cart`, label: messages.nav.cart },
+    { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true },
     { href: `/${locale}/orders`, label: messages.nav.orders },
     { href: `/${locale}/profile`, label: messages.nav.profile },
   ];
@@ -25,11 +31,16 @@ export function BottomNav({ locale }: { locale: string }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-xl px-3 py-2 text-xs font-semibold",
+                "relative rounded-xl px-3 py-2 text-xs font-semibold",
                 active ? "bg-brand-soft text-brand-strong" : "text-app-muted",
               )}
             >
               {item.label}
+              {item.isCart && cartQuantity > 0 ? (
+                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
+                  {cartQuantity > 99 ? "99+" : cartQuantity}
+                </span>
+              ) : null}
             </Link>
           );
         })}

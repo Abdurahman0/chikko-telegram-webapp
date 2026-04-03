@@ -24,7 +24,7 @@ export function ProductCard({
   inStockLabel: string;
   detailsLabel: string;
   currencyLabel: string;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, sourceElement: HTMLElement | null) => void;
 }) {
   const isOut = typeof product.stock === "number" && product.stock <= 0;
 
@@ -64,7 +64,9 @@ export function ProductCard({
         <Button
           fullWidth
           className="mt-3 h-9 rounded-2xl"
-          onClick={() => onAddToCart(product)}
+          onClick={(event) =>
+            onAddToCart(product, event.currentTarget as HTMLElement)
+          }
           disabled={isOut}
         >
           {addToCartLabel}
