@@ -6,17 +6,23 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCartStore } from "@/store/cart-store";
 
-function NavIcon({ type }: { type: "catalog" | "cart" | "orders" | "profile" }) {
+function NavIcon({
+  type,
+  className,
+}: {
+  type: "catalog" | "cart" | "orders" | "profile";
+  className?: string;
+}) {
   if (type === "catalog") {
     return (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
         <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
       </svg>
     );
   }
   if (type === "cart") {
     return (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
         <path
           d="M3.5 5.5h2.6l1.9 8.2a1.4 1.4 0 0 0 1.4 1.1h7.8a1.4 1.4 0 0 0 1.4-1.1L20.2 8H7.1"
           stroke="currentColor"
@@ -31,7 +37,7 @@ function NavIcon({ type }: { type: "catalog" | "cart" | "orders" | "profile" }) 
   }
   if (type === "orders") {
     return (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
         <path
           d="M7 4h10a2 2 0 0 1 2 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2Z"
           stroke="currentColor"
@@ -43,7 +49,7 @@ function NavIcon({ type }: { type: "catalog" | "cart" | "orders" | "profile" }) 
     );
   }
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
       <path
         d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0"
         stroke="currentColor"
@@ -85,16 +91,18 @@ export function BottomNav({ locale }: { locale: string }) {
                 active ? "bg-brand-soft text-brand-strong" : "text-app-muted",
               )}
             >
-              <NavIcon type={item.icon} />
+              <span className="relative inline-flex items-center justify-center">
+                <NavIcon type={item.icon} className={item.isCart ? "h-5 w-5" : "h-4 w-4"} />
+                {item.isCart && cartQuantity > 0 ? (
+                  <span
+                    key={cartQuantity}
+                    className="animate-cart-pop absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white"
+                  >
+                    {cartQuantity > 99 ? "99+" : cartQuantity}
+                  </span>
+                ) : null}
+              </span>
               <span>{item.label}</span>
-              {item.isCart && cartQuantity > 0 ? (
-                <span
-                  key={cartQuantity}
-                  className="animate-cart-pop absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white"
-                >
-                  {cartQuantity > 99 ? "99+" : cartQuantity}
-                </span>
-              ) : null}
             </Link>
           );
         })}
