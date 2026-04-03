@@ -5,8 +5,10 @@ import type {
   CheckoutData,
   Order,
   OrderItem,
+  OrdersData,
   Payment,
   PaymentMethod,
+  ProfileData,
   Product,
 } from "@/types/telegram-webapp";
 import type { z } from "zod";
@@ -14,6 +16,8 @@ import type {
   bootstrapResponseSchema,
   catalogResponseSchema,
   checkoutResponseSchema,
+  ordersResponseSchema,
+  profileResponseSchema,
   rawOrderSchema,
 } from "@/lib/validators/api-schemas";
 
@@ -21,6 +25,8 @@ type RawBootstrap = z.infer<typeof bootstrapResponseSchema>;
 type RawCatalog = z.infer<typeof catalogResponseSchema>;
 type RawCheckout = z.infer<typeof checkoutResponseSchema>;
 type RawOrder = z.infer<typeof rawOrderSchema>;
+type RawOrders = z.infer<typeof ordersResponseSchema>;
+type RawProfile = z.infer<typeof profileResponseSchema>;
 
 function toNumber(value: unknown, fallback = 0) {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -64,9 +70,9 @@ function adaptOrder(raw: RawOrder): Order {
         : item.product !== undefined
           ? String(item.product)
           : `product-${index + 1}`,
-    name: item.name ?? item.title ?? "Product",
+    name: item.name ?? item.title ?? item.product_name ?? "Product",
     quantity: item.quantity,
-    price: item.price,
+    price: toNumber(item.price ?? item.unit_price ?? item.line_total, 0),
     currency: item.currency ?? raw.currency ?? "UZS",
     image: item.image || item.image_url || null,
   }));
@@ -74,8 +80,11 @@ function adaptOrder(raw: RawOrder): Order {
   return {
     id: String(raw.id),
     status: raw.status,
-    paymentStatus: raw.payment_status ?? raw.paymentStatus,
-    totalAmount: raw.total_amount ?? raw.total ?? raw.amount ?? 0,
+    paymentStatus:
+      raw.payment_status ??
+      raw.paymentStatus ??
+      raw.payments?.[0]?.status,
+    totalAmount: toNumber(raw.total_amount ?? raw.total ?? raw.amount, 0),
     currency: raw.currency ?? "UZS",
     items,
     createdAt: raw.created_at,
@@ -194,5 +203,35 @@ export function adaptCheckoutResponse(raw: RawCheckout): CheckoutData {
   return {
     order: adaptOrder(raw.order),
     payment,
+  };
+}
+
+export function adaptOrdersResponse(raw: RawOrders): OrdersData {
+  return {
+    guestMode: raw.guest_mode ?? false,
+    orders: (raw.orders ?? []).map(adaptOrder),
+  };
+}
+
+export function adaptProfileResponse(raw: RawProfile): ProfileData {
+  return {
+    guestMode: raw.guest_mode ?? false,
+    user: raw.user
+      ? {
+          id: raw.user.telegram_user_id,
+          fullName: raw.user.full_name,
+          username: raw.user.username,
+          languageCode: raw.user.language_code,
+        }
+      : null,
+    customer: raw.customer
+      ? {
+          fullName: raw.customer.full_name,
+          phone: raw.customer.phone,
+          address: raw.customer.address,
+        }
+      : null,
+    activeOrder: raw.active_order ? adaptOrder(raw.active_order) : null,
+    orderHistory: (raw.order_history ?? []).map(adaptOrder),
   };
 }

@@ -90,14 +90,16 @@ export const ruMessages: Messages = {
   },
   orders: {
     title: "Заказы",
-    subtitle: "Статус текущего заказа",
-    activeOrder: "Активный заказ",
+    subtitle: "История и статус заказов",
+    activeOrder: "Последний заказ",
+    historyOrder: "Заказ из истории",
     orderItems: "Товары",
-    noActiveOrder: "Нет активного заказа",
-    noHistoryEndpoint:
-      "Endpoint полной истории заказов пока не доступен.",
-    noHistoryEndpointDetail:
-      "Сейчас отображаются active_order из bootstrap и последний checkout.",
+    noActiveOrder: "Заказов пока нет",
+    noHistoryEndpoint: "Endpoint истории заказов недоступен.",
+    noHistoryEndpointDetail: "Пожалуйста, попробуйте позже.",
+    guestModeTitle: "Гостевой режим",
+    guestModeDescription:
+      "Профиль Telegram пока не привязан, история заказов может быть пустой.",
   },
   profile: {
     title: "Профиль",

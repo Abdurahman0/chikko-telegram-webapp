@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { Button } from "@/components/shared/button";
 import { ProfileSummary } from "@/components/profile/profile-summary";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
@@ -24,6 +25,22 @@ function ProfileScreen() {
   return (
     <div className="space-y-4">
       <SectionHeader title={messages.profile.title} subtitle={messages.profile.subtitle} />
+
+      {profile.status === "loading" ? <StateCard title={messages.common.loading} /> : null}
+
+      {profile.status === "error" ? (
+        <StateCard
+          title={messages.checkout.failed}
+          action={<Button onClick={() => void profile.reload()}>{messages.common.retry}</Button>}
+        />
+      ) : null}
+
+      {profile.guestMode ? (
+        <StateCard
+          title={messages.orders.guestModeTitle}
+          description={messages.orders.guestModeDescription}
+        />
+      ) : null}
 
       <div className="space-y-3">
         <ProfileSummary

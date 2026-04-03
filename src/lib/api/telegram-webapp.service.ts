@@ -2,18 +2,24 @@ import {
   adaptBootstrapResponse,
   adaptCatalogResponse,
   adaptCheckoutResponse,
+  adaptOrdersResponse,
+  adaptProfileResponse,
 } from "@/lib/api/telegram-webapp.adapter";
 import { telegramApiRequest } from "@/lib/api/telegram-api-client";
 import {
   bootstrapResponseSchema,
   catalogResponseSchema,
   checkoutResponseSchema,
+  ordersResponseSchema,
+  profileResponseSchema,
 } from "@/lib/validators/api-schemas";
 import type {
   BootstrapData,
   CatalogData,
   CheckoutData,
   CheckoutPayload,
+  OrdersData,
+  ProfileData,
 } from "@/types/telegram-webapp";
 
 export async function getBootstrap(initData: string): Promise<BootstrapData> {
@@ -60,4 +66,24 @@ export async function checkout(
     schema: checkoutResponseSchema,
   });
   return adaptCheckoutResponse(raw);
+}
+
+export async function getOrders(initData: string): Promise<OrdersData> {
+  const raw = await telegramApiRequest({
+    path: "/api/telegram-webapp/orders/",
+    method: "GET",
+    initData,
+    schema: ordersResponseSchema,
+  });
+  return adaptOrdersResponse(raw);
+}
+
+export async function getProfile(initData: string): Promise<ProfileData> {
+  const raw = await telegramApiRequest({
+    path: "/api/telegram-webapp/profile/",
+    method: "GET",
+    initData,
+    schema: profileResponseSchema,
+  });
+  return adaptProfileResponse(raw);
 }

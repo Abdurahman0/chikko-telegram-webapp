@@ -5,10 +5,13 @@ const rawOrderItemSchema = z
     id: z.union([z.string(), z.number()]).optional(),
     product_id: z.union([z.string(), z.number()]).optional(),
     product: z.union([z.string(), z.number()]).optional(),
+    product_name: z.string().optional(),
     name: z.string().optional(),
     title: z.string().optional(),
     quantity: z.number().int().positive().default(1),
-    price: z.number().nonnegative().default(0),
+    price: z.union([z.number(), z.string()]).optional(),
+    unit_price: z.union([z.number(), z.string()]).optional(),
+    line_total: z.union([z.number(), z.string()]).optional(),
     currency: z.string().default("UZS"),
     image: z.string().url().optional().or(z.literal("")),
     image_url: z.string().url().optional().or(z.literal("")),
@@ -21,11 +24,27 @@ export const rawOrderSchema = z
     status: z.string().optional(),
     payment_status: z.string().optional(),
     paymentStatus: z.string().optional(),
-    total_amount: z.number().optional(),
-    total: z.number().optional(),
-    amount: z.number().optional(),
+    total_amount: z.union([z.number(), z.string()]).optional(),
+    total: z.union([z.number(), z.string()]).optional(),
+    amount: z.union([z.number(), z.string()]).optional(),
     currency: z.string().optional().default("UZS"),
+    contact_name: z.string().optional(),
+    contact_phone: z.string().optional(),
+    shipping_address: z.string().optional(),
     created_at: z.string().optional(),
+    payments: z
+      .array(
+        z
+          .object({
+            id: z.union([z.string(), z.number()]).optional(),
+            amount: z.union([z.number(), z.string()]).optional(),
+            status: z.string().optional(),
+            method: z.string().optional(),
+          })
+          .passthrough(),
+      )
+      .optional()
+      .default([]),
     items: z.array(rawOrderItemSchema).optional().default([]),
   })
   .passthrough();
@@ -136,5 +155,39 @@ export const checkoutResponseSchema = z
         checkout_url: z.string().url().optional(),
       })
       .passthrough(),
+  })
+  .passthrough();
+
+export const ordersResponseSchema = z
+  .object({
+    guest_mode: z.boolean().optional().default(false),
+    orders: z.array(rawOrderSchema).optional().default([]),
+  })
+  .passthrough();
+
+export const profileResponseSchema = z
+  .object({
+    guest_mode: z.boolean().optional().default(false),
+    user: z
+      .object({
+        telegram_user_id: z.union([z.string(), z.number()]).optional(),
+        username: z.string().optional(),
+        full_name: z.string().optional(),
+        language_code: z.string().optional(),
+      })
+      .passthrough()
+      .optional()
+      .nullable(),
+    customer: z
+      .object({
+        full_name: z.string().optional(),
+        phone: z.string().optional(),
+        address: z.string().optional(),
+      })
+      .passthrough()
+      .optional()
+      .nullable(),
+    active_order: rawOrderSchema.optional().nullable(),
+    order_history: z.array(rawOrderSchema).optional().default([]),
   })
   .passthrough();

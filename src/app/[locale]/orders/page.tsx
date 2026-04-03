@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { Button } from "@/components/shared/button";
 import { OrderCard } from "@/components/orders/order-card";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
@@ -19,40 +20,42 @@ export default function OrdersPage() {
 
 function OrdersScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
-  const { primaryOrder, secondaryOrder } = useOrdersData();
+  const { status, orders, guestMode, reload } = useOrdersData();
 
   return (
     <div className="space-y-4">
       <SectionHeader title={messages.orders.title} subtitle={messages.orders.subtitle} />
 
-      <StateCard
-        title={messages.orders.noHistoryEndpoint}
-        description={messages.orders.noHistoryEndpointDetail}
-      />
+      {guestMode ? (
+        <StateCard title={messages.orders.guestModeTitle} description={messages.orders.guestModeDescription} />
+      ) : null}
 
-      {primaryOrder ? (
-        <OrderCard
-          locale={locale}
-          title={messages.orders.activeOrder}
-          order={primaryOrder}
-          orderItemsLabel={messages.orders.orderItems}
-          paymentStatusLabel={messages.success.paymentStatus}
-          currencyLabel={messages.common.som}
-        />
-      ) : (
-        <StateCard title={messages.orders.noActiveOrder} />
-      )}
+      {status === "loading" ? <StateCard title={messages.common.loading} /> : null}
 
-      {secondaryOrder ? (
-        <OrderCard
-          locale={locale}
-          title={messages.success.title}
-          order={secondaryOrder}
-          orderItemsLabel={messages.orders.orderItems}
-          paymentStatusLabel={messages.success.paymentStatus}
-          currencyLabel={messages.common.som}
+      {status === "error" ? (
+        <StateCard
+          title={messages.checkout.failed}
+          action={<Button onClick={() => void reload()}>{messages.common.retry}</Button>}
         />
       ) : null}
+
+      {status === "success" && orders.length === 0 ? (
+        <StateCard title={messages.orders.noActiveOrder} />
+      ) : null}
+
+      {status === "success"
+        ? orders.map((order, index) => (
+        <OrderCard
+          key={order.id}
+          locale={locale}
+          title={index === 0 ? messages.orders.activeOrder : messages.orders.historyOrder}
+          order={order}
+          orderItemsLabel={messages.orders.orderItems}
+          paymentStatusLabel={messages.success.paymentStatus}
+          currencyLabel={messages.common.som}
+        />
+          ))
+        : null}
     </div>
   );
 }

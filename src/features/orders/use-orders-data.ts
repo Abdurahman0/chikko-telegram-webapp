@@ -1,27 +1,30 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useBootstrapStore } from "@/store/bootstrap-store";
-import { useCheckoutStore } from "@/store/checkout-store";
+import { useOrdersStore } from "@/store/orders-store";
 
 export function useOrdersData() {
-  const activeOrder = useBootstrapStore((state) => state.activeOrder);
-  const checkoutResult = useCheckoutStore((state) => state.checkoutResult);
+  const initData = useBootstrapStore((state) => state.initData);
+  const hasBootstrapped = useBootstrapStore((state) => state.hasBootstrapped);
+  const loadOrders = useOrdersStore((state) => state.loadOrders);
+  const status = useOrdersStore((state) => state.status);
+  const orders = useOrdersStore((state) => state.orders);
+  const guestMode = useOrdersStore((state) => state.guestMode);
+  const errorCode = useOrdersStore((state) => state.errorCode);
 
-  return useMemo(() => {
-    const lastCheckoutOrder = checkoutResult?.order ?? null;
-    if (activeOrder) {
-      return {
-        primaryOrder: activeOrder,
-        secondaryOrder:
-          lastCheckoutOrder && lastCheckoutOrder.id !== activeOrder.id
-            ? lastCheckoutOrder
-            : null,
-      };
+  useEffect(() => {
+    if (!hasBootstrapped) {
+      return;
     }
-    return {
-      primaryOrder: lastCheckoutOrder,
-      secondaryOrder: null,
-    };
-  }, [activeOrder, checkoutResult]);
+    void loadOrders({ initData });
+  }, [hasBootstrapped, initData, loadOrders]);
+
+  return {
+    status,
+    orders,
+    guestMode,
+    errorCode,
+    reload: () => loadOrders({ initData, force: true }),
+  };
 }

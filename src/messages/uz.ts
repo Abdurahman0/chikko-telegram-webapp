@@ -91,12 +91,16 @@ export const uzMessages: Messages = {
     title: "Buyurtmalar",
     subtitle: "Joriy buyurtma holati",
     activeOrder: "Faol buyurtma",
+    historyOrder: "Buyurtma tarixi",
     orderItems: "Mahsulotlar",
     noActiveOrder: "Faol buyurtma mavjud emas",
     noHistoryEndpoint:
       "To'liq buyurtmalar tarixi endpointi hali mavjud emas.",
     noHistoryEndpointDetail:
       "Hozircha bootstrapdagi active_order va so'nggi checkout natijasi ko'rsatiladi.",
+    guestModeTitle: "Guest rejim",
+    guestModeDescription:
+      "Telegram profilingiz hali bog'lanmagan. Buyurtmalar tarixi bo'sh bo'lishi mumkin.",
   },
   profile: {
     title: "Profil",

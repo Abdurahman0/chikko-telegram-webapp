@@ -88,10 +88,13 @@ export type Messages = {
     title: string;
     subtitle: string;
     activeOrder: string;
+    historyOrder: string;
     orderItems: string;
     noActiveOrder: string;
     noHistoryEndpoint: string;
     noHistoryEndpointDetail: string;
+    guestModeTitle: string;
+    guestModeDescription: string;
   };
   profile: {
     title: string;

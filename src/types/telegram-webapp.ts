@@ -11,6 +11,7 @@ export type TelegramThemeParams = {
 
 export type TelegramUser = {
   id?: number | string;
+  fullName?: string;
   firstName?: string;
   lastName?: string;
   username?: string;
@@ -105,6 +106,19 @@ export type CheckoutPayload = {
 export type CheckoutData = {
   order: Order;
   payment: Payment;
+};
+
+export type OrdersData = {
+  guestMode: boolean;
+  orders: Order[];
+};
+
+export type ProfileData = {
+  guestMode: boolean;
+  user: TelegramUser | null;
+  customer: Customer | null;
+  activeOrder: Order | null;
+  orderHistory: Order[];
 };
 
 export type ApiErrorCode = "forbidden" | "bad_request" | "network" | "unknown";
