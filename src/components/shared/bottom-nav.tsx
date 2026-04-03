@@ -6,6 +6,53 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCartStore } from "@/store/cart-store";
 
+function NavIcon({ type }: { type: "catalog" | "cart" | "orders" | "profile" }) {
+  if (type === "catalog") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (type === "cart") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+        <path
+          d="M4 6h2l1.2 8.4a1.2 1.2 0 0 0 1.2 1h7.6a1.2 1.2 0 0 0 1.2-1L19 8H7.2"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  if (type === "orders") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+        <path
+          d="M7 4h10a2 2 0 0 1 2 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2Z"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+      <path
+        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
   const { messages } = useI18n();
@@ -15,10 +62,10 @@ export function BottomNav({ locale }: { locale: string }) {
     0,
   );
   const items = [
-    { href: `/${locale}/catalog`, label: messages.nav.catalog },
-    { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true },
-    { href: `/${locale}/orders`, label: messages.nav.orders },
-    { href: `/${locale}/profile`, label: messages.nav.profile },
+    { href: `/${locale}/catalog`, label: messages.nav.catalog, icon: "catalog" as const },
+    { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true, icon: "cart" as const },
+    { href: `/${locale}/orders`, label: messages.nav.orders, icon: "orders" as const },
+    { href: `/${locale}/profile`, label: messages.nav.profile, icon: "profile" as const },
   ];
 
   return (
@@ -32,11 +79,12 @@ export function BottomNav({ locale }: { locale: string }) {
               href={item.href}
               data-cart-target={item.isCart ? "true" : undefined}
               className={cn(
-                "relative rounded-xl px-3 py-2 text-xs font-semibold transition-transform",
+                "relative inline-flex min-w-[4rem] flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-[11px] font-semibold transition-transform",
                 active ? "bg-brand-soft text-brand-strong" : "text-app-muted",
               )}
             >
-              {item.label}
+              <NavIcon type={item.icon} />
+              <span>{item.label}</span>
               {item.isCart && cartQuantity > 0 ? (
                 <span
                   key={cartQuantity}

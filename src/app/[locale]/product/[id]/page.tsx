@@ -80,7 +80,30 @@ function ProductScreen({
   const isOut = typeof product.stock === "number" && product.stock <= 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-12">
+      <Link
+        href={`/${locale}/cart`}
+        className="fixed left-4 top-4 z-40 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-strong shadow-soft ring-1 ring-surface-accent"
+        aria-label={messages.nav.cart}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 6h2l1.2 8.4a1.2 1.2 0 0 0 1.2 1h7.6a1.2 1.2 0 0 0 1.2-1L19 8H7.2"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="10" cy="18.5" r="1.2" fill="currentColor" />
+          <circle cx="16" cy="18.5" r="1.2" fill="currentColor" />
+        </svg>
+      </Link>
+
       <SectionHeader title={product.name} subtitle={messages.product.noEndpointNote} />
 
       <div className="rounded-3xl bg-surface p-3 shadow-soft">
