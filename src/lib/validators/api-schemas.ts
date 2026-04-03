@@ -65,24 +65,54 @@ const rawCategorySchema = z
     id: z.union([z.string(), z.number()]),
     name: z.string().optional(),
     title: z.string().optional(),
+    code: z.string().optional(),
   })
   .passthrough();
+
+const rawProductImageSchema = z
+  .union([
+    z.string().url(),
+    z
+      .object({
+        image: z.string().url().optional().or(z.literal("")),
+        image_url: z.string().url().optional().or(z.literal("")),
+      })
+      .passthrough(),
+  ])
+  .optional();
 
 export const rawProductSchema = z
   .object({
     id: z.union([z.string(), z.number()]),
     name: z.string().optional(),
     title: z.string().optional(),
+    sku: z.string().optional(),
     short_description: z.string().optional(),
     description: z.string().optional(),
-    price: z.number(),
+    price: z.union([z.number(), z.string()]),
     currency: z.string().optional().default("UZS"),
     stock: z.number().optional().nullable(),
+    stock_quantity: z.number().optional().nullable(),
+    has_stock: z.boolean().optional(),
     category_id: z.union([z.string(), z.number()]).optional().nullable(),
-    category: z.union([z.string(), z.number()]).optional().nullable(),
+    category: z
+      .union([
+        z.string(),
+        z.number(),
+        z
+          .object({
+            id: z.union([z.string(), z.number()]).optional(),
+            code: z.string().optional(),
+            name: z.string().optional(),
+            title: z.string().optional(),
+          })
+          .passthrough(),
+      ])
+      .optional()
+      .nullable(),
     image: z.string().url().optional().or(z.literal("")),
     image_url: z.string().url().optional().or(z.literal("")),
-    images: z.array(z.string().url()).optional().default([]),
+    images: z.array(rawProductImageSchema).optional().default([]),
   })
   .passthrough();
 

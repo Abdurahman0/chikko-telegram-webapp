@@ -22,6 +22,19 @@ type RawCatalog = z.infer<typeof catalogResponseSchema>;
 type RawCheckout = z.infer<typeof checkoutResponseSchema>;
 type RawOrder = z.infer<typeof rawOrderSchema>;
 
+function toNumber(value: unknown, fallback = 0) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number.parseFloat(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return fallback;
+}
+
 function toPaymentMethod(value: unknown): PaymentMethod | null {
   if (typeof value === "string") {
     const normalized = value.toLowerCase();
@@ -105,27 +118,61 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
   }));
 
   const products: Product[] = raw.products.map((product) => {
+    const imagesFromList = (product.images ?? [])
+      .map((image) => {
+        if (!image) {
+          return null;
+        }
+        if (typeof image === "string") {
+          return image;
+        }
+        return image.image_url || image.image || null;
+      })
+      .filter((value): value is string => Boolean(value));
+
     const gallery = [
-      ...(product.images ?? []),
+      ...imagesFromList,
       ...(product.image ? [product.image] : []),
       ...(product.image_url ? [product.image_url] : []),
-    ].filter(Boolean);
+    ].filter((value): value is string => Boolean(value));
+
+    const categoryFromObject =
+      typeof product.category === "object" && product.category !== null
+        ? product.category
+        : null;
+
+    const categoryId =
+      product.category_id !== undefined && product.category_id !== null
+        ? String(product.category_id)
+        : categoryFromObject?.id !== undefined && categoryFromObject?.id !== null
+          ? String(categoryFromObject.id)
+          : typeof product.category === "string" || typeof product.category === "number"
+            ? String(product.category)
+            : null;
+
+    const stock =
+      product.stock !== undefined && product.stock !== null
+        ? product.stock
+        : product.stock_quantity !== undefined && product.stock_quantity !== null
+          ? product.stock_quantity
+          : product.has_stock === false
+            ? 0
+            : null;
 
     return {
       id: String(product.id),
       name: product.name ?? product.title ?? "Product",
       shortDescription: product.short_description,
       description: product.description,
-      price: product.price,
+      price: toNumber(product.price, 0),
       currency: product.currency ?? "UZS",
-      stock: product.stock,
-      categoryId:
-        product.category_id !== undefined && product.category_id !== null
-          ? String(product.category_id)
-          : product.category !== undefined && product.category !== null
-            ? String(product.category)
-            : null,
-      image: product.image || product.image_url || null,
+      stock,
+      categoryId,
+      categoryName:
+        categoryFromObject?.name ??
+        categoryFromObject?.title ??
+        categories.find((category) => category.id === categoryId)?.name,
+      image: product.image || product.image_url || gallery[0] || null,
       images: gallery,
     };
   });
