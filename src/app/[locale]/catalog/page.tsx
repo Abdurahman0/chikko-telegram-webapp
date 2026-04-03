@@ -102,9 +102,8 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
 
   return (
     <div>
-      <div className="sticky top-0 z-20 space-y-4 bg-app-bg/95 pb-3 backdrop-blur-md">
-        <SectionHeader title={messages.catalog.title} subtitle={messages.catalog.subtitle} />
-
+      <SectionHeader title={messages.catalog.title} subtitle={messages.catalog.subtitle} />
+      <div className="sticky top-0 z-20 bg-app-bg/95 py-3 backdrop-blur-md">
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
