@@ -59,9 +59,10 @@ export async function telegramApiRequest<T>({
 
   let payload: unknown = null;
   try {
-    payload = await response.json();
+    const text = await response.text();
+    payload = text ? JSON.parse(text) : {};
   } catch {
-    payload = null;
+    payload = {};
   }
 
   if (!response.ok) {

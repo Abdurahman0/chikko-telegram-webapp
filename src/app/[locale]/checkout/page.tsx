@@ -140,11 +140,13 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
           placeholder={messages.checkout.address}
         />
         <LocationPickerPlaceholder
+          locale={locale}
           title={messages.checkout.location}
           hint={messages.checkout.locationHint}
           actionLabel={messages.checkout.useCurrentLocation}
           pickedLabel={messages.checkout.locationPicked}
           location={draft.location}
+          onSelectLocation={(nextLocation) => setDraftField("location", nextLocation)}
           onPickLocation={onPickLocation}
         />
         {locationError ? <p className="text-xs text-app-muted">{locationError}</p> : null}

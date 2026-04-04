@@ -197,11 +197,13 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
 }
 
 export function adaptCheckoutResponse(raw: RawCheckout): CheckoutData {
+  const rawPayment = raw.payment ?? {};
+
   const payment: Payment = {
-    method: toPaymentMethod(raw.payment.method ?? raw.payment.payment_method) ?? "payme",
-    status: raw.payment.status,
-    amount: raw.payment.amount,
-    paymentUrl: raw.payment.payment_url ?? raw.payment.checkout_url,
+    method: toPaymentMethod(rawPayment.method ?? rawPayment.payment_method) ?? "payme",
+    status: rawPayment.status,
+    amount: toNumber(rawPayment.amount, 0),
+    paymentUrl: rawPayment.payment_url ?? rawPayment.checkout_url,
   };
 
   return {

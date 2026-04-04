@@ -151,11 +151,13 @@ export const checkoutResponseSchema = z
         method: z.string().optional(),
         payment_method: z.string().optional(),
         status: z.string().optional(),
-        amount: z.number().optional(),
-        payment_url: z.string().url().optional(),
-        checkout_url: z.string().url().optional(),
+        amount: z.union([z.number(), z.string()]).optional(),
+        payment_url: z.string().optional(),
+        checkout_url: z.string().optional(),
       })
-      .passthrough(),
+      .passthrough()
+      .optional()
+      .nullable(),
   })
   .passthrough();
 
