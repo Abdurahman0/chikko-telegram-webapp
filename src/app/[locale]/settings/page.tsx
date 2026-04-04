@@ -5,6 +5,7 @@ import { Button } from "@/components/shared/button";
 import { FloatingBackButton } from "@/components/shared/floating-back-button";
 import { SectionHeader } from "@/components/shared/section-header";
 import { useI18n } from "@/components/shared/locale-provider";
+import { triggerHaptic } from "@/lib/telegram/haptics";
 import { isSupportedLocale, type AppLocale } from "@/lib/i18n/config";
 import { useAppSettingsStore } from "@/store/app-settings-store";
 import { useCartStore } from "@/store/cart-store";
@@ -21,17 +22,13 @@ export default function SettingsPage() {
 
 function SettingsScreen({ locale }: { locale: AppLocale }) {
   const { messages } = useI18n();
-  const notificationsEnabled = useAppSettingsStore((state) => state.notificationsEnabled);
+  const hideOutOfStock = useAppSettingsStore((state) => state.hideOutOfStock);
   const hapticsEnabled = useAppSettingsStore((state) => state.hapticsEnabled);
   const autoPlayPromotions = useAppSettingsStore((state) => state.autoPlayPromotions);
   const compactCards = useAppSettingsStore((state) => state.compactCards);
-  const setNotificationsEnabled = useAppSettingsStore(
-    (state) => state.setNotificationsEnabled,
-  );
+  const setHideOutOfStock = useAppSettingsStore((state) => state.setHideOutOfStock);
   const setHapticsEnabled = useAppSettingsStore((state) => state.setHapticsEnabled);
-  const setAutoPlayPromotions = useAppSettingsStore(
-    (state) => state.setAutoPlayPromotions,
-  );
+  const setAutoPlayPromotions = useAppSettingsStore((state) => state.setAutoPlayPromotions);
   const setCompactCards = useAppSettingsStore((state) => state.setCompactCards);
 
   const cartItems = useCartStore((state) => state.items);
@@ -46,11 +43,11 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
       ? {
           subtitle: "Ilova ishlashini boshqarish",
           preferences: "Ilova sozlamalari",
-          notifications: "Bildirishnomalar",
-          notificationsHint: "Buyurtma holati yangiliklari",
+          hideUnavailable: "Mavjud bo'lmagan mahsulotlarni yashirish",
+          hideUnavailableHint: "Katalogda faqat mavjud mahsulotlar ko'rsatiladi",
           haptics: "Vibratsiya effekti",
-          hapticsHint: "Tugmalar uchun tebranish javobi",
-          promotions: "Promo slider auto-play",
+          hapticsHint: "Telegram ichida bosilganda tebranish javobi",
+          promotions: "Banner slayderini avtomatik aylantirish",
           promotionsHint: "Katalog banneri avtomatik aylansin",
           compactCards: "Ixcham kartalar",
           compactCardsHint: "Katalogda yanada kompakt ko'rinish",
@@ -62,13 +59,13 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           profileHint: "Til, biz haqimizda va kontaktlar Profil sahifasida.",
         }
       : {
-          subtitle: "Управление поведением приложения",
+          subtitle: "Управление работой приложения",
           preferences: "Настройки приложения",
-          notifications: "Уведомления",
-          notificationsHint: "Обновления статуса заказа",
+          hideUnavailable: "Скрывать товары не в наличии",
+          hideUnavailableHint: "В каталоге показываются только доступные товары",
           haptics: "Тактильный отклик",
-          hapticsHint: "Вибро-отклик на действия",
-          promotions: "Автопрокрутка промо",
+          hapticsHint: "Вибро-отклик при нажатиях в Telegram",
+          promotions: "Автопрокрутка баннера",
           promotionsHint: "Автоматическая смена баннера в каталоге",
           compactCards: "Компактные карточки",
           compactCardsHint: "Более плотный вид каталога",
@@ -98,31 +95,43 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
         <p className="px-2 pb-2 pt-1 text-sm font-semibold">{text.preferences}</p>
 
         <SettingToggleRow
-          title={text.notifications}
-          description={text.notificationsHint}
-          checked={notificationsEnabled}
-          onToggle={() => setNotificationsEnabled(!notificationsEnabled)}
+          title={text.hideUnavailable}
+          description={text.hideUnavailableHint}
+          checked={hideOutOfStock}
+          onToggle={() => {
+            triggerHaptic(hapticsEnabled, "selection");
+            setHideOutOfStock(!hideOutOfStock);
+          }}
         />
 
         <SettingToggleRow
           title={text.haptics}
           description={text.hapticsHint}
           checked={hapticsEnabled}
-          onToggle={() => setHapticsEnabled(!hapticsEnabled)}
+          onToggle={() => {
+            triggerHaptic(hapticsEnabled, "selection");
+            setHapticsEnabled(!hapticsEnabled);
+          }}
         />
 
         <SettingToggleRow
           title={text.promotions}
           description={text.promotionsHint}
           checked={autoPlayPromotions}
-          onToggle={() => setAutoPlayPromotions(!autoPlayPromotions)}
+          onToggle={() => {
+            triggerHaptic(hapticsEnabled, "selection");
+            setAutoPlayPromotions(!autoPlayPromotions);
+          }}
         />
 
         <SettingToggleRow
           title={text.compactCards}
           description={text.compactCardsHint}
           checked={compactCards}
-          onToggle={() => setCompactCards(!compactCards)}
+          onToggle={() => {
+            triggerHaptic(hapticsEnabled, "selection");
+            setCompactCards(!compactCards);
+          }}
         />
       </div>
 
@@ -135,12 +144,23 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
             fullWidth
             variant="danger"
             disabled={!hasCartItems}
-            onClick={clearCart}
+            onClick={() => {
+              triggerHaptic(hapticsEnabled, "warning");
+              clearCart();
+            }}
             className="h-10"
           >
             {hasCartItems ? text.clearCart : text.alreadyEmpty}
           </Button>
-          <Button fullWidth variant="soft" onClick={resetCheckoutDraft} className="h-10">
+          <Button
+            fullWidth
+            variant="soft"
+            onClick={() => {
+              triggerHaptic(hapticsEnabled, "light");
+              resetCheckoutDraft();
+            }}
+            className="h-10"
+          >
             {text.resetCheckout}
           </Button>
         </div>

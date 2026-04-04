@@ -16,6 +16,7 @@ import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
 import { useAppSettingsStore } from "@/store/app-settings-store";
+import { triggerHaptic } from "@/lib/telegram/haptics";
 import { isSupportedLocale } from "@/lib/i18n/config";
 
 export default function CatalogPage() {
@@ -53,16 +54,27 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const addItem = useCartStore((state) => state.addItem);
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
+  const hideOutOfStock = useAppSettingsStore((state) => state.hideOutOfStock);
+  const hapticsEnabled = useAppSettingsStore((state) => state.hapticsEnabled);
   const compactCards = useAppSettingsStore((state) => state.compactCards);
   const [flyItems, setFlyItems] = useState<FlyItem[]>([]);
 
-  const hasProducts = useMemo(() => products.length > 0, [products.length]);
+  const visibleProducts = useMemo(
+    () =>
+      hideOutOfStock
+        ? products.filter((product) => product.stock === null || product.stock === undefined || product.stock > 0)
+        : products,
+    [hideOutOfStock, products],
+  );
+
+  const hasProducts = useMemo(() => visibleProducts.length > 0, [visibleProducts.length]);
 
   const handleAddToCart = (
     product: (typeof products)[number],
     sourceElement: HTMLElement | null,
   ) => {
     addItem(product);
+    triggerHaptic(hapticsEnabled, "light");
 
     const cartFooterTarget = document.querySelector(
       '[data-cart-target="true"]',
@@ -158,7 +170,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
 
         {status === "success" && hasProducts ? (
           <div className="grid grid-cols-2 items-stretch gap-3">
-            {products.map((product) => (
+            {visibleProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 locale={locale}
@@ -171,7 +183,10 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                 quantity={cartItems[product.id]?.quantity ?? 0}
                 compact={compactCards}
                 onIncrement={handleAddToCart}
-                onDecrement={decrement}
+                onDecrement={(productId) => {
+                  decrement(productId);
+                  triggerHaptic(hapticsEnabled, "light");
+                }}
               />
             ))}
           </div>

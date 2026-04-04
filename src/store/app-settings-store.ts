@@ -4,11 +4,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type AppSettingsStore = {
-  notificationsEnabled: boolean;
+  hideOutOfStock: boolean;
   hapticsEnabled: boolean;
   autoPlayPromotions: boolean;
   compactCards: boolean;
-  setNotificationsEnabled: (value: boolean) => void;
+  setHideOutOfStock: (value: boolean) => void;
   setHapticsEnabled: (value: boolean) => void;
   setAutoPlayPromotions: (value: boolean) => void;
   setCompactCards: (value: boolean) => void;
@@ -17,11 +17,11 @@ type AppSettingsStore = {
 export const useAppSettingsStore = create<AppSettingsStore>()(
   persist(
     (set) => ({
-      notificationsEnabled: true,
+      hideOutOfStock: false,
       hapticsEnabled: true,
       autoPlayPromotions: true,
       compactCards: false,
-      setNotificationsEnabled: (value) => set({ notificationsEnabled: value }),
+      setHideOutOfStock: (value) => set({ hideOutOfStock: value }),
       setHapticsEnabled: (value) => set({ hapticsEnabled: value }),
       setAutoPlayPromotions: (value) => set({ autoPlayPromotions: value }),
       setCompactCards: (value) => set({ compactCards: value }),

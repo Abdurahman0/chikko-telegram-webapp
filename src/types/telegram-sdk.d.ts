@@ -19,6 +19,11 @@ type TelegramWebApp = {
     button_text_color?: string;
     secondary_bg_color?: string;
   };
+  HapticFeedback?: {
+    impactOccurred: (style: "light" | "medium" | "heavy" | "rigid" | "soft") => void;
+    notificationOccurred: (type: "error" | "success" | "warning") => void;
+    selectionChanged: () => void;
+  };
   ready: () => void;
   expand: () => void;
 };
