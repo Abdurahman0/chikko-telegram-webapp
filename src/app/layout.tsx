@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -20,13 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" className={`${manrope.variable} h-full antialiased`}>
-      <body className="h-full overflow-hidden">
-        <Script
-          src="https://telegram.org/js/telegram-web-app.js"
-          strategy="beforeInteractive"
-        />
-        {children}
-      </body>
+      <body className="h-full overflow-hidden">{children}</body>
     </html>
   );
 }
