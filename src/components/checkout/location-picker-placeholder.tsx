@@ -170,7 +170,15 @@ async function reverseGeocodeToAddress(
   const kinds: Array<"house" | "street" | "locality"> = ["house", "street", "locality"];
   for (const candidate of candidates) {
     for (const kind of kinds) {
-      const result = await ymaps.geocode(candidate, { results: 3, kind });
+      let result: YGeocodeResult | null = null;
+      try {
+        result = await ymaps.geocode(candidate, { results: 3, kind });
+      } catch {
+        result = null;
+      }
+      if (!result) {
+        continue;
+      }
       for (let index = 0; index < 3; index += 1) {
         const text = extractText(result.geoObjects.get(index));
         if (text) {
@@ -233,6 +241,7 @@ export function LocationPickerPlaceholder({
   const onAddressChangeRef = useRef(onAddressChange);
   const lastGeocodedAddressRef = useRef("");
   const reverseRequestIdRef = useRef(0);
+  const skipNextLocationSyncRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
   const [uiDebugLogs, setUiDebugLogs] = useState<string[]>([]);
@@ -315,8 +324,10 @@ export function LocationPickerPlaceholder({
         debugMap(`reverse failed (${source})`, { error, requestId });
         setMapError(true);
         if (mapDebugEnabled) {
+          const errorText =
+            error instanceof Error ? error.message : typeof error === "string" ? error : "unknown";
           setUiDebugLogs((prev) => [
-            `reverse failed (${source}) #${requestId}`,
+            `reverse failed (${source}) #${requestId}: ${errorText}`,
             ...prev,
           ].slice(0, 14));
         }
@@ -377,6 +388,7 @@ export function LocationPickerPlaceholder({
             latitude: coords[0],
             longitude: coords[1],
           });
+          skipNextLocationSyncRef.current = true;
           void resolveAddressAndFill(coords, "map_click");
         });
 
@@ -447,6 +459,10 @@ export function LocationPickerPlaceholder({
 
   useEffect(() => {
     if (!location || !mapRef.current || !isMapReady) {
+      return;
+    }
+    if (skipNextLocationSyncRef.current) {
+      skipNextLocationSyncRef.current = false;
       return;
     }
 
