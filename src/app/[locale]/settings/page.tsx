@@ -164,10 +164,10 @@ function SettingToggleRow({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl px-2 py-2.5">
-      <div>
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl px-2 py-2.5">
+      <div className="max-w-[72%] sm:max-w-[80%]">
         <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-app-muted">{description}</p>
+        <p className="text-xs leading-4 text-app-muted break-words">{description}</p>
       </div>
       <button
         type="button"

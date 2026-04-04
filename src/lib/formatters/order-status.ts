@@ -11,25 +11,26 @@ function fallbackLabel(value?: string | null) {
 }
 
 const orderStatusLabels: Record<string, { uz: string; ru: string }> = {
-  created: { uz: "Qabul qilindi", ru: "РџСЂРёРЅСЏС‚" },
-  pending: { uz: "Kutilmoqda", ru: "РћР¶РёРґР°РµС‚СЃСЏ" },
-  waiting_payment: { uz: "To'lov kutilmoqda", ru: "РћР¶РёРґР°РµС‚ РѕРїР»Р°С‚Сѓ" },
-  processing: { uz: "Jarayonda", ru: "Р’ РѕР±СЂР°Р±РѕС‚РєРµ" },
-  shipped: { uz: "Jo'natildi", ru: "РћС‚РїСЂР°РІР»РµРЅ" },
-  delivered: { uz: "Yetkazildi", ru: "Р”РѕСЃС‚Р°РІР»РµРЅ" },
-  completed: { uz: "Yakunlandi", ru: "Р—Р°РІРµСЂС€РµРЅ" },
-  canceled: { uz: "Bekor qilingan", ru: "РћС‚РјРµРЅРµРЅ" },
-  cancelled: { uz: "Bekor qilingan", ru: "РћС‚РјРµРЅРµРЅ" },
+  created: { uz: "Qabul qilindi", ru: "Принят" },
+  pending: { uz: "Kutilmoqda", ru: "Ожидается" },
+  waiting_payment: { uz: "To'lov kutilmoqda", ru: "Ожидает оплату" },
+  processing: { uz: "Jarayonda", ru: "В обработке" },
+  shipped: { uz: "Jo'natildi", ru: "Отправлен" },
+  delivered: { uz: "Yetkazildi", ru: "Доставлен" },
+  completed: { uz: "Yakunlandi", ru: "Завершен" },
+  paid: { uz: "To'langan", ru: "Оплачен" },
+  canceled: { uz: "Bekor qilingan", ru: "Отменен" },
+  cancelled: { uz: "Bekor qilingan", ru: "Отменен" },
 };
 
 const paymentStatusLabels: Record<string, { uz: string; ru: string }> = {
-  pending: { uz: "Kutilmoqda", ru: "РћР¶РёРґР°РµС‚СЃСЏ" },
-  waiting: { uz: "Kutilmoqda", ru: "РћР¶РёРґР°РµС‚СЃСЏ" },
-  paid: { uz: "To'langan", ru: "РћРїР»Р°С‡РµРЅ" },
-  success: { uz: "Muvaffaqiyatli", ru: "РЈСЃРїРµС€РЅРѕ" },
-  failed: { uz: "Muvaffaqiyatsiz", ru: "РќРµСѓСЃРїРµС€РЅРѕ" },
-  canceled: { uz: "Bekor qilingan", ru: "РћС‚РјРµРЅРµРЅ" },
-  cancelled: { uz: "Bekor qilingan", ru: "РћС‚РјРµРЅРµРЅ" },
+  pending: { uz: "Kutilmoqda", ru: "Ожидается" },
+  waiting: { uz: "Kutilmoqda", ru: "Ожидается" },
+  paid: { uz: "To'langan", ru: "Оплачен" },
+  success: { uz: "Muvaffaqiyatli", ru: "Успешно" },
+  failed: { uz: "Muvaffaqiyatsiz", ru: "Неуспешно" },
+  canceled: { uz: "Bekor qilingan", ru: "Отменен" },
+  cancelled: { uz: "Bekor qilingan", ru: "Отменен" },
 };
 
 export function formatOrderStatus(status: string | undefined, locale: AppLocale) {
@@ -58,7 +59,7 @@ export function formatPaymentStatus(status: string | undefined, locale: AppLocal
 
 export function formatPaymentMethod(method: string | undefined, locale: AppLocale) {
   if (!method) {
-    return locale === "uz" ? "Noma'lum" : "РќРµРёР·РІРµСЃС‚РЅРѕ";
+    return locale === "uz" ? "Noma'lum" : "Неизвестно";
   }
   const normalized = method.toLowerCase();
   if (normalized === "payme") {
