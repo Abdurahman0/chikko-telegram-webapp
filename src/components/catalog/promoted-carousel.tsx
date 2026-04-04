@@ -49,17 +49,24 @@ export function PromotedCarousel({
             <ProductImage
               src={product.image}
               alt={product.name}
-              className="h-52 w-full object-cover"
+              className="h-56 w-full bg-surface-soft object-contain"
             />
           </Link>
         ))}
       </div>
 
       {products.length > 1 ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5">
+        <div className="absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-1.5">
           {products.map((product, dotIndex) => (
-            <span
+            <button
               key={`${product.id}-dot`}
+              type="button"
+              aria-label={`Go to slide ${dotIndex + 1}`}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setIndex(dotIndex);
+              }}
               className={cn(
                 "h-1.5 rounded-full transition-all",
                 dotIndex === safeIndex
