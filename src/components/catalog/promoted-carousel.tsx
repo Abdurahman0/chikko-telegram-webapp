@@ -1,12 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type TouchEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react";
 import { ProductImage } from "@/components/shared/product-image";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Product } from "@/types/telegram-webapp";
 import { cn } from "@/lib/utils/cn";
 import { useAppSettingsStore } from "@/store/app-settings-store";
+
+const SWIPE_THRESHOLD = 45;
+
+function getRealIndex(trackIndex: number, count: number) {
+  if (count <= 1) {
+    return 0;
+  }
+  if (trackIndex === 0) {
+    return count - 1;
+  }
+  if (trackIndex === count + 1) {
+    return 0;
+  }
+  return trackIndex - 1;
+}
 
 export function PromotedCarousel({
   locale,
@@ -16,31 +31,64 @@ export function PromotedCarousel({
   products: Product[];
 }) {
   const autoPlayPromotions = useAppSettingsStore((state) => state.autoPlayPromotions);
-  const [index, setIndex] = useState(0);
+  const count = products.length;
+
+  const [trackIndex, setTrackIndex] = useState(count > 1 ? 1 : 0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
+
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const suppressClickRef = useRef(false);
 
+  const slides = useMemo(() => {
+    if (count <= 1) {
+      return products;
+    }
+    return [products[count - 1], ...products, products[0]];
+  }, [count, products]);
+
+  const activeIndex = useMemo(
+    () => getRealIndex(trackIndex, count),
+    [count, trackIndex],
+  );
+
   useEffect(() => {
-    if (!autoPlayPromotions || products.length <= 1 || isDragging) {
+    const frame = requestAnimationFrame(() => {
+      setTrackIndex(count > 1 ? 1 : 0);
+      setDragOffset(0);
+      setIsDragging(false);
+      setIsAnimating(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [count]);
+
+  useEffect(() => {
+    if (!autoPlayPromotions || count <= 1 || isDragging) {
       return;
     }
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % products.length);
+      setIsAnimating(true);
+      setTrackIndex((prev) => prev + 1);
     }, 3500);
     return () => clearInterval(timer);
-  }, [autoPlayPromotions, isDragging, products.length]);
+  }, [autoPlayPromotions, count, isDragging]);
 
-  if (products.length === 0) {
+  useEffect(() => {
+    if (isAnimating) {
+      return;
+    }
+    const frame = requestAnimationFrame(() => setIsAnimating(true));
+    return () => cancelAnimationFrame(frame);
+  }, [isAnimating]);
+
+  if (count === 0) {
     return null;
   }
 
-  const safeIndex = Math.min(index, products.length - 1);
-
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    if (products.length <= 1) {
+    if (count <= 1) {
       return;
     }
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
@@ -70,25 +118,39 @@ export function PromotedCarousel({
       return;
     }
 
-    const threshold = 45;
+    if (Math.abs(dragOffset) > 8) {
+      suppressClickRef.current = true;
+      setTimeout(() => {
+        suppressClickRef.current = false;
+      }, 80);
+    }
 
-    if (dragOffset < -threshold && safeIndex < products.length - 1) {
-      setIndex((prev) => prev + 1);
-      suppressClickRef.current = true;
-    } else if (dragOffset > threshold && safeIndex > 0) {
-      setIndex((prev) => prev - 1);
-      suppressClickRef.current = true;
+    if (dragOffset <= -SWIPE_THRESHOLD) {
+      setIsAnimating(true);
+      setTrackIndex((prev) => prev + 1);
+    } else if (dragOffset >= SWIPE_THRESHOLD) {
+      setIsAnimating(true);
+      setTrackIndex((prev) => prev - 1);
     }
 
     setIsDragging(false);
     setDragOffset(0);
     touchStartXRef.current = null;
     touchStartYRef.current = null;
+  };
 
-    if (suppressClickRef.current) {
-      setTimeout(() => {
-        suppressClickRef.current = false;
-      }, 60);
+  const handleTransitionEnd = () => {
+    if (count <= 1) {
+      return;
+    }
+    if (trackIndex === 0) {
+      setIsAnimating(false);
+      setTrackIndex(count);
+      return;
+    }
+    if (trackIndex === count + 1) {
+      setIsAnimating(false);
+      setTrackIndex(1);
     }
   };
 
@@ -103,15 +165,16 @@ export function PromotedCarousel({
       <div
         className={cn(
           "flex ease-out",
-          isDragging ? "transition-none" : "transition-transform duration-500",
+          isDragging || !isAnimating ? "transition-none" : "transition-transform duration-500",
         )}
         style={{
-          transform: `translateX(calc(-${safeIndex * 100}% + ${dragOffset}px))`,
+          transform: `translateX(calc(-${trackIndex * 100}% + ${dragOffset}px))`,
         }}
+        onTransitionEnd={handleTransitionEnd}
       >
-        {products.map((product) => (
+        {slides.map((product, idx) => (
           <Link
-            key={product.id}
+            key={`${product.id}-${idx}`}
             href={`/${locale}/product/${product.id}`}
             className="block w-full shrink-0"
             onClick={(event) => {
@@ -129,7 +192,7 @@ export function PromotedCarousel({
         ))}
       </div>
 
-      {products.length > 1 ? (
+      {count > 1 ? (
         <div className="absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-1.5">
           {products.map((product, dotIndex) => (
             <button
@@ -139,13 +202,12 @@ export function PromotedCarousel({
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                setIndex(dotIndex);
+                setIsAnimating(true);
+                setTrackIndex(dotIndex + 1);
               }}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                dotIndex === safeIndex
-                  ? "w-4 bg-white"
-                  : "w-1.5 bg-white/65",
+                dotIndex === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/65",
               )}
             />
           ))}
