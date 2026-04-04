@@ -63,8 +63,6 @@ type YMapsGlobal = {
   ) => Promise<YGeocodeResult>;
 };
 
-type ReverseSource = "map_click" | "location_sync";
-
 function getYMaps() {
   return (window as Window & { ymaps?: YMapsGlobal }).ymaps ?? null;
 }
@@ -84,26 +82,6 @@ function toTuple(coords: number[] | undefined): [number, number] | null {
 function roundCoord(value: number, digits: number) {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
-}
-
-function getMapDebugEnabled() {
-  // Keep UI debug visible by default until location flow is verified on device.
-  // You can hide it temporarily with ?map_debug=0.
-  if (typeof window === "undefined") {
-    return true;
-  }
-  return new URLSearchParams(window.location.search).get("map_debug") !== "0";
-}
-
-function debugMap(message: string, payload?: unknown) {
-  if (!getMapDebugEnabled()) {
-    return;
-  }
-  if (payload === undefined) {
-    console.debug(`[LocationPicker] ${message}`);
-    return;
-  }
-  console.debug(`[LocationPicker] ${message}`, payload);
 }
 
 async function reverseByNominatim(
@@ -244,8 +222,6 @@ export function LocationPickerPlaceholder({
   const skipNextLocationSyncRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
-  const [uiDebugLogs, setUiDebugLogs] = useState<string[]>([]);
-  const mapDebugEnabled = getMapDebugEnabled();
 
   useEffect(() => {
     onSelectLocationRef.current = onSelectLocation;
@@ -260,80 +236,36 @@ export function LocationPickerPlaceholder({
   }, [location]);
 
   const resolveAddressAndFill = useCallback(
-    async (coords: [number, number], source: ReverseSource) => {
+    async (coords: [number, number]) => {
       const ymaps = getYMaps();
       if (!ymaps) {
-        debugMap(`skip reverse geocode: ymaps not ready (${source})`);
-        if (mapDebugEnabled) {
-          setUiDebugLogs((prev) => [
-            `skip reverse geocode: ymaps not ready (${source})`,
-            ...prev,
-          ].slice(0, 14));
-        }
         return;
       }
 
       const requestId = reverseRequestIdRef.current + 1;
       reverseRequestIdRef.current = requestId;
-      debugMap(`reverse start (${source})`, { coords, requestId });
-      if (mapDebugEnabled) {
-        setUiDebugLogs((prev) => [
-          `reverse start (${source}) #${requestId}: ${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`,
-          ...prev,
-        ].slice(0, 14));
-      }
 
       try {
         const address = await reverseGeocodeToAddress(ymaps, coords, locale);
         if (reverseRequestIdRef.current !== requestId) {
-          debugMap(`reverse stale ignored (${source})`, { requestId });
-          if (mapDebugEnabled) {
-            setUiDebugLogs((prev) => [
-              `reverse stale ignored (${source}) #${requestId}`,
-              ...prev,
-            ].slice(0, 14));
-          }
           return;
         }
         if (!address) {
-          debugMap(`reverse empty (${source})`, { coords, requestId });
           const fallbackAddress =
             locale === "ru" ? "Адрес рядом с выбранной точкой" : "Tanlangan nuqta yaqinidagi manzil";
           onAddressChangeRef.current(fallbackAddress);
           lastGeocodedAddressRef.current = fallbackAddress.toLowerCase();
           setMapError(true);
-          if (mapDebugEnabled) {
-            setUiDebugLogs((prev) => [
-              `reverse empty (${source}) #${requestId} -> fallback label`,
-              ...prev,
-            ].slice(0, 14));
-          }
           return;
-        }
-        debugMap(`reverse success (${source})`, { address, requestId });
-        if (mapDebugEnabled) {
-          setUiDebugLogs((prev) => [
-            `reverse success (${source}) #${requestId}: ${address}`,
-            ...prev,
-          ].slice(0, 14));
         }
         onAddressChangeRef.current(address);
         lastGeocodedAddressRef.current = address.toLowerCase();
         setMapError(false);
-      } catch (error) {
-        debugMap(`reverse failed (${source})`, { error, requestId });
+      } catch {
         setMapError(true);
-        if (mapDebugEnabled) {
-          const errorText =
-            error instanceof Error ? error.message : typeof error === "string" ? error : "unknown";
-          setUiDebugLogs((prev) => [
-            `reverse failed (${source}) #${requestId}: ${errorText}`,
-            ...prev,
-          ].slice(0, 14));
-        }
       }
     },
-    [locale, mapDebugEnabled],
+    [locale],
   );
 
   useEffect(() => {
@@ -389,7 +321,7 @@ export function LocationPickerPlaceholder({
             longitude: coords[1],
           });
           skipNextLocationSyncRef.current = true;
-          void resolveAddressAndFill(coords, "map_click");
+          void resolveAddressAndFill(coords);
         });
 
         if (initialLocation) {
@@ -399,18 +331,11 @@ export function LocationPickerPlaceholder({
             { preset: "islands#greenDotIcon" },
           );
           map.geoObjects.add(placemarkRef.current);
-          void resolveAddressAndFill(
-            [initialLocation.latitude, initialLocation.longitude],
-            "location_sync",
-          );
+          void resolveAddressAndFill([initialLocation.latitude, initialLocation.longitude]);
         }
 
         mapRef.current = map;
         setIsMapReady(true);
-        debugMap("map initialized");
-        if (mapDebugEnabled) {
-          setUiDebugLogs((prev) => ["map initialized", ...prev].slice(0, 14));
-        }
       });
     };
 
@@ -455,7 +380,7 @@ export function LocationPickerPlaceholder({
         placemarkRef.current = null;
       }
     };
-  }, [locale, mapDebugEnabled, resolveAddressAndFill]);
+  }, [locale, resolveAddressAndFill]);
 
   useEffect(() => {
     if (!location || !mapRef.current || !isMapReady) {
@@ -486,7 +411,7 @@ export function LocationPickerPlaceholder({
 
     mapRef.current.setCenter(coords, 15, { duration: 250 });
     const timer = window.setTimeout(() => {
-      void resolveAddressAndFill(coords, "location_sync");
+      void resolveAddressAndFill(coords);
     }, 0);
     return () => {
       window.clearTimeout(timer);
@@ -561,19 +486,6 @@ export function LocationPickerPlaceholder({
         </p>
       ) : null}
       {mapError ? <p className="mt-2 text-xs text-danger">{hint}</p> : null}
-      {mapDebugEnabled ? (
-        <div className="mt-2 rounded-xl border border-surface-accent bg-surface p-2">
-          <p className="text-[11px] font-semibold text-app-muted">Map Debug</p>
-          <div className="mt-1 max-h-28 overflow-y-auto pr-1 text-[11px] leading-4 text-app-muted">
-            <p>mapReady={String(isMapReady)}</p>
-            <p>hasYmaps={String(Boolean(getYMaps()))}</p>
-            <p>addressLen={addressValue.trim().length}</p>
-            {uiDebugLogs.map((line, index) => (
-              <p key={`${line}-${index}`}>{line}</p>
-            ))}
-          </div>
-        </div>
-      ) : null}
       <Button variant="soft" className="mt-3" type="button" onClick={onPickLocation}>
         {actionLabel}
       </Button>
