@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/shared/button";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { LocationPoint } from "@/types/telegram-webapp";
@@ -63,6 +63,8 @@ type YMapsGlobal = {
   ) => Promise<YGeocodeResult>;
 };
 
+type ReverseSource = "map_click" | "location_sync";
+
 function getYMaps() {
   return (window as Window & { ymaps?: YMapsGlobal }).ymaps ?? null;
 }
@@ -84,9 +86,49 @@ function roundCoord(value: number, digits: number) {
   return Math.round(value * factor) / factor;
 }
 
+function getMapDebugEnabled() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  return (
+    process.env.NEXT_PUBLIC_MAP_DEBUG === "true" ||
+    new URLSearchParams(window.location.search).get("map_debug") === "1"
+  );
+}
+
+function debugMap(message: string, payload?: unknown) {
+  if (!getMapDebugEnabled()) {
+    return;
+  }
+  if (payload === undefined) {
+    console.debug(`[LocationPicker] ${message}`);
+    return;
+  }
+  console.debug(`[LocationPicker] ${message}`, payload);
+}
+
+async function reverseByNominatim(
+  coords: [number, number],
+  locale: AppLocale,
+): Promise<string> {
+  const lang = locale === "ru" ? "ru" : "uz";
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords[0]}&lon=${coords[1]}&accept-language=${lang}`,
+    { headers: { Accept: "application/json" } },
+  );
+
+  if (!response.ok) {
+    return "";
+  }
+
+  const data = (await response.json()) as { display_name?: string };
+  return (data.display_name ?? "").trim();
+}
+
 async function reverseGeocodeToAddress(
   ymaps: YMapsGlobal,
   coords: [number, number],
+  locale: AppLocale,
 ): Promise<string> {
   const candidates: Array<[number, number]> = [
     coords,
@@ -110,18 +152,26 @@ async function reverseGeocodeToAddress(
     }
   }
 
-  const rounded: [number, number] = [roundCoord(coords[0], 3), roundCoord(coords[1], 3)];
-  const asText = `${rounded[0]}, ${rounded[1]}`;
-  const textLookup = await ymaps.geocode(asText, { results: 3 });
-  for (let index = 0; index < 3; index += 1) {
-    const item = textLookup.geoObjects.get(index);
-    const text = item?.properties.get("text") ?? item?.properties.get("name") ?? "";
-    if (text.trim()) {
-      return text.trim();
+  try {
+    const rounded: [number, number] = [roundCoord(coords[0], 3), roundCoord(coords[1], 3)];
+    const asText = `${rounded[0]}, ${rounded[1]}`;
+    const textLookup = await ymaps.geocode(asText, { results: 3 });
+    for (let index = 0; index < 3; index += 1) {
+      const item = textLookup.geoObjects.get(index);
+      const text = item?.properties.get("text") ?? item?.properties.get("name") ?? "";
+      if (text.trim()) {
+        return text.trim();
+      }
     }
+  } catch {
+    // fallback below
   }
 
-  return "";
+  try {
+    return await reverseByNominatim(coords, locale);
+  } catch {
+    return "";
+  }
 }
 
 export function LocationPickerPlaceholder({
@@ -154,6 +204,8 @@ export function LocationPickerPlaceholder({
   const onSelectLocationRef = useRef(onSelectLocation);
   const onAddressChangeRef = useRef(onAddressChange);
   const lastGeocodedAddressRef = useRef("");
+  const reverseRequestIdRef = useRef(0);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
@@ -167,6 +219,41 @@ export function LocationPickerPlaceholder({
   useEffect(() => {
     initialLocationRef.current = location;
   }, [location]);
+
+  const resolveAddressAndFill = useCallback(
+    async (coords: [number, number], source: ReverseSource) => {
+      const ymaps = getYMaps();
+      if (!ymaps) {
+        debugMap(`skip reverse geocode: ymaps not ready (${source})`);
+        return;
+      }
+
+      const requestId = reverseRequestIdRef.current + 1;
+      reverseRequestIdRef.current = requestId;
+      debugMap(`reverse start (${source})`, { coords, requestId });
+
+      try {
+        const address = await reverseGeocodeToAddress(ymaps, coords, locale);
+        if (reverseRequestIdRef.current !== requestId) {
+          debugMap(`reverse stale ignored (${source})`, { requestId });
+          return;
+        }
+        if (!address) {
+          debugMap(`reverse empty (${source})`, { coords, requestId });
+          setMapError(true);
+          return;
+        }
+        debugMap(`reverse success (${source})`, { address, requestId });
+        onAddressChangeRef.current(address);
+        lastGeocodedAddressRef.current = address.toLowerCase();
+        setMapError(false);
+      } catch (error) {
+        debugMap(`reverse failed (${source})`, { error, requestId });
+        setMapError(true);
+      }
+    },
+    [locale],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -220,18 +307,7 @@ export function LocationPickerPlaceholder({
             latitude: coords[0],
             longitude: coords[1],
           });
-
-          void reverseGeocodeToAddress(ymaps, coords)
-            .then((address) => {
-              if (!address) {
-                return;
-              }
-              onAddressChangeRef.current(address);
-              lastGeocodedAddressRef.current = address.toLowerCase();
-            })
-            .catch(() => {
-              setMapError(true);
-            });
+          void resolveAddressAndFill(coords, "map_click");
         });
 
         if (initialLocation) {
@@ -241,9 +317,15 @@ export function LocationPickerPlaceholder({
             { preset: "islands#greenDotIcon" },
           );
           map.geoObjects.add(placemarkRef.current);
+          void resolveAddressAndFill(
+            [initialLocation.latitude, initialLocation.longitude],
+            "location_sync",
+          );
         }
 
         mapRef.current = map;
+        setIsMapReady(true);
+        debugMap("map initialized");
       });
     };
 
@@ -280,6 +362,7 @@ export function LocationPickerPlaceholder({
 
     return () => {
       cancelled = true;
+      setIsMapReady(false);
       cleanupScriptListeners?.();
       if (mapRef.current) {
         mapRef.current.destroy();
@@ -287,16 +370,18 @@ export function LocationPickerPlaceholder({
         placemarkRef.current = null;
       }
     };
-  }, [locale]);
+  }, [locale, resolveAddressAndFill]);
 
   useEffect(() => {
-    if (!location || !mapRef.current) {
+    if (!location || !mapRef.current || !isMapReady) {
       return;
     }
+
     const ymaps = getYMaps();
     if (!ymaps) {
       return;
     }
+
     const coords: [number, number] = [location.latitude, location.longitude];
 
     if (!placemarkRef.current) {
@@ -309,26 +394,15 @@ export function LocationPickerPlaceholder({
     } else {
       placemarkRef.current.geometry.setCoordinates(coords);
     }
-    mapRef.current.setCenter(coords, 15, { duration: 250 });
 
-    // Keep address input synced when location is changed externally
-    // (e.g. "use current location" button or store hydration).
-    void reverseGeocodeToAddress(ymaps, coords)
-      .then((address) => {
-        if (!address) {
-          return;
-        }
-        const normalized = address.toLowerCase();
-        if (normalized === lastGeocodedAddressRef.current) {
-          return;
-        }
-        onAddressChangeRef.current(address);
-        lastGeocodedAddressRef.current = normalized;
-      })
-      .catch(() => {
-        setMapError(true);
-      });
-  }, [location]);
+    mapRef.current.setCenter(coords, 15, { duration: 250 });
+    const timer = window.setTimeout(() => {
+      void resolveAddressAndFill(coords, "location_sync");
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [isMapReady, location, resolveAddressAndFill]);
 
   useEffect(() => {
     const query = addressValue.trim();
