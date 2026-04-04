@@ -20,8 +20,6 @@ export function useTelegramBootstrap() {
       return;
     }
     let cancelled = false;
-    let attempts = 0;
-    const maxAttempts = 18;
 
     const tryBootstrap = () => {
       if (cancelled) {
@@ -40,21 +38,15 @@ export function useTelegramBootstrap() {
 
       if (initData) {
         void fetchBootstrap();
-        return;
       }
-
-      if (attempts >= maxAttempts) {
-        return;
-      }
-
-      attempts += 1;
-      setTimeout(tryBootstrap, 150);
     };
 
     tryBootstrap();
+    const timer = window.setInterval(tryBootstrap, 1000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
   }, [hasBootstrapped, status, setTelegramContext, fetchBootstrap]);
 

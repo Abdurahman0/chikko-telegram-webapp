@@ -28,9 +28,15 @@ export async function forwardTelegramRequest({
   }
 
   const initData = request.headers.get("x-telegram-init-data") ?? "";
+  const authHeader = request.headers.get("authorization") ?? "";
   const headers = new Headers({
     "X-Telegram-Init-Data": initData,
   });
+  if (authHeader) {
+    headers.set("Authorization", authHeader);
+  } else if (initData) {
+    headers.set("Authorization", `tma ${initData}`);
+  }
   if (body) {
     headers.set("Content-Type", "application/json");
   }

@@ -47,6 +47,9 @@ export async function telegramApiRequest<T>({
     "Content-Type": "application/json",
     "X-Telegram-Init-Data": effectiveInitData,
   });
+  if (effectiveInitData) {
+    headers.set("Authorization", `tma ${effectiveInitData}`);
+  }
 
   let response: Response;
   try {
