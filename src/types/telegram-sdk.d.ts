@@ -15,7 +15,11 @@ type TelegramWebAppChat = {
 
 type TelegramWebApp = {
   initData: string;
+  platform?: string;
+  version?: string;
   initDataUnsafe?: {
+    query_id?: string;
+    start_param?: string;
     user?: TelegramWebAppUser;
     chat?: TelegramWebAppChat;
     receiver?: TelegramWebAppChat;
