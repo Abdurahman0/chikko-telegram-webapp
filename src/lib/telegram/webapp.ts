@@ -133,7 +133,9 @@ export function initializeTelegramWebApp() {
   }
   webApp.ready();
   webApp.expand();
-  applyTelegramTheme(webApp.themeParams ?? {});
+  if (process.env.NEXT_PUBLIC_ENABLE_TELEGRAM_THEME === "true") {
+    applyTelegramTheme(webApp.themeParams ?? {});
+  }
   return webApp;
 }
 
@@ -258,6 +260,12 @@ export type TelegramDebugSnapshot = {
   hasWebAppObject: boolean;
   initDataLength: number;
   initDataSource: "webapp" | "url" | "cache" | "none";
+  platform: string;
+  version: string;
+  hasQueryId: boolean;
+  hasUser: boolean;
+  hasChat: boolean;
+  startParam: string;
   search: string;
   hash: string;
 };
@@ -270,6 +278,12 @@ export function getTelegramDebugSnapshot(): TelegramDebugSnapshot {
       hasWebAppObject: false,
       initDataLength: 0,
       initDataSource: "none",
+      platform: "",
+      version: "",
+      hasQueryId: false,
+      hasUser: false,
+      hasChat: false,
+      startParam: "",
       search: "",
       hash: "",
     };
@@ -301,6 +315,12 @@ export function getTelegramDebugSnapshot(): TelegramDebugSnapshot {
     hasWebAppObject: Boolean(webApp),
     initDataLength: activeValue.length,
     initDataSource: source,
+    platform: webApp?.platform ?? "",
+    version: webApp?.version ?? "",
+    hasQueryId: Boolean(webApp?.initDataUnsafe?.query_id),
+    hasUser: Boolean(webApp?.initDataUnsafe?.user?.id),
+    hasChat: Boolean(webApp?.initDataUnsafe?.chat?.id),
+    startParam: webApp?.initDataUnsafe?.start_param ?? "",
     search: window.location.search,
     hash: window.location.hash,
   };

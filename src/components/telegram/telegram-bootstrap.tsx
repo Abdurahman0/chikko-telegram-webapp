@@ -48,6 +48,12 @@ export function TelegramBootstrap() {
         <p>hasWebApp={String(debug.hasWebAppObject)}</p>
         <p>initDataSource={debug.initDataSource}</p>
         <p>initDataLen={debug.initDataLength}</p>
+        <p>platform={debug.platform || "-"}</p>
+        <p>version={debug.version || "-"}</p>
+        <p>hasQueryId={String(debug.hasQueryId)}</p>
+        <p>hasUser={String(debug.hasUser)}</p>
+        <p>hasChat={String(debug.hasChat)}</p>
+        <p>startParam={debug.startParam || "-"}</p>
         <p>storeInitDataLen={initDataInStore.length}</p>
         <p>search={debug.search || "-"}</p>
         <p>hash={debug.hash || "-"}</p>
