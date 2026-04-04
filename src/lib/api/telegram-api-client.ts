@@ -24,6 +24,17 @@ function mapStatusCodeToErrorCode(status: number): ApiErrorCode {
   return "unknown";
 }
 
+function withChatId(path: string, chatId: string) {
+  if (!chatId || !path.startsWith("/api/telegram-webapp/")) {
+    return path;
+  }
+  const url = new URL(path, "http://local");
+  if (!url.searchParams.get("chat_id")) {
+    url.searchParams.set("chat_id", chatId);
+  }
+  return `${url.pathname}${url.search}`;
+}
+
 export async function telegramApiRequest<T>({
   path,
   method = "GET",
@@ -40,11 +51,12 @@ export async function telegramApiRequest<T>({
   const baseUrl = path.startsWith("/api/telegram-webapp/")
     ? ""
     : process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-  const url = `${baseUrl}${path}`;
   const effectiveInitData =
     initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
   const chatId =
     typeof window !== "undefined" ? getTelegramChatId() : "";
+  const pathWithChat = withChatId(path, chatId);
+  const url = `${baseUrl}${pathWithChat}`;
   const headers = new Headers({
     "Content-Type": "application/json",
     "X-Telegram-Init-Data": effectiveInitData,

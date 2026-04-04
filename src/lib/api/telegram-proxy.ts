@@ -79,8 +79,17 @@ export async function forwardTelegramRequest({
   }
 
   const initData = request.headers.get("x-telegram-init-data") ?? "";
+  const chatIdFromQuery = request.nextUrl.searchParams.get("chat_id") ?? "";
   const chatIdFromHeader = request.headers.get("x-telegram-chat-id") ?? "";
-  const chatId = chatIdFromHeader || extractChatIdFromInitData(initData);
+  const chatId = chatIdFromQuery || chatIdFromHeader || extractChatIdFromInitData(initData);
+
+  if (!chatId) {
+    return NextResponse.json(
+      { detail: "chat_id is required" },
+      { status: 400 },
+    );
+  }
+
   const backendPathWithChat = withChatIdQuery(backendPath, chatId);
 
   let preparedBody = body;
