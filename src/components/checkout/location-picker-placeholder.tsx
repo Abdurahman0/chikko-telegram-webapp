@@ -207,6 +207,8 @@ export function LocationPickerPlaceholder({
   const reverseRequestIdRef = useRef(0);
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const [uiDebugLogs, setUiDebugLogs] = useState<string[]>([]);
+  const mapDebugEnabled = getMapDebugEnabled();
 
   useEffect(() => {
     onSelectLocationRef.current = onSelectLocation;
@@ -225,34 +227,70 @@ export function LocationPickerPlaceholder({
       const ymaps = getYMaps();
       if (!ymaps) {
         debugMap(`skip reverse geocode: ymaps not ready (${source})`);
+        if (mapDebugEnabled) {
+          setUiDebugLogs((prev) => [
+            `skip reverse geocode: ymaps not ready (${source})`,
+            ...prev,
+          ].slice(0, 14));
+        }
         return;
       }
 
       const requestId = reverseRequestIdRef.current + 1;
       reverseRequestIdRef.current = requestId;
       debugMap(`reverse start (${source})`, { coords, requestId });
+      if (mapDebugEnabled) {
+        setUiDebugLogs((prev) => [
+          `reverse start (${source}) #${requestId}: ${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`,
+          ...prev,
+        ].slice(0, 14));
+      }
 
       try {
         const address = await reverseGeocodeToAddress(ymaps, coords, locale);
         if (reverseRequestIdRef.current !== requestId) {
           debugMap(`reverse stale ignored (${source})`, { requestId });
+          if (mapDebugEnabled) {
+            setUiDebugLogs((prev) => [
+              `reverse stale ignored (${source}) #${requestId}`,
+              ...prev,
+            ].slice(0, 14));
+          }
           return;
         }
         if (!address) {
           debugMap(`reverse empty (${source})`, { coords, requestId });
           setMapError(true);
+          if (mapDebugEnabled) {
+            setUiDebugLogs((prev) => [
+              `reverse empty (${source}) #${requestId}`,
+              ...prev,
+            ].slice(0, 14));
+          }
           return;
         }
         debugMap(`reverse success (${source})`, { address, requestId });
+        if (mapDebugEnabled) {
+          setUiDebugLogs((prev) => [
+            `reverse success (${source}) #${requestId}: ${address}`,
+            ...prev,
+          ].slice(0, 14));
+        }
         onAddressChangeRef.current(address);
         lastGeocodedAddressRef.current = address.toLowerCase();
         setMapError(false);
       } catch (error) {
         debugMap(`reverse failed (${source})`, { error, requestId });
         setMapError(true);
+        if (mapDebugEnabled) {
+          setUiDebugLogs((prev) => [
+            `reverse failed (${source}) #${requestId}`,
+            ...prev,
+          ].slice(0, 14));
+        }
       }
     },
-    [locale],
+    [locale, mapDebugEnabled],
   );
 
   useEffect(() => {
@@ -326,6 +364,9 @@ export function LocationPickerPlaceholder({
         mapRef.current = map;
         setIsMapReady(true);
         debugMap("map initialized");
+        if (mapDebugEnabled) {
+          setUiDebugLogs((prev) => ["map initialized", ...prev].slice(0, 14));
+        }
       });
     };
 
@@ -370,7 +411,7 @@ export function LocationPickerPlaceholder({
         placemarkRef.current = null;
       }
     };
-  }, [locale, resolveAddressAndFill]);
+  }, [locale, mapDebugEnabled, resolveAddressAndFill]);
 
   useEffect(() => {
     if (!location || !mapRef.current || !isMapReady) {
@@ -472,6 +513,19 @@ export function LocationPickerPlaceholder({
         </p>
       ) : null}
       {mapError ? <p className="mt-2 text-xs text-danger">{hint}</p> : null}
+      {mapDebugEnabled ? (
+        <div className="mt-2 rounded-xl border border-surface-accent bg-surface p-2">
+          <p className="text-[11px] font-semibold text-app-muted">Map Debug</p>
+          <div className="mt-1 max-h-28 overflow-y-auto pr-1 text-[11px] leading-4 text-app-muted">
+            <p>mapReady={String(isMapReady)}</p>
+            <p>hasYmaps={String(Boolean(getYMaps()))}</p>
+            <p>addressLen={addressValue.trim().length}</p>
+            {uiDebugLogs.map((line, index) => (
+              <p key={`${line}-${index}`}>{line}</p>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <Button variant="soft" className="mt-3" type="button" onClick={onPickLocation}>
         {actionLabel}
       </Button>
