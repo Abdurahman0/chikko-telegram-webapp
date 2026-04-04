@@ -81,6 +81,11 @@ function extractChatIdFromInitData(initData: string) {
     return fromChat;
   }
 
+  const fromReceiver = parseJsonId(params.get("receiver"));
+  if (fromReceiver) {
+    return fromReceiver;
+  }
+
   const fromUser = parseJsonId(params.get("user"));
   if (fromUser) {
     return fromUser;
@@ -162,6 +167,28 @@ export function getTelegramPreferredLocale(): AppLocale {
 
 export function getTelegramChatId() {
   const webApp = getTelegramWebApp();
+  const fromChatId = webApp?.initDataUnsafe?.chat?.id;
+  if (fromChatId !== undefined && fromChatId !== null) {
+    const value = String(fromChatId);
+    try {
+      window.sessionStorage.setItem(TELEGRAM_CHAT_ID_CACHE_KEY, value);
+    } catch {
+      // ignore storage errors
+    }
+    return value;
+  }
+
+  const fromReceiverId = webApp?.initDataUnsafe?.receiver?.id;
+  if (fromReceiverId !== undefined && fromReceiverId !== null) {
+    const value = String(fromReceiverId);
+    try {
+      window.sessionStorage.setItem(TELEGRAM_CHAT_ID_CACHE_KEY, value);
+    } catch {
+      // ignore storage errors
+    }
+    return value;
+  }
+
   const fromUserId = webApp?.initDataUnsafe?.user?.id;
   if (fromUserId !== undefined && fromUserId !== null) {
     const value = String(fromUserId);

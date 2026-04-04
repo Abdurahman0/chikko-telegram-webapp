@@ -69,6 +69,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       if (error instanceof TelegramApiError) {
         set({
           status: "error",
+          lastQueryKey: queryKey,
           loadingQueryKey: null,
           errorCode: error.code,
           errorMessage: error.message,
@@ -77,6 +78,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       }
       set({
         status: "error",
+        lastQueryKey: queryKey,
         loadingQueryKey: null,
         errorCode: "unknown",
         errorMessage: "Unknown error",

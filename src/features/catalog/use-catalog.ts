@@ -9,6 +9,7 @@ const CATALOG_STALE_MS = 2 * 60 * 1000;
 export function useCatalog() {
   const initData = useBootstrapStore((state) => state.initData);
   const hasBootstrapped = useBootstrapStore((state) => state.hasBootstrapped);
+  const bootstrapStatus = useBootstrapStore((state) => state.status);
   const activeCategory = useCatalogStore((state) => state.activeCategory);
   const search = useCatalogStore((state) => state.search);
   const status = useCatalogStore((state) => state.status);
@@ -18,7 +19,7 @@ export function useCatalog() {
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
 
   useEffect(() => {
-    if (!hasBootstrapped) {
+    if (!hasBootstrapped || bootstrapStatus !== "success") {
       return;
     }
 
@@ -29,8 +30,10 @@ export function useCatalog() {
       Date.now() - lastFetchedAt < CATALOG_STALE_MS;
     const isAlreadyLoadingThisQuery =
       status === "loading" && loadingQueryKey === queryKey;
+    const isSameFailedQuery =
+      status === "error" && lastQueryKey === queryKey;
 
-    if (isSameSuccessfulQuery || isAlreadyLoadingThisQuery) {
+    if (isSameSuccessfulQuery || isAlreadyLoadingThisQuery || isSameFailedQuery) {
       return;
     }
 
@@ -49,6 +52,7 @@ export function useCatalog() {
     initData,
     loadCatalog,
     hasBootstrapped,
+    bootstrapStatus,
     status,
     lastQueryKey,
     loadingQueryKey,

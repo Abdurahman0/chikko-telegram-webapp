@@ -6,10 +6,19 @@ type TelegramWebAppUser = {
   language_code?: string;
 };
 
+type TelegramWebAppChat = {
+  id?: number | string;
+  type?: string;
+  title?: string;
+  username?: string;
+};
+
 type TelegramWebApp = {
   initData: string;
   initDataUnsafe?: {
     user?: TelegramWebAppUser;
+    chat?: TelegramWebAppChat;
+    receiver?: TelegramWebAppChat;
   };
   themeParams?: {
     bg_color?: string;
