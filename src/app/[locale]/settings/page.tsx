@@ -5,7 +5,6 @@ import { Button } from "@/components/shared/button";
 import { FloatingBackButton } from "@/components/shared/floating-back-button";
 import { SectionHeader } from "@/components/shared/section-header";
 import { useI18n } from "@/components/shared/locale-provider";
-import { triggerHaptic } from "@/lib/telegram/haptics";
 import { isSupportedLocale, type AppLocale } from "@/lib/i18n/config";
 import { useAppSettingsStore } from "@/store/app-settings-store";
 import { useCartStore } from "@/store/cart-store";
@@ -23,11 +22,11 @@ export default function SettingsPage() {
 function SettingsScreen({ locale }: { locale: AppLocale }) {
   const { messages } = useI18n();
   const hideOutOfStock = useAppSettingsStore((state) => state.hideOutOfStock);
-  const hapticsEnabled = useAppSettingsStore((state) => state.hapticsEnabled);
+  const showStockLabel = useAppSettingsStore((state) => state.showStockLabel);
   const autoPlayPromotions = useAppSettingsStore((state) => state.autoPlayPromotions);
   const compactCards = useAppSettingsStore((state) => state.compactCards);
   const setHideOutOfStock = useAppSettingsStore((state) => state.setHideOutOfStock);
-  const setHapticsEnabled = useAppSettingsStore((state) => state.setHapticsEnabled);
+  const setShowStockLabel = useAppSettingsStore((state) => state.setShowStockLabel);
   const setAutoPlayPromotions = useAppSettingsStore((state) => state.setAutoPlayPromotions);
   const setCompactCards = useAppSettingsStore((state) => state.setCompactCards);
 
@@ -45,8 +44,8 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           preferences: "Ilova sozlamalari",
           hideUnavailable: "Mavjud bo'lmagan mahsulotlarni yashirish",
           hideUnavailableHint: "Katalogda faqat mavjud mahsulotlar ko'rsatiladi",
-          haptics: "Vibratsiya effekti",
-          hapticsHint: "Telegram ichida bosilganda tebranish javobi",
+          stockBadge: "Mavjudlik yozuvini ko'rsatish",
+          stockBadgeHint: "Kartalarda “Mavjud / Sotuvda yo'q” holati chiqadi",
           promotions: "Banner slayderini avtomatik aylantirish",
           promotionsHint: "Katalog banneri avtomatik aylansin",
           compactCards: "Ixcham kartalar",
@@ -54,7 +53,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           dataSection: "Mahalliy ma'lumotlar",
           dataHint: "Qurilmadagi vaqtinchalik holat",
           clearCart: "Savatni tozalash",
-          resetCheckout: "Checkout maydonlarini tozalash",
+          resetCheckout: "Buyurtma formasi maydonlarini tozalash",
           alreadyEmpty: "Savat allaqachon bo'sh",
           profileHint: "Til, biz haqimizda va kontaktlar Profil sahifasida.",
         }
@@ -63,8 +62,8 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           preferences: "Настройки приложения",
           hideUnavailable: "Скрывать товары не в наличии",
           hideUnavailableHint: "В каталоге показываются только доступные товары",
-          haptics: "Тактильный отклик",
-          hapticsHint: "Вибро-отклик при нажатиях в Telegram",
+          stockBadge: "Показывать статус наличия",
+          stockBadgeHint: "На карточках виден статус “В наличии / Нет в наличии”",
           promotions: "Автопрокрутка баннера",
           promotionsHint: "Автоматическая смена баннера в каталоге",
           compactCards: "Компактные карточки",
@@ -72,7 +71,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           dataSection: "Локальные данные",
           dataHint: "Временные данные на этом устройстве",
           clearCart: "Очистить корзину",
-          resetCheckout: "Очистить данные checkout",
+          resetCheckout: "Очистить поля оформления заказа",
           alreadyEmpty: "Корзина уже пустая",
           profileHint: "Язык, о нас и контакты находятся в Профиле.",
         };
@@ -98,40 +97,28 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           title={text.hideUnavailable}
           description={text.hideUnavailableHint}
           checked={hideOutOfStock}
-          onToggle={() => {
-            triggerHaptic(hapticsEnabled, "selection");
-            setHideOutOfStock(!hideOutOfStock);
-          }}
+          onToggle={() => setHideOutOfStock(!hideOutOfStock)}
         />
 
         <SettingToggleRow
-          title={text.haptics}
-          description={text.hapticsHint}
-          checked={hapticsEnabled}
-          onToggle={() => {
-            triggerHaptic(hapticsEnabled, "selection");
-            setHapticsEnabled(!hapticsEnabled);
-          }}
+          title={text.stockBadge}
+          description={text.stockBadgeHint}
+          checked={showStockLabel}
+          onToggle={() => setShowStockLabel(!showStockLabel)}
         />
 
         <SettingToggleRow
           title={text.promotions}
           description={text.promotionsHint}
           checked={autoPlayPromotions}
-          onToggle={() => {
-            triggerHaptic(hapticsEnabled, "selection");
-            setAutoPlayPromotions(!autoPlayPromotions);
-          }}
+          onToggle={() => setAutoPlayPromotions(!autoPlayPromotions)}
         />
 
         <SettingToggleRow
           title={text.compactCards}
           description={text.compactCardsHint}
           checked={compactCards}
-          onToggle={() => {
-            triggerHaptic(hapticsEnabled, "selection");
-            setCompactCards(!compactCards);
-          }}
+          onToggle={() => setCompactCards(!compactCards)}
         />
       </div>
 
@@ -144,10 +131,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
             fullWidth
             variant="danger"
             disabled={!hasCartItems}
-            onClick={() => {
-              triggerHaptic(hapticsEnabled, "warning");
-              clearCart();
-            }}
+            onClick={clearCart}
             className="h-10"
           >
             {hasCartItems ? text.clearCart : text.alreadyEmpty}
@@ -155,10 +139,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
           <Button
             fullWidth
             variant="soft"
-            onClick={() => {
-              triggerHaptic(hapticsEnabled, "light");
-              resetCheckoutDraft();
-            }}
+            onClick={resetCheckoutDraft}
             className="h-10"
           >
             {text.resetCheckout}

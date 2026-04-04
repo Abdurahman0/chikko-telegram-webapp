@@ -9,9 +9,7 @@ import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { formatCurrency } from "@/lib/formatters/currency";
 import { isSupportedLocale } from "@/lib/i18n/config";
-import { triggerHaptic } from "@/lib/telegram/haptics";
 import { useCart } from "@/features/cart/use-cart";
-import { useAppSettingsStore } from "@/store/app-settings-store";
 import { useCartStore } from "@/store/cart-store";
 
 export default function CartPage() {
@@ -30,7 +28,6 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
   const decrement = useCartStore((state) => state.decrement);
   const removeItem = useCartStore((state) => state.removeItem);
   const clear = useCartStore((state) => state.clear);
-  const hapticsEnabled = useAppSettingsStore((state) => state.hapticsEnabled);
 
   return (
     <div className="space-y-4">
@@ -39,13 +36,7 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
         subtitle={messages.cart.subtitle}
         right={
           !isEmpty ? (
-            <Button
-              variant="danger"
-              onClick={() => {
-                triggerHaptic(hapticsEnabled, "warning");
-                clear();
-              }}
-            >
+            <Button variant="danger" onClick={clear}>
               {messages.cart.clear}
             </Button>
           ) : null
@@ -73,18 +64,9 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
               item={item}
               currencyLabel={messages.common.som}
               piecesLabel={messages.common.pieces}
-              onIncrement={() => {
-                increment(item.productId);
-                triggerHaptic(hapticsEnabled, "light");
-              }}
-              onDecrement={() => {
-                decrement(item.productId);
-                triggerHaptic(hapticsEnabled, "light");
-              }}
-              onRemove={() => {
-                removeItem(item.productId);
-                triggerHaptic(hapticsEnabled, "warning");
-              }}
+              onIncrement={() => increment(item.productId)}
+              onDecrement={() => decrement(item.productId)}
+              onRemove={() => removeItem(item.productId)}
             />
           ))}
         </div>

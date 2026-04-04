@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
-import { Button } from "@/components/shared/button";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
 import { LanguageBottomSheet } from "@/components/profile/language-bottom-sheet";
@@ -60,7 +59,15 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
       {profile.status === "error" ? (
         <StateCard
           title={messages.checkout.failed}
-          action={<Button onClick={() => void profile.reload()}>{messages.common.retry}</Button>}
+          action={
+            <button
+              type="button"
+              onClick={() => void profile.reload()}
+              className="inline-flex items-center justify-center rounded-2xl bg-brand px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              {messages.common.retry}
+            </button>
+          }
         />
       ) : null}
 
@@ -81,6 +88,16 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
       </div>
 
       <div className="rounded-3xl bg-surface p-2 shadow-soft">
+        <Link
+          href={`/${locale}/settings`}
+          className="flex items-center justify-between rounded-2xl px-3 py-3 text-left hover:bg-surface-soft"
+        >
+          <span className="text-sm font-medium">{messages.profile.settingsTitle}</span>
+          <span className="text-app-muted">
+            <ChevronRightIcon />
+          </span>
+        </Link>
+
         <button
           type="button"
           onClick={() => setLanguageOpen(true)}
@@ -136,12 +153,6 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
             <FaTelegramPlane className="h-5 w-5" />
           </a>
         </div>
-      </div>
-
-      <div className="rounded-3xl bg-surface p-4 shadow-soft">
-        <Link href={`/${locale}/settings`} className="block">
-          <Button fullWidth>{messages.profile.settingsTitle}</Button>
-        </Link>
       </div>
 
       <LanguageBottomSheet

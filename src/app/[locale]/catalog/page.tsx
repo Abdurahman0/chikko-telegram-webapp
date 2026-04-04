@@ -8,7 +8,6 @@ import { ProductSkeletonGrid } from "@/components/catalog/product-skeleton-grid"
 import { PromotedCarousel } from "@/components/catalog/promoted-carousel";
 import { Button } from "@/components/shared/button";
 import { Input } from "@/components/shared/input";
-import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCatalog } from "@/features/catalog/use-catalog";
@@ -16,7 +15,6 @@ import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
 import { useAppSettingsStore } from "@/store/app-settings-store";
-import { triggerHaptic } from "@/lib/telegram/haptics";
 import { isSupportedLocale } from "@/lib/i18n/config";
 
 export default function CatalogPage() {
@@ -55,7 +53,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
   const hideOutOfStock = useAppSettingsStore((state) => state.hideOutOfStock);
-  const hapticsEnabled = useAppSettingsStore((state) => state.hapticsEnabled);
+  const showStockLabel = useAppSettingsStore((state) => state.showStockLabel);
   const compactCards = useAppSettingsStore((state) => state.compactCards);
   const [flyItems, setFlyItems] = useState<FlyItem[]>([]);
 
@@ -74,7 +72,6 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
     sourceElement: HTMLElement | null,
   ) => {
     addItem(product);
-    triggerHaptic(hapticsEnabled, "light");
 
     const cartFooterTarget = document.querySelector(
       '[data-cart-target="true"]',
@@ -117,12 +114,10 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <div className="-mx-4 -mt-3">
         <PromotedCarousel locale={locale} products={promotedProducts} />
       </div>
-
-      <SectionHeader title={messages.catalog.title} subtitle={messages.catalog.subtitle} />
       <div className="sticky top-0 z-20 bg-app-bg/95 py-3 backdrop-blur-md">
         <Input
           value={search}
@@ -182,11 +177,9 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                 currencyLabel={messages.common.som}
                 quantity={cartItems[product.id]?.quantity ?? 0}
                 compact={compactCards}
+                showStockLabel={showStockLabel}
                 onIncrement={handleAddToCart}
-                onDecrement={(productId) => {
-                  decrement(productId);
-                  triggerHaptic(hapticsEnabled, "light");
-                }}
+                onDecrement={decrement}
               />
             ))}
           </div>

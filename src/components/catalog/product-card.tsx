@@ -18,6 +18,7 @@ export function ProductCard({
   currencyLabel,
   quantity,
   compact,
+  showStockLabel,
   onIncrement,
   onDecrement,
 }: {
@@ -30,6 +31,7 @@ export function ProductCard({
   currencyLabel: string;
   quantity: number;
   compact: boolean;
+  showStockLabel: boolean;
   onIncrement: (product: Product, sourceElement: HTMLElement | null) => void;
   onDecrement: (productId: string) => void;
 }) {
@@ -71,13 +73,17 @@ export function ProductCard({
               {currencyLabel}
             </span>
           </p>
-          <p
-            className={`whitespace-nowrap text-xs font-medium ${
-              isOut ? "text-danger" : "text-brand-strong"
-            }`}
-          >
-            {isOut ? outOfStockLabel : inStockLabel}
-          </p>
+          {showStockLabel ? (
+            <p
+              className={`whitespace-nowrap text-xs font-medium ${
+                isOut ? "text-danger" : "text-brand-strong"
+              }`}
+            >
+              {isOut ? outOfStockLabel : inStockLabel}
+            </p>
+          ) : (
+            <span />
+          )}
         </div>
         {quantity > 0 ? (
           <div className={cn("flex items-center justify-between rounded-2xl bg-brand-soft px-2", compact ? "mt-2 h-8" : "mt-3 h-9")}>
