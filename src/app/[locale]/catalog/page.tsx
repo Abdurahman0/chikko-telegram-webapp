@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { CategoryChips } from "@/components/catalog/category-chips";
 import { ProductCard } from "@/components/catalog/product-card";
 import { ProductSkeletonGrid } from "@/components/catalog/product-skeleton-grid";
+import { PromotedCarousel } from "@/components/catalog/promoted-carousel";
 import { Button } from "@/components/shared/button";
 import { Input } from "@/components/shared/input";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -40,6 +41,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   useCatalog();
   const status = useCatalogStore((state) => state.status);
   const categories = useCatalogStore((state) => state.categories);
+  const promotedProducts = useCatalogStore((state) => state.promotedProducts);
   const products = useCatalogStore((state) => state.products);
   const search = useCatalogStore((state) => state.search);
   const activeCategory = useCatalogStore((state) => state.activeCategory);
@@ -113,6 +115,8 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
       </div>
 
       <div className="space-y-4 pt-2">
+        <PromotedCarousel locale={locale} products={promotedProducts} />
+
         <CategoryChips
           categories={categories}
           activeCategory={activeCategory}

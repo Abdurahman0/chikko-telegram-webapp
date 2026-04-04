@@ -85,6 +85,7 @@ export type BootstrapData = {
 
 export type CatalogData = {
   categories: CatalogCategory[];
+  promotedProducts: Product[];
   products: Product[];
 };
 

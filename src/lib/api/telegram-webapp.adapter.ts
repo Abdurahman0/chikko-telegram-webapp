@@ -126,7 +126,7 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
     name: category.name ?? category.title ?? `Category ${category.id}`,
   }));
 
-  const products: Product[] = raw.products.map((product) => {
+  const adaptProduct = (product: RawCatalog["products"][number]): Product => {
     const imagesFromList = (product.images ?? [])
       .map((image) => {
         if (!image) {
@@ -184,10 +184,14 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
       image: product.image || product.image_url || gallery[0] || null,
       images: gallery,
     };
-  });
+  };
+
+  const promotedProducts: Product[] = (raw.promoted_products ?? []).map(adaptProduct);
+  const products: Product[] = raw.products.map(adaptProduct);
 
   return {
     categories,
+    promotedProducts,
     products,
   };
 }

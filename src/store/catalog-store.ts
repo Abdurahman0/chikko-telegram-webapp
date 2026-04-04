@@ -9,6 +9,7 @@ type CatalogStatus = "idle" | "loading" | "success" | "error";
 
 type CatalogStore = {
   categories: CatalogCategory[];
+  promotedProducts: Product[];
   products: Product[];
   activeCategory: string;
   search: string;
@@ -33,6 +34,7 @@ function createCatalogQueryKey(params: { category?: string; search?: string }) {
 
 export const useCatalogStore = create<CatalogStore>((set) => ({
   categories: [],
+  promotedProducts: [],
   products: [],
   activeCategory: "",
   search: "",
@@ -56,6 +58,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       const data = await getCatalog(initData, { category, search });
       set({
         categories: data.categories,
+        promotedProducts: data.promotedProducts,
         products: data.products,
         status: "success",
         lastQueryKey: queryKey,
