@@ -1,5 +1,6 @@
 import { z, type ZodSchema } from "zod";
 import type { ApiErrorCode } from "@/types/telegram-webapp";
+import { getTelegramChatId, getTelegramInitData } from "@/lib/telegram/webapp";
 
 export class TelegramApiError extends Error {
   status: number;
@@ -40,10 +41,17 @@ export async function telegramApiRequest<T>({
     ? ""
     : process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const url = `${baseUrl}${path}`;
+  const effectiveInitData =
+    initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
+  const chatId =
+    typeof window !== "undefined" ? getTelegramChatId() : "";
   const headers = new Headers({
     "Content-Type": "application/json",
-    "X-Telegram-Init-Data": initData ?? "",
+    "X-Telegram-Init-Data": effectiveInitData,
   });
+  if (chatId) {
+    headers.set("X-Telegram-Chat-Id", chatId);
+  }
 
   let response: Response;
   try {

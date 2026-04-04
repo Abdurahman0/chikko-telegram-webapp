@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { getOrders } from "@/lib/api/telegram-webapp.service";
+import { getTelegramInitData } from "@/lib/telegram/webapp";
 import { TelegramApiError } from "@/lib/api/telegram-api-client";
 import type { Order } from "@/types/telegram-webapp";
 
@@ -46,7 +47,9 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
     });
 
     try {
-      const data = await getOrders(initData);
+      const effectiveInitData =
+        initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
+      const data = await getOrders(effectiveInitData);
       set({
         guestMode: data.guestMode,
         orders: data.orders,

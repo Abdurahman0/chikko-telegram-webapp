@@ -6,12 +6,27 @@ import type { AppLocale } from "@/lib/i18n/config";
 import type { LocationPoint } from "@/types/telegram-webapp";
 
 type YMapClickEvent = {
-  get: (key: "coords") => [number, number];
+  get: (key: "coords") => number[] | undefined;
 };
 
 type YPlacemarkInstance = {
   geometry: {
     setCoordinates: (coords: [number, number]) => void;
+  };
+};
+
+type YGeoObject = {
+  properties: {
+    get: (key: string) => string | undefined;
+  };
+  geometry: {
+    getCoordinates: () => number[] | undefined;
+  };
+};
+
+type YGeocodeResult = {
+  geoObjects: {
+    get: (index: number) => YGeoObject | undefined;
   };
 };
 
@@ -42,10 +57,26 @@ type YMapsGlobal = {
     properties: Record<string, unknown>,
     options: { preset: string },
   ) => YPlacemarkInstance;
+  geocode: (
+    request: string | [number, number],
+    options?: { results?: number },
+  ) => Promise<YGeocodeResult>;
 };
 
 function getYMaps() {
   return (window as Window & { ymaps?: YMapsGlobal }).ymaps ?? null;
+}
+
+function toTuple(coords: number[] | undefined): [number, number] | null {
+  if (!coords || coords.length < 2) {
+    return null;
+  }
+  const first = Number(coords[0]);
+  const second = Number(coords[1]);
+  if (!Number.isFinite(first) || !Number.isFinite(second)) {
+    return null;
+  }
+  return [first, second];
 }
 
 export function LocationPickerPlaceholder({
@@ -55,6 +86,8 @@ export function LocationPickerPlaceholder({
   actionLabel,
   pickedLabel,
   location,
+  addressValue,
+  onAddressChange,
   onSelectLocation,
   onPickLocation,
 }: {
@@ -64,6 +97,8 @@ export function LocationPickerPlaceholder({
   actionLabel: string;
   pickedLabel: string;
   location: LocationPoint | null;
+  addressValue: string;
+  onAddressChange: (value: string) => void;
   onSelectLocation: (location: LocationPoint) => void;
   onPickLocation: () => void;
 }) {
@@ -72,11 +107,17 @@ export function LocationPickerPlaceholder({
   const placemarkRef = useRef<YPlacemarkInstance | null>(null);
   const initialLocationRef = useRef<LocationPoint | null>(location);
   const onSelectLocationRef = useRef(onSelectLocation);
+  const onAddressChangeRef = useRef(onAddressChange);
+  const lastGeocodedAddressRef = useRef("");
   const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
     onSelectLocationRef.current = onSelectLocation;
   }, [onSelectLocation]);
+
+  useEffect(() => {
+    onAddressChangeRef.current = onAddressChange;
+  }, [onAddressChange]);
 
   useEffect(() => {
     initialLocationRef.current = location;
@@ -92,10 +133,7 @@ export function LocationPickerPlaceholder({
       }
 
       ymaps.ready(() => {
-        if (cancelled || !mapContainerRef.current) {
-          return;
-        }
-        if (mapRef.current) {
+        if (cancelled || !mapContainerRef.current || mapRef.current) {
           return;
         }
 
@@ -117,7 +155,7 @@ export function LocationPickerPlaceholder({
         );
 
         map.events.add("click", (event) => {
-          const coords = event.get("coords");
+          const coords = toTuple(event.get("coords"));
           if (!coords) {
             return;
           }
@@ -137,6 +175,20 @@ export function LocationPickerPlaceholder({
             latitude: coords[0],
             longitude: coords[1],
           });
+
+          void ymaps
+            .geocode(coords, { results: 1 })
+            .then((result) => {
+              const first = result.geoObjects.get(0);
+              const text = first?.properties.get("text") ?? first?.properties.get("name");
+              if (text?.trim()) {
+                onAddressChangeRef.current(text);
+                lastGeocodedAddressRef.current = text.trim().toLowerCase();
+              }
+            })
+            .catch(() => {
+              setMapError(true);
+            });
         });
 
         if (initialLocation) {
@@ -198,12 +250,10 @@ export function LocationPickerPlaceholder({
     if (!location || !mapRef.current) {
       return;
     }
-
     const ymaps = getYMaps();
     if (!ymaps) {
       return;
     }
-
     const coords: [number, number] = [location.latitude, location.longitude];
     if (!placemarkRef.current) {
       placemarkRef.current = new ymaps.Placemark(
@@ -218,13 +268,67 @@ export function LocationPickerPlaceholder({
     mapRef.current.setCenter(coords, 15, { duration: 250 });
   }, [location]);
 
+  useEffect(() => {
+    const query = addressValue.trim();
+    if (query.length < 4 || !mapRef.current) {
+      return;
+    }
+
+    const normalized = query.toLowerCase();
+    if (normalized === lastGeocodedAddressRef.current) {
+      return;
+    }
+
+    const ymaps = getYMaps();
+    if (!ymaps) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void ymaps
+        .geocode(query, { results: 1 })
+        .then((result) => {
+          const first = result.geoObjects.get(0);
+          const coords = toTuple(first?.geometry.getCoordinates());
+          if (!coords || !mapRef.current) {
+            return;
+          }
+
+          if (!placemarkRef.current) {
+            placemarkRef.current = new ymaps.Placemark(
+              coords,
+              {},
+              { preset: "islands#greenDotIcon" },
+            );
+            mapRef.current.geoObjects.add(placemarkRef.current);
+          } else {
+            placemarkRef.current.geometry.setCoordinates(coords);
+          }
+
+          mapRef.current.setCenter(coords, 15, { duration: 250 });
+          onSelectLocationRef.current({
+            latitude: coords[0],
+            longitude: coords[1],
+          });
+          lastGeocodedAddressRef.current = normalized;
+        })
+        .catch(() => {
+          setMapError(true);
+        });
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [addressValue]);
+
   return (
     <div className="rounded-2xl bg-surface-soft p-4">
       <p className="text-sm font-semibold">{title}</p>
       <p className="mt-1 text-xs text-app-muted">{hint}</p>
       <div
         ref={mapContainerRef}
-        className="mt-3 h-52 w-full overflow-hidden rounded-2xl border border-surface-accent bg-surface"
+        className="mt-3 h-56 w-full overflow-hidden rounded-2xl border border-surface-accent bg-surface"
       />
       {location ? (
         <p className="mt-2 text-xs text-brand-strong">

@@ -146,6 +146,8 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
           actionLabel={messages.checkout.useCurrentLocation}
           pickedLabel={messages.checkout.locationPicked}
           location={draft.location}
+          addressValue={draft.address}
+          onAddressChange={(nextAddress) => setDraftField("address", nextAddress)}
           onSelectLocation={(nextLocation) => setDraftField("location", nextLocation)}
           onPickLocation={onPickLocation}
         />

@@ -8,6 +8,7 @@ import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useOrdersData } from "@/features/orders/use-orders-data";
 import { isSupportedLocale } from "@/lib/i18n/config";
+import { useBootstrapStore } from "@/store/bootstrap-store";
 
 export default function OrdersPage() {
   const params = useParams<{ locale: string }>();
@@ -21,12 +22,14 @@ export default function OrdersPage() {
 function OrdersScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
   const { status, orders, guestMode, reload } = useOrdersData();
+  const telegramUser = useBootstrapStore((state) => state.telegramUser);
+  const showGuestMode = guestMode && !telegramUser?.id;
 
   return (
     <div className="space-y-4">
       <SectionHeader title={messages.orders.title} subtitle={messages.orders.subtitle} />
 
-      {guestMode ? (
+      {showGuestMode ? (
         <StateCard title={messages.orders.guestModeTitle} description={messages.orders.guestModeDescription} />
       ) : null}
 

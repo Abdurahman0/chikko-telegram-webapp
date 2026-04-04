@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { getProfile } from "@/lib/api/telegram-webapp.service";
+import { getTelegramInitData } from "@/lib/telegram/webapp";
 import { TelegramApiError } from "@/lib/api/telegram-api-client";
 import type { Customer, Order, TelegramUser } from "@/types/telegram-webapp";
 
@@ -52,7 +53,9 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     });
 
     try {
-      const data = await getProfile(initData);
+      const effectiveInitData =
+        initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
+      const data = await getProfile(effectiveInitData);
       set({
         guestMode: data.guestMode,
         user: data.user,

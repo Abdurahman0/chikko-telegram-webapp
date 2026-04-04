@@ -1,6 +1,73 @@
 import { detectLocaleFromLanguageCode, type AppLocale } from "@/lib/i18n/config";
 import type { TelegramThemeParams, TelegramUser } from "@/types/telegram-webapp";
 
+const TELEGRAM_INIT_DATA_CACHE_KEY = "chikko_tg_init_data";
+
+function readInitDataFromUrl() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const sources = [window.location.search];
+  if (window.location.hash.includes("?")) {
+    sources.push(window.location.hash.slice(window.location.hash.indexOf("?")));
+  }
+
+  for (const source of sources) {
+    const params = new URLSearchParams(source.startsWith("?") ? source.slice(1) : source);
+    const value = params.get("tgWebAppData") ?? params.get("telegramInitData");
+    if (value) {
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    }
+  }
+
+  return "";
+}
+
+function extractChatIdFromInitData(initData: string) {
+  if (!initData) {
+    return "";
+  }
+
+  const params = new URLSearchParams(initData);
+  const direct = params.get("chat_id");
+  if (direct) {
+    return direct;
+  }
+
+  const parseJsonId = (value: string | null) => {
+    if (!value) {
+      return "";
+    }
+    try {
+      const parsed = JSON.parse(value) as { id?: string | number };
+      if (parsed?.id !== undefined && parsed?.id !== null) {
+        return String(parsed.id);
+      }
+      return "";
+    } catch {
+      return "";
+    }
+  };
+
+  const fromChat = parseJsonId(params.get("chat"));
+  if (fromChat) {
+    return fromChat;
+  }
+
+  const fromUser = parseJsonId(params.get("user"));
+  if (fromUser) {
+    return fromUser;
+  }
+
+  const chatInstance = params.get("chat_instance");
+  return chatInstance ?? "";
+}
+
 export function getTelegramWebApp() {
   if (typeof window === "undefined") {
     return null;
@@ -21,7 +88,32 @@ export function initializeTelegramWebApp() {
 
 export function getTelegramInitData() {
   const webApp = getTelegramWebApp();
-  return webApp?.initData ?? "";
+  const fromWebApp = webApp?.initData ?? "";
+
+  if (fromWebApp) {
+    try {
+      window.sessionStorage.setItem(TELEGRAM_INIT_DATA_CACHE_KEY, fromWebApp);
+    } catch {
+      // ignore storage errors
+    }
+    return fromWebApp;
+  }
+
+  const fromUrl = readInitDataFromUrl();
+  if (fromUrl) {
+    try {
+      window.sessionStorage.setItem(TELEGRAM_INIT_DATA_CACHE_KEY, fromUrl);
+    } catch {
+      // ignore storage errors
+    }
+    return fromUrl;
+  }
+
+  try {
+    return window.sessionStorage.getItem(TELEGRAM_INIT_DATA_CACHE_KEY) ?? "";
+  } catch {
+    return "";
+  }
 }
 
 export function getTelegramUser(): TelegramUser | null {
@@ -44,6 +136,17 @@ export function getTelegramLanguageCode() {
 
 export function getTelegramPreferredLocale(): AppLocale {
   return detectLocaleFromLanguageCode(getTelegramLanguageCode());
+}
+
+export function getTelegramChatId() {
+  const webApp = getTelegramWebApp();
+  const fromUserId = webApp?.initDataUnsafe?.user?.id;
+  if (fromUserId !== undefined && fromUserId !== null) {
+    return String(fromUserId);
+  }
+
+  const initData = getTelegramInitData();
+  return extractChatIdFromInitData(initData);
 }
 
 export function applyTelegramTheme(theme: TelegramThemeParams) {

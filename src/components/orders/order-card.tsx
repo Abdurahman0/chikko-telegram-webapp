@@ -1,4 +1,5 @@
 import { formatCurrency } from "@/lib/formatters/currency";
+import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-status";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Order } from "@/types/telegram-webapp";
 
@@ -25,7 +26,7 @@ export function OrderCard({
           <p className="mt-1 text-xs text-app-muted">#{order.id}</p>
         </div>
         <div className="rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand-strong">
-          {order.status ?? "new"}
+          {formatOrderStatus(order.status, locale) || "New"}
         </div>
       </div>
       <p className="mt-3 text-sm font-bold">
@@ -36,7 +37,7 @@ export function OrderCard({
       </p>
       {order.paymentStatus ? (
         <p className="mt-1 text-xs text-app-muted">
-          {paymentStatusLabel}: {order.paymentStatus}
+          {paymentStatusLabel}: {formatPaymentStatus(order.paymentStatus, locale)}
         </p>
       ) : null}
     </div>

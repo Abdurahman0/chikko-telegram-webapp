@@ -19,16 +19,39 @@ export function useTelegramBootstrap() {
     if (hasBootstrapped || status === "loading") {
       return;
     }
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 18;
 
-    const webApp = initializeTelegramWebApp();
-    setTelegramContext({
-      initData: getTelegramInitData(),
-      user: getTelegramUser(),
-      theme: webApp?.themeParams ?? null,
-      languageCode: webApp?.initDataUnsafe?.user?.language_code ?? null,
-    });
+    const tryBootstrap = () => {
+      if (cancelled) {
+        return;
+      }
 
-    void fetchBootstrap();
+      const webApp = initializeTelegramWebApp();
+      const initData = getTelegramInitData();
+
+      setTelegramContext({
+        initData,
+        user: getTelegramUser(),
+        theme: webApp?.themeParams ?? null,
+        languageCode: webApp?.initDataUnsafe?.user?.language_code ?? null,
+      });
+
+      if (initData || attempts >= maxAttempts) {
+        void fetchBootstrap();
+        return;
+      }
+
+      attempts += 1;
+      setTimeout(tryBootstrap, 150);
+    };
+
+    tryBootstrap();
+
+    return () => {
+      cancelled = true;
+    };
   }, [hasBootstrapped, status, setTelegramContext, fetchBootstrap]);
 
   return {

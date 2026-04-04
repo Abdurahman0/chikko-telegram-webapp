@@ -62,7 +62,7 @@ export const uzMessages: Messages = {
     phone: "Telefon",
     address: "Manzil",
     location: "Lokatsiya",
-    locationHint: "Yandex Maps integratsiyasi uchun tayyor blok",
+    locationHint: "Xaritadan nuqta tanlang yoki manzil kiriting",
     useCurrentLocation: "Joriy joylashuvni olish",
     locationPicked: "Lokatsiya tanlandi",
     paymentMethod: "To'lov usuli",
@@ -98,7 +98,7 @@ export const uzMessages: Messages = {
       "To'liq buyurtmalar tarixi endpointi hali mavjud emas.",
     noHistoryEndpointDetail:
       "Hozircha bootstrapdagi active_order va so'nggi checkout natijasi ko'rsatiladi.",
-    guestModeTitle: "Guest rejim",
+    guestModeTitle: "Mehmon rejimi",
     guestModeDescription:
       "Telegram profilingiz hali bog'lanmagan. Buyurtmalar tarixi bo'sh bo'lishi mumkin.",
   },

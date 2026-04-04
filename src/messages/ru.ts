@@ -62,7 +62,7 @@ export const ruMessages: Messages = {
     phone: "Телефон",
     address: "Адрес",
     location: "Локация",
-    locationHint: "Блок готов для интеграции с Yandex Maps",
+    locationHint: "Выберите точку на карте или введите адрес",
     useCurrentLocation: "Использовать текущую геопозицию",
     locationPicked: "Локация выбрана",
     paymentMethod: "Способ оплаты",
