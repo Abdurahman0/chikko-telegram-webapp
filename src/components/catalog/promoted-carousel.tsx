@@ -37,6 +37,7 @@ export function PromotedCarousel({
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
@@ -60,6 +61,7 @@ export function PromotedCarousel({
       setDragOffset(0);
       setIsDragging(false);
       setIsAnimating(true);
+      setIsTransitioning(false);
     });
     return () => cancelAnimationFrame(frame);
   }, [count]);
@@ -69,11 +71,15 @@ export function PromotedCarousel({
       return;
     }
     const timer = setInterval(() => {
+      if (isTransitioning) {
+        return;
+      }
+      setIsTransitioning(true);
       setIsAnimating(true);
       setTrackIndex((prev) => prev + 1);
     }, 3500);
     return () => clearInterval(timer);
-  }, [autoPlayPromotions, count, isDragging]);
+  }, [autoPlayPromotions, count, isDragging, isTransitioning]);
 
   useEffect(() => {
     if (isAnimating) {
@@ -88,7 +94,7 @@ export function PromotedCarousel({
   }
 
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    if (count <= 1) {
+    if (count <= 1 || isTransitioning) {
       return;
     }
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
@@ -126,9 +132,11 @@ export function PromotedCarousel({
     }
 
     if (dragOffset <= -SWIPE_THRESHOLD) {
+      setIsTransitioning(true);
       setIsAnimating(true);
       setTrackIndex((prev) => prev + 1);
     } else if (dragOffset >= SWIPE_THRESHOLD) {
+      setIsTransitioning(true);
       setIsAnimating(true);
       setTrackIndex((prev) => prev - 1);
     }
@@ -141,17 +149,22 @@ export function PromotedCarousel({
 
   const handleTransitionEnd = () => {
     if (count <= 1) {
+      setIsTransitioning(false);
       return;
     }
     if (trackIndex === 0) {
       setIsAnimating(false);
       setTrackIndex(count);
+      setIsTransitioning(false);
       return;
     }
     if (trackIndex === count + 1) {
       setIsAnimating(false);
       setTrackIndex(1);
+      setIsTransitioning(false);
+      return;
     }
+    setIsTransitioning(false);
   };
 
   return (
@@ -202,6 +215,10 @@ export function PromotedCarousel({
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
+                if (isTransitioning) {
+                  return;
+                }
+                setIsTransitioning(true);
                 setIsAnimating(true);
                 setTrackIndex(dotIndex + 1);
               }}
