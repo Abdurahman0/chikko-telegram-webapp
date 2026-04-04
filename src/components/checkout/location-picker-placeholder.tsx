@@ -59,7 +59,7 @@ type YMapsGlobal = {
   ) => YPlacemarkInstance;
   geocode: (
     request: string | [number, number],
-    options?: { results?: number },
+    options?: { results?: number; kind?: "house" | "street" | "locality" },
   ) => Promise<YGeocodeResult>;
 };
 
@@ -87,13 +87,12 @@ function roundCoord(value: number, digits: number) {
 }
 
 function getMapDebugEnabled() {
+  // Keep UI debug visible by default until location flow is verified on device.
+  // You can hide it temporarily with ?map_debug=0.
   if (typeof window === "undefined") {
-    return false;
+    return true;
   }
-  return (
-    process.env.NEXT_PUBLIC_MAP_DEBUG === "true" ||
-    new URLSearchParams(window.location.search).get("map_debug") === "1"
-  );
+  return new URLSearchParams(window.location.search).get("map_debug") !== "0";
 }
 
 function debugMap(message: string, payload?: unknown) {
@@ -130,24 +129,53 @@ async function reverseGeocodeToAddress(
   coords: [number, number],
   locale: AppLocale,
 ): Promise<string> {
+  const extractText = (item: YGeoObject | undefined) => {
+    const fromProps =
+      item?.properties.get("text") ??
+      item?.properties.get("name") ??
+      item?.properties.get("description") ??
+      item?.properties.get("metaDataProperty.GeocoderMetaData.text") ??
+      "";
+
+    if (fromProps.trim()) {
+      return fromProps.trim();
+    }
+
+    const metaRaw = item?.properties.get("metaDataProperty");
+    if (metaRaw) {
+      const meta = metaRaw as unknown as {
+        GeocoderMetaData?: {
+          Address?: {
+            formatted?: string;
+          };
+          text?: string;
+        };
+      };
+      const formatted =
+        meta?.GeocoderMetaData?.Address?.formatted ?? meta?.GeocoderMetaData?.text ?? "";
+      if (formatted.trim()) {
+        return formatted.trim();
+      }
+    }
+
+    return "";
+  };
+
   const candidates: Array<[number, number]> = [
     coords,
     [roundCoord(coords[0], 4), roundCoord(coords[1], 4)],
     [roundCoord(coords[0], 3), roundCoord(coords[1], 3)],
   ];
 
+  const kinds: Array<"house" | "street" | "locality"> = ["house", "street", "locality"];
   for (const candidate of candidates) {
-    const result = await ymaps.geocode(candidate, { results: 3 });
-    for (let index = 0; index < 3; index += 1) {
-      const item = result.geoObjects.get(index);
-      const text =
-        item?.properties.get("text") ??
-        item?.properties.get("name") ??
-        item?.properties.get("description") ??
-        item?.properties.get("metaDataProperty.GeocoderMetaData.text") ??
-        "";
-      if (text.trim()) {
-        return text.trim();
+    for (const kind of kinds) {
+      const result = await ymaps.geocode(candidate, { results: 3, kind });
+      for (let index = 0; index < 3; index += 1) {
+        const text = extractText(result.geoObjects.get(index));
+        if (text) {
+          return text;
+        }
       }
     }
   }
@@ -158,9 +186,9 @@ async function reverseGeocodeToAddress(
     const textLookup = await ymaps.geocode(asText, { results: 3 });
     for (let index = 0; index < 3; index += 1) {
       const item = textLookup.geoObjects.get(index);
-      const text = item?.properties.get("text") ?? item?.properties.get("name") ?? "";
-      if (text.trim()) {
-        return text.trim();
+      const text = extractText(item);
+      if (text) {
+        return text;
       }
     }
   } catch {
@@ -260,10 +288,14 @@ export function LocationPickerPlaceholder({
         }
         if (!address) {
           debugMap(`reverse empty (${source})`, { coords, requestId });
+          const fallbackAddress =
+            locale === "ru" ? "Адрес рядом с выбранной точкой" : "Tanlangan nuqta yaqinidagi manzil";
+          onAddressChangeRef.current(fallbackAddress);
+          lastGeocodedAddressRef.current = fallbackAddress.toLowerCase();
           setMapError(true);
           if (mapDebugEnabled) {
             setUiDebugLogs((prev) => [
-              `reverse empty (${source}) #${requestId}`,
+              `reverse empty (${source}) #${requestId} -> fallback label`,
               ...prev,
             ].slice(0, 14));
           }
