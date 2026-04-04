@@ -85,7 +85,12 @@ async function reverseGeocodeToAddress(
 ): Promise<string> {
   const result = await ymaps.geocode(coords, { results: 1 });
   const first = result.geoObjects.get(0);
-  const text = first?.properties.get("text") ?? first?.properties.get("name") ?? "";
+  const text =
+    first?.properties.get("text") ??
+    first?.properties.get("name") ??
+    first?.properties.get("description") ??
+    first?.properties.get("metaDataProperty.GeocoderMetaData.text") ??
+    "";
   return text.trim();
 }
 
@@ -119,6 +124,7 @@ export function LocationPickerPlaceholder({
   const onSelectLocationRef = useRef(onSelectLocation);
   const onAddressChangeRef = useRef(onAddressChange);
   const lastGeocodedAddressRef = useRef("");
+  const lastCoordsRef = useRef("");
   const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
@@ -169,6 +175,8 @@ export function LocationPickerPlaceholder({
           if (!coords) {
             return;
           }
+          const coordsText = `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`;
+          lastCoordsRef.current = coordsText;
 
           if (!placemarkRef.current) {
             placemarkRef.current = new ymaps.Placemark(
@@ -185,6 +193,8 @@ export function LocationPickerPlaceholder({
             latitude: coords[0],
             longitude: coords[1],
           });
+          onAddressChangeRef.current(coordsText);
+          lastGeocodedAddressRef.current = coordsText.toLowerCase();
 
           void reverseGeocodeToAddress(ymaps, coords)
             .then((address) => {
@@ -263,6 +273,13 @@ export function LocationPickerPlaceholder({
       return;
     }
     const coords: [number, number] = [location.latitude, location.longitude];
+    const coordsText = `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`;
+    if (coordsText !== lastCoordsRef.current) {
+      onAddressChangeRef.current(coordsText);
+      lastGeocodedAddressRef.current = coordsText.toLowerCase();
+      lastCoordsRef.current = coordsText;
+    }
+
     if (!placemarkRef.current) {
       placemarkRef.current = new ymaps.Placemark(
         coords,
