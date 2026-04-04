@@ -233,6 +233,60 @@ export function getTelegramChatId() {
   }
 }
 
+export type TelegramDebugSnapshot = {
+  hasWindow: boolean;
+  hasTelegramObject: boolean;
+  hasWebAppObject: boolean;
+  initDataLength: number;
+  initDataSource: "webapp" | "url" | "cache" | "none";
+  search: string;
+  hash: string;
+};
+
+export function getTelegramDebugSnapshot(): TelegramDebugSnapshot {
+  if (typeof window === "undefined") {
+    return {
+      hasWindow: false,
+      hasTelegramObject: false,
+      hasWebAppObject: false,
+      initDataLength: 0,
+      initDataSource: "none",
+      search: "",
+      hash: "",
+    };
+  }
+
+  const webApp = window.Telegram?.WebApp;
+  const fromWebApp = webApp?.initData ?? "";
+  const fromUrl = readInitDataFromUrl();
+  let fromCache = "";
+  try {
+    fromCache = window.sessionStorage.getItem(TELEGRAM_INIT_DATA_CACHE_KEY) ?? "";
+  } catch {
+    fromCache = "";
+  }
+
+  const source = fromWebApp
+    ? "webapp"
+    : fromUrl
+      ? "url"
+      : fromCache
+        ? "cache"
+        : "none";
+
+  const activeValue = fromWebApp || fromUrl || fromCache;
+
+  return {
+    hasWindow: true,
+    hasTelegramObject: Boolean(window.Telegram),
+    hasWebAppObject: Boolean(webApp),
+    initDataLength: activeValue.length,
+    initDataSource: source,
+    search: window.location.search,
+    hash: window.location.hash,
+  };
+}
+
 export function applyTelegramTheme(theme: TelegramThemeParams) {
   if (typeof document === "undefined") {
     return;
