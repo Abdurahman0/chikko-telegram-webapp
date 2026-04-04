@@ -79,19 +79,49 @@ function toTuple(coords: number[] | undefined): [number, number] | null {
   return [first, second];
 }
 
+function roundCoord(value: number, digits: number) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
 async function reverseGeocodeToAddress(
   ymaps: YMapsGlobal,
   coords: [number, number],
 ): Promise<string> {
-  const result = await ymaps.geocode(coords, { results: 1 });
-  const first = result.geoObjects.get(0);
-  const text =
-    first?.properties.get("text") ??
-    first?.properties.get("name") ??
-    first?.properties.get("description") ??
-    first?.properties.get("metaDataProperty.GeocoderMetaData.text") ??
-    "";
-  return text.trim();
+  const candidates: Array<[number, number]> = [
+    coords,
+    [roundCoord(coords[0], 4), roundCoord(coords[1], 4)],
+    [roundCoord(coords[0], 3), roundCoord(coords[1], 3)],
+  ];
+
+  for (const candidate of candidates) {
+    const result = await ymaps.geocode(candidate, { results: 3 });
+    for (let index = 0; index < 3; index += 1) {
+      const item = result.geoObjects.get(index);
+      const text =
+        item?.properties.get("text") ??
+        item?.properties.get("name") ??
+        item?.properties.get("description") ??
+        item?.properties.get("metaDataProperty.GeocoderMetaData.text") ??
+        "";
+      if (text.trim()) {
+        return text.trim();
+      }
+    }
+  }
+
+  const rounded: [number, number] = [roundCoord(coords[0], 3), roundCoord(coords[1], 3)];
+  const asText = `${rounded[0]}, ${rounded[1]}`;
+  const textLookup = await ymaps.geocode(asText, { results: 3 });
+  for (let index = 0; index < 3; index += 1) {
+    const item = textLookup.geoObjects.get(index);
+    const text = item?.properties.get("text") ?? item?.properties.get("name") ?? "";
+    if (text.trim()) {
+      return text.trim();
+    }
+  }
+
+  return "";
 }
 
 export function LocationPickerPlaceholder({
