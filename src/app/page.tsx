@@ -13,7 +13,9 @@ export default function RootPage() {
     const locale = detectLocaleFromLanguageCode(
       getTelegramLanguageCode() ?? (typeof navigator !== "undefined" ? navigator.language : undefined),
     );
-    router.replace(`/${locale}/catalog`);
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    router.replace(`/${locale}/catalog${search}${hash}`);
   }, [router]);
 
   return (

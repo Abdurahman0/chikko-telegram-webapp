@@ -10,12 +10,20 @@ function readInitDataFromUrl() {
   }
 
   const sources = [window.location.search];
-  if (window.location.hash.includes("?")) {
-    sources.push(window.location.hash.slice(window.location.hash.indexOf("?")));
+  const rawHash = window.location.hash.startsWith("#")
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+
+  if (rawHash) {
+    if (rawHash.includes("?")) {
+      sources.push(rawHash.slice(rawHash.indexOf("?")));
+    }
+    sources.push(rawHash);
   }
 
   for (const source of sources) {
-    const params = new URLSearchParams(source.startsWith("?") ? source.slice(1) : source);
+    const normalized = source.startsWith("?") ? source.slice(1) : source;
+    const params = new URLSearchParams(normalized);
     const value = params.get("tgWebAppData") ?? params.get("telegramInitData");
     if (value) {
       // URLSearchParams already decodes query params once.
