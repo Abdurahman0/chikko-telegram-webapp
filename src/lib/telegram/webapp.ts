@@ -2,6 +2,7 @@ import { detectLocaleFromLanguageCode, type AppLocale } from "@/lib/i18n/config"
 import type { TelegramThemeParams, TelegramUser } from "@/types/telegram-webapp";
 
 const TELEGRAM_INIT_DATA_CACHE_KEY = "chikko_tg_init_data";
+const TELEGRAM_CHAT_ID_CACHE_KEY = "chikko_tg_chat_id";
 
 function readInitDataFromUrl() {
   if (typeof window === "undefined") {
@@ -22,6 +23,27 @@ function readInitDataFromUrl() {
       } catch {
         return value;
       }
+    }
+  }
+
+  return "";
+}
+
+function readChatIdFromUrl() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const sources = [window.location.search];
+  if (window.location.hash.includes("?")) {
+    sources.push(window.location.hash.slice(window.location.hash.indexOf("?")));
+  }
+
+  for (const source of sources) {
+    const params = new URLSearchParams(source.startsWith("?") ? source.slice(1) : source);
+    const value = params.get("chat_id") ?? params.get("user_id");
+    if (value) {
+      return value;
     }
   }
 
@@ -142,11 +164,41 @@ export function getTelegramChatId() {
   const webApp = getTelegramWebApp();
   const fromUserId = webApp?.initDataUnsafe?.user?.id;
   if (fromUserId !== undefined && fromUserId !== null) {
-    return String(fromUserId);
+    const value = String(fromUserId);
+    try {
+      window.sessionStorage.setItem(TELEGRAM_CHAT_ID_CACHE_KEY, value);
+    } catch {
+      // ignore storage errors
+    }
+    return value;
+  }
+
+  const fromUrl = readChatIdFromUrl();
+  if (fromUrl) {
+    try {
+      window.sessionStorage.setItem(TELEGRAM_CHAT_ID_CACHE_KEY, fromUrl);
+    } catch {
+      // ignore storage errors
+    }
+    return fromUrl;
   }
 
   const initData = getTelegramInitData();
-  return extractChatIdFromInitData(initData);
+  const fromInitData = extractChatIdFromInitData(initData);
+  if (fromInitData) {
+    try {
+      window.sessionStorage.setItem(TELEGRAM_CHAT_ID_CACHE_KEY, fromInitData);
+    } catch {
+      // ignore storage errors
+    }
+    return fromInitData;
+  }
+
+  try {
+    return window.sessionStorage.getItem(TELEGRAM_CHAT_ID_CACHE_KEY) ?? "";
+  } catch {
+    return "";
+  }
 }
 
 export function applyTelegramTheme(theme: TelegramThemeParams) {

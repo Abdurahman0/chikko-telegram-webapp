@@ -80,15 +80,13 @@ export async function forwardTelegramRequest({
 
   const initData = request.headers.get("x-telegram-init-data") ?? "";
   const chatIdFromQuery = request.nextUrl.searchParams.get("chat_id") ?? "";
+  const chatIdFromUserQuery = request.nextUrl.searchParams.get("user_id") ?? "";
   const chatIdFromHeader = request.headers.get("x-telegram-chat-id") ?? "";
-  const chatId = chatIdFromQuery || chatIdFromHeader || extractChatIdFromInitData(initData);
-
-  if (!chatId) {
-    return NextResponse.json(
-      { detail: "chat_id is required" },
-      { status: 400 },
-    );
-  }
+  const chatId =
+    chatIdFromQuery ||
+    chatIdFromUserQuery ||
+    chatIdFromHeader ||
+    extractChatIdFromInitData(initData);
 
   const backendPathWithChat = withChatIdQuery(backendPath, chatId);
 
