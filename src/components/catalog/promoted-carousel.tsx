@@ -6,6 +6,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Product } from "@/types/telegram-webapp";
 import { cn } from "@/lib/utils/cn";
+import { useAppSettingsStore } from "@/store/app-settings-store";
 
 export function PromotedCarousel({
   locale,
@@ -14,17 +15,18 @@ export function PromotedCarousel({
   locale: AppLocale;
   products: Product[];
 }) {
+  const autoPlayPromotions = useAppSettingsStore((state) => state.autoPlayPromotions);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (products.length <= 1) {
+    if (!autoPlayPromotions || products.length <= 1) {
       return;
     }
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % products.length);
     }, 3500);
     return () => clearInterval(timer);
-  }, [products.length]);
+  }, [autoPlayPromotions, products.length]);
 
   if (products.length === 0) {
     return null;

@@ -15,6 +15,7 @@ import { useCatalog } from "@/features/catalog/use-catalog";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
+import { useAppSettingsStore } from "@/store/app-settings-store";
 import { isSupportedLocale } from "@/lib/i18n/config";
 
 export default function CatalogPage() {
@@ -52,6 +53,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const addItem = useCartStore((state) => state.addItem);
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
+  const compactCards = useAppSettingsStore((state) => state.compactCards);
   const [flyItems, setFlyItems] = useState<FlyItem[]>([]);
 
   const hasProducts = useMemo(() => products.length > 0, [products.length]);
@@ -167,6 +169,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                 detailsLabel={messages.catalog.details}
                 currencyLabel={messages.common.som}
                 quantity={cartItems[product.id]?.quantity ?? 0}
+                compact={compactCards}
                 onIncrement={handleAddToCart}
                 onDecrement={decrement}
               />

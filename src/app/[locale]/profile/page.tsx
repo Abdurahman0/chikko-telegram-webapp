@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
 import { Button } from "@/components/shared/button";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
+import { LanguageBottomSheet } from "@/components/profile/language-bottom-sheet";
 import { useI18n } from "@/components/shared/locale-provider";
 import { isSupportedLocale, type AppLocale } from "@/lib/i18n/config";
 import { useProfileDraft } from "@/features/profile/use-profile-draft";
@@ -21,7 +23,10 @@ export default function ProfilePage() {
 
 function ProfileScreen({ locale }: { locale: AppLocale }) {
   const { messages } = useI18n();
+  const router = useRouter();
+  const pathname = usePathname();
   const profile = useProfileDraft();
+  const [languageOpen, setLanguageOpen] = useState(false);
 
   const initials = useMemo(() => {
     const value = profile.fullName || profile.telegramName || "C";
@@ -33,8 +38,21 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
       .join("");
   }, [profile.fullName, profile.telegramName]);
 
+  const languageLabel =
+    locale === "uz" ? messages.profile.uzbek : messages.profile.russian;
+
+  const switchLocale = (nextLocale: AppLocale) => {
+    if (nextLocale === locale) {
+      setLanguageOpen(false);
+      return;
+    }
+    const nextPath = pathname.replace(/^\/(uz|ru)(?=\/|$)/, `/${nextLocale}`);
+    setLanguageOpen(false);
+    router.push(nextPath);
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-1">
       <SectionHeader title={messages.profile.title} subtitle={messages.profile.subtitle} />
 
       {profile.status === "loading" ? <StateCard title={messages.common.loading} /> : null}
@@ -62,11 +80,93 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
         </div>
       </div>
 
+      <div className="rounded-3xl bg-surface p-2 shadow-soft">
+        <button
+          type="button"
+          onClick={() => setLanguageOpen(true)}
+          className="flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left hover:bg-surface-soft"
+        >
+          <span className="text-sm font-medium">{messages.profile.language}</span>
+          <span className="inline-flex items-center gap-2 text-sm text-app-muted">
+            {languageLabel}
+            <ChevronRightIcon />
+          </span>
+        </button>
+
+        <Link
+          href={`/${locale}/about`}
+          className="flex items-center justify-between rounded-2xl px-3 py-3 text-left hover:bg-surface-soft"
+        >
+          <span className="text-sm font-medium">{messages.profile.aboutUs}</span>
+          <span className="text-app-muted">
+            <ChevronRightIcon />
+          </span>
+        </Link>
+
+        <Link
+          href={`/${locale}/about#contacts`}
+          className="flex items-center justify-between rounded-2xl px-3 py-3 text-left hover:bg-surface-soft"
+        >
+          <span className="text-sm font-medium">{messages.profile.contactUs}</span>
+          <span className="text-app-muted">
+            <ChevronRightIcon />
+          </span>
+        </Link>
+      </div>
+
+      <div className="rounded-3xl bg-surface p-4 shadow-soft">
+        <p className="text-sm font-semibold">{messages.about.socialsTitle}</p>
+        <div className="mt-3 flex items-center gap-3">
+          <a
+            href="https://instagram.com/chikko_shop"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#E1306C] text-white shadow-[0_10px_20px_-12px_rgba(225,48,108,0.9)]"
+            aria-label={messages.about.instagram}
+          >
+            <FaInstagram className="h-5 w-5" />
+          </a>
+          <a
+            href="https://t.me/chikko_shop"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#229ED9] text-white shadow-[0_10px_20px_-12px_rgba(34,158,217,0.95)]"
+            aria-label={messages.about.telegram}
+          >
+            <FaTelegramPlane className="h-5 w-5" />
+          </a>
+        </div>
+      </div>
+
       <div className="rounded-3xl bg-surface p-4 shadow-soft">
         <Link href={`/${locale}/settings`} className="block">
           <Button fullWidth>{messages.profile.settingsTitle}</Button>
         </Link>
       </div>
+
+      <LanguageBottomSheet
+        open={languageOpen}
+        locale={locale}
+        title={messages.profile.languageModalTitle}
+        uzbekLabel={messages.profile.uzbek}
+        russianLabel={messages.profile.russian}
+        onClose={() => setLanguageOpen(false)}
+        onSelect={switchLocale}
+      />
     </div>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+      <path
+        d="m7.5 4 5 6-5 6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

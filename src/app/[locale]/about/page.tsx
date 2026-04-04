@@ -53,7 +53,7 @@ function AboutScreen({ locale }: { locale: AppLocale }) {
 
   return (
     <div className="space-y-4 pt-12">
-      <FloatingBackButton href={`/${locale}/settings`} />
+      <FloatingBackButton href={`/${locale}/profile`} />
       <SectionHeader title={messages.about.title} subtitle={messages.about.subtitle} />
 
       <div className="rounded-3xl bg-surface p-5 text-center shadow-soft">
@@ -109,7 +109,7 @@ function AboutScreen({ locale }: { locale: AppLocale }) {
             href="https://instagram.com/chikko_shop"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface-soft text-[#E1306C]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#E1306C] text-white shadow-[0_10px_20px_-12px_rgba(225,48,108,0.9)]"
             aria-label={messages.about.instagram}
           >
             <FaInstagram className="h-6 w-6" />
@@ -118,7 +118,7 @@ function AboutScreen({ locale }: { locale: AppLocale }) {
             href="https://t.me/chikko_shop"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface-soft text-[#229ED9]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#229ED9] text-white shadow-[0_10px_20px_-12px_rgba(34,158,217,0.95)]"
             aria-label={messages.about.telegram}
           >
             <FaTelegramPlane className="h-6 w-6" />
