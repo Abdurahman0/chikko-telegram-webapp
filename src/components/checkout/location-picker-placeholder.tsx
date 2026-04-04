@@ -79,6 +79,16 @@ function toTuple(coords: number[] | undefined): [number, number] | null {
   return [first, second];
 }
 
+async function reverseGeocodeToAddress(
+  ymaps: YMapsGlobal,
+  coords: [number, number],
+): Promise<string> {
+  const result = await ymaps.geocode(coords, { results: 1 });
+  const first = result.geoObjects.get(0);
+  const text = first?.properties.get("text") ?? first?.properties.get("name") ?? "";
+  return text.trim();
+}
+
 export function LocationPickerPlaceholder({
   locale,
   title,
@@ -176,15 +186,13 @@ export function LocationPickerPlaceholder({
             longitude: coords[1],
           });
 
-          void ymaps
-            .geocode(coords, { results: 1 })
-            .then((result) => {
-              const first = result.geoObjects.get(0);
-              const text = first?.properties.get("text") ?? first?.properties.get("name");
-              if (text?.trim()) {
-                onAddressChangeRef.current(text);
-                lastGeocodedAddressRef.current = text.trim().toLowerCase();
+          void reverseGeocodeToAddress(ymaps, coords)
+            .then((address) => {
+              if (!address) {
+                return;
               }
+              onAddressChangeRef.current(address);
+              lastGeocodedAddressRef.current = address.toLowerCase();
             })
             .catch(() => {
               setMapError(true);
@@ -266,6 +274,24 @@ export function LocationPickerPlaceholder({
       placemarkRef.current.geometry.setCoordinates(coords);
     }
     mapRef.current.setCenter(coords, 15, { duration: 250 });
+
+    // Keep address input synced when location is changed externally
+    // (e.g. "use current location" button or store hydration).
+    void reverseGeocodeToAddress(ymaps, coords)
+      .then((address) => {
+        if (!address) {
+          return;
+        }
+        const normalized = address.toLowerCase();
+        if (normalized === lastGeocodedAddressRef.current) {
+          return;
+        }
+        onAddressChangeRef.current(address);
+        lastGeocodedAddressRef.current = normalized;
+      })
+      .catch(() => {
+        setMapError(true);
+      });
   }, [location]);
 
   useEffect(() => {
