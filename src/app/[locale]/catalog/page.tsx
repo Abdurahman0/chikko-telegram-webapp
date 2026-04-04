@@ -104,6 +104,10 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
 
   return (
     <div>
+      <div className="-mx-4 -mt-3">
+        <PromotedCarousel locale={locale} products={promotedProducts} />
+      </div>
+
       <SectionHeader title={messages.catalog.title} subtitle={messages.catalog.subtitle} />
       <div className="sticky top-0 z-20 bg-app-bg/95 py-3 backdrop-blur-md">
         <Input
@@ -115,8 +119,6 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
       </div>
 
       <div className="space-y-4 pt-2">
-        <PromotedCarousel locale={locale} products={promotedProducts} />
-
         <CategoryChips
           categories={categories}
           activeCategory={activeCategory}
