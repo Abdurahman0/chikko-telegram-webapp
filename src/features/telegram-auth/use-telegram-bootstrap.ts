@@ -38,8 +38,12 @@ export function useTelegramBootstrap() {
         languageCode: webApp?.initDataUnsafe?.user?.language_code ?? null,
       });
 
-      if (initData || attempts >= maxAttempts) {
+      if (initData) {
         void fetchBootstrap();
+        return;
+      }
+
+      if (attempts >= maxAttempts) {
         return;
       }
 

@@ -1,6 +1,6 @@
 import { z, type ZodSchema } from "zod";
 import type { ApiErrorCode } from "@/types/telegram-webapp";
-import { getTelegramChatId, getTelegramInitData } from "@/lib/telegram/webapp";
+import { getTelegramInitData } from "@/lib/telegram/webapp";
 
 export class TelegramApiError extends Error {
   status: number;
@@ -24,17 +24,6 @@ function mapStatusCodeToErrorCode(status: number): ApiErrorCode {
   return "unknown";
 }
 
-function withChatId(path: string, chatId: string) {
-  if (!chatId || !path.startsWith("/api/telegram-webapp/")) {
-    return path;
-  }
-  const url = new URL(path, "http://local");
-  if (!url.searchParams.get("chat_id")) {
-    url.searchParams.set("chat_id", chatId);
-  }
-  return `${url.pathname}${url.search}`;
-}
-
 export async function telegramApiRequest<T>({
   path,
   method = "GET",
@@ -53,17 +42,11 @@ export async function telegramApiRequest<T>({
     : process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const effectiveInitData =
     initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
-  const chatId =
-    typeof window !== "undefined" ? getTelegramChatId() : "";
-  const pathWithChat = withChatId(path, chatId);
-  const url = `${baseUrl}${pathWithChat}`;
+  const url = `${baseUrl}${path}`;
   const headers = new Headers({
     "Content-Type": "application/json",
     "X-Telegram-Init-Data": effectiveInitData,
   });
-  if (chatId) {
-    headers.set("X-Telegram-Chat-Id", chatId);
-  }
 
   let response: Response;
   try {
