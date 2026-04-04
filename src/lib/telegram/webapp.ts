@@ -3,6 +3,7 @@ import type { TelegramThemeParams, TelegramUser } from "@/types/telegram-webapp"
 
 const TELEGRAM_INIT_DATA_CACHE_KEY = "chikko_tg_init_data";
 const TELEGRAM_CHAT_ID_CACHE_KEY = "chikko_tg_chat_id";
+const TELEGRAM_SDK_SCRIPT_ID = "telegram-webapp-sdk";
 
 function readInitDataFromUrl() {
   if (typeof window === "undefined") {
@@ -105,6 +106,24 @@ export function getTelegramWebApp() {
     return null;
   }
   return window.Telegram?.WebApp ?? null;
+}
+
+export function ensureTelegramWebAppScript() {
+  if (typeof window === "undefined" || window.Telegram?.WebApp) {
+    return;
+  }
+
+  const existing = document.getElementById(TELEGRAM_SDK_SCRIPT_ID) as HTMLScriptElement | null;
+  if (existing) {
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.id = TELEGRAM_SDK_SCRIPT_ID;
+  script.src = "https://telegram.org/js/telegram-web-app.js";
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
 }
 
 export function initializeTelegramWebApp() {

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  ensureTelegramWebAppScript,
   getTelegramInitData,
   getTelegramUser,
   getTelegramWebApp,
@@ -26,6 +27,7 @@ export function useTelegramBootstrap() {
         return;
       }
 
+      ensureTelegramWebAppScript();
       const webApp = initializeTelegramWebApp();
       const initData = getTelegramInitData();
 
