@@ -69,6 +69,7 @@ export function BottomNav({ locale }: { locale: string }) {
     (sum, item) => sum + item.quantity,
     0,
   );
+  const cartBadgeText = cartQuantity > 99 ? "99+" : String(cartQuantity);
   const items = [
     { href: `/${locale}/catalog`, label: messages.nav.catalog, icon: "catalog" as const },
     { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true, icon: "cart" as const },
@@ -96,9 +97,12 @@ export function BottomNav({ locale }: { locale: string }) {
                 {item.isCart && cartQuantity > 0 ? (
                   <span
                     key={cartQuantity}
-                    className="animate-cart-pop absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white"
+                    className={cn(
+                      "animate-cart-pop absolute -right-2 -top-2 inline-flex items-center justify-center rounded-full bg-brand text-[10px] font-bold leading-none text-white",
+                      cartBadgeText.length === 1 ? "h-4 w-4" : "h-4 min-w-4 px-1",
+                    )}
                   >
-                    {cartQuantity > 99 ? "99+" : cartQuantity}
+                    <span className="block leading-none">{cartBadgeText}</span>
                   </span>
                 ) : null}
               </span>

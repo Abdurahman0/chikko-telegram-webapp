@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import { ProductImage } from "@/components/shared/product-image";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Product } from "@/types/telegram-webapp";
@@ -17,16 +17,21 @@ export function PromotedCarousel({
 }) {
   const autoPlayPromotions = useAppSettingsStore((state) => state.autoPlayPromotions);
   const [index, setIndex] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const suppressClickRef = useRef(false);
 
   useEffect(() => {
-    if (!autoPlayPromotions || products.length <= 1) {
+    if (!autoPlayPromotions || products.length <= 1 || isDragging) {
       return;
     }
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % products.length);
     }, 3500);
     return () => clearInterval(timer);
-  }, [autoPlayPromotions, products.length]);
+  }, [autoPlayPromotions, isDragging, products.length]);
 
   if (products.length === 0) {
     return null;
@@ -34,17 +39,86 @@ export function PromotedCarousel({
 
   const safeIndex = Math.min(index, products.length - 1);
 
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    if (products.length <= 1) {
+      return;
+    }
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchStartYRef.current = event.touches[0]?.clientY ?? null;
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    if (!isDragging || touchStartXRef.current === null || touchStartYRef.current === null) {
+      return;
+    }
+    const currentX = event.touches[0]?.clientX ?? touchStartXRef.current;
+    const currentY = event.touches[0]?.clientY ?? touchStartYRef.current;
+    const deltaX = currentX - touchStartXRef.current;
+    const deltaY = currentY - touchStartYRef.current;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      return;
+    }
+
+    setDragOffset(deltaX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) {
+      return;
+    }
+
+    const threshold = 45;
+
+    if (dragOffset < -threshold && safeIndex < products.length - 1) {
+      setIndex((prev) => prev + 1);
+      suppressClickRef.current = true;
+    } else if (dragOffset > threshold && safeIndex > 0) {
+      setIndex((prev) => prev - 1);
+      suppressClickRef.current = true;
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (suppressClickRef.current) {
+      setTimeout(() => {
+        suppressClickRef.current = false;
+      }, 60);
+    }
+  };
+
   return (
-    <div className="relative overflow-hidden rounded-none bg-surface">
+    <div
+      className="relative overflow-hidden rounded-none bg-surface"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       <div
-        className="flex transition-transform duration-500 ease-out"
-        style={{ transform: `translateX(-${safeIndex * 100}%)` }}
+        className={cn(
+          "flex ease-out",
+          isDragging ? "transition-none" : "transition-transform duration-500",
+        )}
+        style={{
+          transform: `translateX(calc(-${safeIndex * 100}% + ${dragOffset}px))`,
+        }}
       >
         {products.map((product) => (
           <Link
             key={product.id}
             href={`/${locale}/product/${product.id}`}
             className="block w-full shrink-0"
+            onClick={(event) => {
+              if (suppressClickRef.current) {
+                event.preventDefault();
+              }
+            }}
           >
             <ProductImage
               src={product.image}
