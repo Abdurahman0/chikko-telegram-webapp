@@ -42,6 +42,11 @@ export async function telegramApiRequest<T>({
     : process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const effectiveInitData =
     initData || (typeof window !== "undefined" ? getTelegramInitData() : "");
+
+  if (path.startsWith("/api/telegram-webapp/") && !effectiveInitData) {
+    throw new TelegramApiError("Telegram initData is missing", 403, "forbidden");
+  }
+
   const url = `${baseUrl}${path}`;
   const headers = new Headers({
     "Content-Type": "application/json",

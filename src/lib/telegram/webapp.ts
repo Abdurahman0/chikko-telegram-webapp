@@ -18,11 +18,8 @@ function readInitDataFromUrl() {
     const params = new URLSearchParams(source.startsWith("?") ? source.slice(1) : source);
     const value = params.get("tgWebAppData") ?? params.get("telegramInitData");
     if (value) {
-      try {
-        return decodeURIComponent(value);
-      } catch {
-        return value;
-      }
+      // URLSearchParams already decodes query params once.
+      return value;
     }
   }
 

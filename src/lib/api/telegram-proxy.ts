@@ -27,8 +27,12 @@ export async function forwardTelegramRequest({
     );
   }
 
-  const initData = request.headers.get("x-telegram-init-data") ?? "";
+  const initDataFromHeader = request.headers.get("x-telegram-init-data") ?? "";
   const authHeader = request.headers.get("authorization") ?? "";
+  const initDataFromAuth = authHeader.toLowerCase().startsWith("tma ")
+    ? authHeader.slice(4).trim()
+    : "";
+  const initData = initDataFromHeader || initDataFromAuth;
   const headers = new Headers({
     "X-Telegram-Init-Data": initData,
   });
