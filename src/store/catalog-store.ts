@@ -104,7 +104,14 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           products: detailData.products,
         };
       } else {
-        data = await getCatalog(initData, { category, search });
+        data = await getCatalog(initData, { 
+          category, 
+          search,
+          brand,
+          priceFrom,
+          priceTo,
+          sort 
+        });
       }
 
       set((state: CatalogStore) => ({

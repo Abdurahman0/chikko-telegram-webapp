@@ -50,14 +50,33 @@ export async function getBootstrap(initData: string): Promise<BootstrapData> {
 
 export async function getCatalog(
   initData: string,
-  params?: { category?: string; search?: string },
+  params?: {
+    category?: string;
+    brand?: string;
+    priceFrom?: number;
+    priceTo?: number;
+    search?: string;
+    sort?: CatalogSortOption;
+  },
 ): Promise<CatalogData> {
   const query = new URLSearchParams();
   if (params?.category) {
     query.set("category", params.category);
   }
+  if (params?.brand) {
+    query.set("brand", params.brand);
+  }
+  if (params?.priceFrom !== undefined) {
+    query.set("price_from", String(params.priceFrom));
+  }
+  if (params?.priceTo !== undefined) {
+    query.set("price_to", String(params.priceTo));
+  }
   if (params?.search) {
     query.set("search", params.search);
+  }
+  if (params?.sort) {
+    query.set("sort", params.sort);
   }
   const suffix = query.toString().length > 0 ? `?${query}` : "";
 
