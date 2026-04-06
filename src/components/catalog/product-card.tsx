@@ -44,24 +44,24 @@ export function ProductCard({
         compact ? "min-h-[17.6rem] p-2.5" : "min-h-[18.8rem] p-3",
       )}
     >
-      <Link href={`/${locale}/product/${product.id}`}>
+      <Link
+        href={`/${locale}/product/${product.id}`}
+        className={cn(
+          "relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-surface-soft",
+          compact ? "h-[7.8rem]" : "h-[8.5rem]"
+        )}
+      >
         {product.image ? (
           <Image
             src={product.image}
             alt={product.name}
-            width={0}
-            height={0}
+            fill
             sizes="(max-width: 768px) 50vw, 33vw"
             unoptimized
-            className="h-auto w-full rounded-2xl bg-surface-soft object-contain"
+            className="object-contain p-2"
           />
         ) : (
-          <div
-            className={cn(
-              "flex w-full items-center justify-center rounded-2xl bg-surface-accent text-sm text-app-muted",
-              compact ? "aspect-[4/3]" : "aspect-[4/3]",
-            )}
-          >
+          <div className="text-sm text-app-muted">
             {product.name.slice(0, 2).toUpperCase()}
           </div>
         )}

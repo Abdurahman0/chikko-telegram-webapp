@@ -189,7 +189,7 @@ export function PromotedCarousel({
           <Link
             key={`${product.id}-${idx}`}
             href={`/${locale}/product/${product.id}`}
-            className="block w-full shrink-0"
+            className="relative block h-64 w-full shrink-0 bg-surface-soft"
             onClick={(event) => {
               if (suppressClickRef.current) {
                 event.preventDefault();
@@ -200,14 +200,13 @@ export function PromotedCarousel({
               <Image
                 src={product.image}
                 alt={product.name}
-                width={0}
-                height={0}
+                fill
                 sizes="100vw"
                 unoptimized
-                className="h-auto w-full bg-surface-soft object-contain"
+                className="object-contain p-2"
               />
             ) : (
-              <div className="flex aspect-square w-full items-center justify-center bg-surface-soft text-2xl text-app-muted">
+              <div className="flex h-full w-full items-center justify-center text-2xl text-app-muted">
                 {product.name.slice(0, 2).toUpperCase()}
               </div>
             )}

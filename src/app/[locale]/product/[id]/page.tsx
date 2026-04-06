@@ -84,19 +84,18 @@ function ProductScreen({
       <FloatingBackButton href={`/${locale}/catalog`} />
 
       <div className="bg-surface pb-4 shadow-soft sm:rounded-b-3xl">
-        <div className="relative w-full">
+        <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-surface-soft">
           {currentImage ? (
             <Image
               src={currentImage}
               alt={product.name}
-              width={0}
-              height={0}
+              fill
               sizes="100vw"
               unoptimized
-              className="h-auto w-full object-contain"
+              className="object-contain p-4"
             />
           ) : (
-            <div className="flex aspect-square w-full items-center justify-center bg-surface-soft text-2xl text-app-muted">
+            <div className="text-2xl text-app-muted">
               {product.name.slice(0, 2).toUpperCase()}
             </div>
           )}
