@@ -194,7 +194,11 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
               ? messages.checkout.addressOrLocation
               : submitError === "empty_cart"
                 ? messages.checkout.requiredCart
-                : messages.checkout.failed
+                : submitError === "full_name_required"
+                  ? messages.checkout.fullNameRequired
+                  : submitError === "phone_required"
+                    ? messages.checkout.phoneRequired
+                    : messages.checkout.failed
           }
         />
       ) : null}

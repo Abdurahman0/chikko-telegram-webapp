@@ -75,6 +75,8 @@ export type Messages = {
     payme: string;
     fallbackPaymentMethods: string;
     failed: string;
+    fullNameRequired: string;
+    phoneRequired: string;
   };
   success: {
     title: string;

@@ -78,6 +78,8 @@ export const uzMessages: Messages = {
     payme: "Payme",
     fallbackPaymentMethods: "To'lov usullari bootstrapdan olinmadi, standartlar ishlatilmoqda.",
     failed: "Buyurtma yuborilmadi. Ma'lumotlarni tekshirib qayta urinib ko'ring.",
+    fullNameRequired: "Iltimos, ismingizni to'liq kiriting (kamida 2 harf)",
+    phoneRequired: "Iltimos, telefon raqamingizni kiriting",
   },
   success: {
     title: "Buyurtma qabul qilindi",

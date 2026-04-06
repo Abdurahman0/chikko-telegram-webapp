@@ -79,6 +79,8 @@ export const ruMessages: Messages = {
     fallbackPaymentMethods:
       "Способы оплаты из bootstrap не получены, используются стандартные.",
     failed: "Не удалось отправить заказ. Проверьте данные и попробуйте снова.",
+    fullNameRequired: "Пожалуйста, введите ваше полное имя (минимум 2 буквы)",
+    phoneRequired: "Пожалуйста, введите ваш номер телефона",
   },
   success: {
     title: "Заказ принят",
