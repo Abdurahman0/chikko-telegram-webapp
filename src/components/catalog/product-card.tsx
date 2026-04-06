@@ -1,5 +1,7 @@
 "use client";
 
+import { FiHeart } from "react-icons/fi";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/shared/button";
@@ -36,6 +38,13 @@ export function ProductCard({
   onDecrement: (productId: string) => void;
 }) {
   const isOut = typeof product.stock === "number" && product.stock <= 0;
+  const [localIsFavorite, setLocalIsFavorite] = useState(product.isFavorite);
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLocalIsFavorite(!localIsFavorite);
+  };
 
   return (
     <div
@@ -62,6 +71,19 @@ export function ProductCard({
             {product.name.slice(0, 2).toUpperCase()}
           </div>
         )}
+        
+        {/* Favorite Icon */}
+        <button
+          onClick={toggleFavorite}
+          className={cn(
+            "absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300",
+            localIsFavorite 
+              ? "bg-brand text-white shadow-[0_4px_10px_rgba(255,126,139,0.3)]" 
+              : "bg-white/80 text-app-muted/60 backdrop-blur-md shadow-sm active:scale-90"
+          )}
+        >
+          <FiHeart className={cn("h-5 w-5", localIsFavorite && "fill-current")} />
+        </button>
       </Link>
       <div className={cn("flex flex-1 flex-col", compact ? "mt-2.5" : "mt-3")}>
         <Link

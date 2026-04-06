@@ -96,15 +96,17 @@ export default function CategoryPage({
     setCategory(id === "all" ? "" : id);
   }, [id, setCategory]);
 
-  const activeCategoryData = categories.find((c) => c.id === id);
-  const categoryName = id === "all" ? messages.catalog.allCategories : activeCategoryData?.name ?? messages.common.unknown;
+  const activeCategory = useCatalogStore((state) => state.activeCategory);
+  
+  const activeCategoryData = categories.find((c) => c.id === activeCategory);
+  const categoryName = activeCategory === "" ? messages.catalog.allCategories : activeCategoryData?.name ?? messages.common.unknown;
   const productCount = messages.catalog.productCount.replace("{count}", String(products.length));
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-10 pb-4 backdrop-blur-md">
-        <div className="flex items-center gap-3 mb-6">
+      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-6 pb-4 backdrop-blur-md transition-all duration-300">
+        <div className="flex items-center gap-3 mb-4">
           <button
             onClick={() => router.back()}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface shadow-sm border border-surface-accent/20"
@@ -130,7 +132,7 @@ export default function CategoryPage({
         </div>
 
         {/* Control Bar */}
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-4 flex items-center gap-3">
           <button 
             onClick={() => setIsSortOpen(true)}
             className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-accent/30 text-app-text transition-colors active:bg-surface-accent"

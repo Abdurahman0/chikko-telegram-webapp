@@ -99,10 +99,9 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
         data = await getCatalog(initData, { category, search });
       }
 
-      const isUnfilteredLoad = !category && !search && !brand && !priceFrom && !priceTo && !sort;
       set((state: CatalogStore) => ({
         categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
-        promotedProducts: isUnfilteredLoad ? data.promotedProducts : state.promotedProducts,
+        promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
         products: data.products,
         status: "success",
         lastQueryKey: queryKey,

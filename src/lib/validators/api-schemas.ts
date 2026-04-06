@@ -13,8 +13,8 @@ const rawOrderItemSchema = z
     unit_price: z.union([z.number(), z.string()]).optional(),
     line_total: z.union([z.number(), z.string()]).optional(),
     currency: z.string().default("UZS"),
-    image: z.string().url().optional().or(z.literal("")),
-    image_url: z.string().url().optional().or(z.literal("")),
+    image: z.string().optional().or(z.literal("")),
+    image_url: z.string().optional().or(z.literal("")),
   })
   .passthrough();
 
@@ -104,11 +104,11 @@ const rawBrandSchema = z
 
 const rawProductImageSchema = z
   .union([
-    z.string().url(),
+    z.string(),
     z
       .object({
-        image: z.string().url().optional().or(z.literal("")),
-        image_url: z.string().url().optional().or(z.literal("")),
+        image: z.string().optional().or(z.literal("")),
+        image_url: z.string().optional().or(z.literal("")),
       })
       .passthrough(),
   ])
@@ -158,8 +158,8 @@ export const rawProductSchema = z
       ])
       .optional()
       .nullable(),
-    image: z.string().url().optional().or(z.literal("")),
-    image_url: z.string().url().optional().or(z.literal("")),
+    image: z.string().optional().or(z.literal("")),
+    image_url: z.string().optional().or(z.literal("")),
     images: z.array(rawProductImageSchema).optional().default([]),
   })
   .passthrough();

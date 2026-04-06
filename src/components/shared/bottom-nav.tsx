@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCartStore } from "@/store/cart-store";
+import { useCatalogStore } from "@/store/catalog-store";
 
 import { FiGrid, FiShoppingCart, FiPackage, FiUser, FiHeart } from "react-icons/fi";
 
@@ -34,13 +35,15 @@ export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
   const { messages } = useI18n();
   const cartItems = useCartStore((state) => state.items);
+  const setCategory = useCatalogStore((state) => state.setCategory);
+  
   const cartQuantity = Object.values(cartItems).reduce(
     (sum, item) => sum + item.quantity,
     0,
   );
   const cartBadgeText = cartQuantity > 99 ? "99+" : String(cartQuantity);
   const items = [
-    { href: `/${locale}/catalog`, label: messages.nav.home, icon: "catalog" as const },
+    { href: `/${locale}/catalog`, label: messages.nav.home, icon: "catalog" as const, isHome: true },
     { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true, icon: "cart" as const },
     { href: `/${locale}/favorites`, label: messages.nav.favorites, icon: "favorites" as const },
     { href: `/${locale}/orders`, label: messages.nav.orders, icon: "orders" as const },
@@ -57,6 +60,11 @@ export function BottomNav({ locale }: { locale: string }) {
               key={item.href}
               href={item.href}
               data-cart-target={item.isCart ? "true" : undefined}
+              onClick={() => {
+                if (item.isHome) {
+                  setCategory("");
+                }
+              }}
               className={cn(
                 "relative inline-flex w-full flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[11px] font-semibold transition-transform",
                 active ? "bg-brand-soft text-brand-strong" : "text-app-muted",

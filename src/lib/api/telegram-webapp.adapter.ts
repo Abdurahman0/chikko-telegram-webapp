@@ -118,17 +118,18 @@ function adaptProduct(
         return null;
       }
       if (typeof image === "string") {
-        return image;
+        return image !== "string" ? image : null;
       }
       // Handle the new nested object structure { image_url, image }
-      return (image as { image_url?: string; image?: string }).image_url || (image as { image_url?: string; image?: string }).image || null;
+      const url = (image as { image_url?: string; image?: string }).image_url || (image as { image_url?: string; image?: string }).image || null;
+      return url !== "string" ? url : null;
     })
     .filter((value): value is string => Boolean(value));
 
   const gallery = [
     ...imagesFromList,
-    ...(typeof product.image === "string" ? [product.image] : []),
-    ...(typeof product.image_url === "string" ? [product.image_url] : []),
+    ...(typeof product.image === "string" && product.image !== "string" ? [product.image] : []),
+    ...(typeof product.image_url === "string" && product.image_url !== "string" ? [product.image_url] : []),
   ].filter((value): value is string => Boolean(value));
 
   const categoryFromObject =

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { CategoryChips } from "@/components/catalog/category-chips";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -122,6 +122,12 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
 
   const { useRouter } = require("next/navigation");
   const router = useRouter();
+
+  useEffect(() => {
+    // Optional: Reset category when landing on home if desired, 
+    // but the user mostly wanted the buttons and persistence fixed.
+    // We already handled the bottom nav reset.
+  }, []);
 
   return (
     <div className="min-h-screen bg-app-bg pb-20">
