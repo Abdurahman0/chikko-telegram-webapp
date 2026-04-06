@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
-import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
+import { TbBrandInstagram, TbBrandTelegram } from "react-icons/tb";
 import { FloatingBackButton } from "@/components/shared/floating-back-button";
 import { SectionHeader } from "@/components/shared/section-header";
 import { useI18n } from "@/components/shared/locale-provider";
@@ -112,7 +112,7 @@ function AboutScreen({ locale }: { locale: AppLocale }) {
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#E1306C] text-white shadow-[0_10px_20px_-12px_rgba(225,48,108,0.9)]"
             aria-label={messages.about.instagram}
           >
-            <FaInstagram className="h-6 w-6" />
+            <TbBrandInstagram className="h-6 w-6" />
           </a>
           <a
             href="https://t.me/chikko_shop"
@@ -121,7 +121,7 @@ function AboutScreen({ locale }: { locale: AppLocale }) {
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#229ED9] text-white shadow-[0_10px_20px_-12px_rgba(34,158,217,0.95)]"
             aria-label={messages.about.telegram}
           >
-            <FaTelegramPlane className="h-6 w-6" />
+            <TbBrandTelegram className="h-6 w-6" />
           </a>
         </div>
       </div>

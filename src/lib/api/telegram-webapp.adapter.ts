@@ -1,32 +1,49 @@
 import type {
   BootstrapData,
+  Brand,
   CatalogCategory,
   CatalogData,
+  CategoryDetailData,
   CheckoutData,
+  FavoritesData,
   Order,
   OrderItem,
   OrdersData,
   Payment,
   PaymentMethod,
-  ProfileData,
   Product,
+  ProfileData,
+  Review,
+  ReviewsData,
 } from "@/types/telegram-webapp";
 import type { z } from "zod";
 import type {
   bootstrapResponseSchema,
   catalogResponseSchema,
+  categoryDetailResponseSchema,
   checkoutResponseSchema,
+  favoritesResponseSchema,
   ordersResponseSchema,
   profileResponseSchema,
   rawOrderSchema,
+  rawProductSchema,
+  reviewsResponseSchema,
+  submitReviewResponseSchema,
+  categoriesResponseSchema,
 } from "@/lib/validators/api-schemas";
 
 type RawBootstrap = z.infer<typeof bootstrapResponseSchema>;
 type RawCatalog = z.infer<typeof catalogResponseSchema>;
+type RawCategoryDetail = z.infer<typeof categoryDetailResponseSchema>;
 type RawCheckout = z.infer<typeof checkoutResponseSchema>;
 type RawOrder = z.infer<typeof rawOrderSchema>;
 type RawOrders = z.infer<typeof ordersResponseSchema>;
 type RawProfile = z.infer<typeof profileResponseSchema>;
+type RawProduct = z.infer<typeof rawProductSchema>;
+type RawFavorites = z.infer<typeof favoritesResponseSchema>;
+type RawReviews = z.infer<typeof reviewsResponseSchema>;
+type RawReview = z.infer<typeof submitReviewResponseSchema>;
+type RawCategories = z.infer<typeof categoriesResponseSchema>;
 
 function toNumber(value: unknown, fallback = 0) {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -91,6 +108,78 @@ function adaptOrder(raw: RawOrder): Order {
   };
 }
 
+function adaptProduct(
+  product: RawProduct,
+  categories?: CatalogCategory[],
+): Product {
+  const imagesFromList = (product.images ?? [])
+    .map((image) => {
+      if (!image) {
+        return null;
+      }
+      if (typeof image === "string") {
+        return image;
+      }
+      return image.image_url || image.image || null;
+    })
+    .filter((value): value is string => Boolean(value));
+
+  const gallery = [
+    ...imagesFromList,
+    ...(product.image ? [product.image] : []),
+    ...(product.image_url ? [product.image_url] : []),
+  ].filter((value): value is string => Boolean(value));
+
+  const categoryFromObject =
+    typeof product.category === "object" && product.category !== null
+      ? product.category
+      : null;
+
+  const categoryId =
+    product.category_id !== undefined && product.category_id !== null
+      ? String(product.category_id)
+      : categoryFromObject?.id !== undefined && categoryFromObject?.id !== null
+        ? String(categoryFromObject.id)
+        : typeof product.category === "string" || typeof product.category === "number"
+          ? String(product.category)
+          : null;
+
+  const brandFromObject =
+    typeof product.brand === "object" && product.brand !== null
+      ? product.brand
+      : null;
+
+  const stock =
+    product.stock !== undefined && product.stock !== null
+      ? product.stock
+      : product.stock_quantity !== undefined && product.stock_quantity !== null
+        ? product.stock_quantity
+        : product.has_stock === false
+          ? 0
+          : null;
+
+  return {
+    id: String(product.id),
+    name: product.name ?? product.title ?? "Product",
+    sku: product.sku,
+    shortDescription: product.short_description,
+    description: product.description,
+    price: toNumber(product.price, 0),
+    currency: product.currency ?? "UZS",
+    stock,
+    categoryId,
+    categoryName:
+      categoryFromObject?.name ??
+      categoryFromObject?.title ??
+      categories?.find((c) => c.id === categoryId)?.name,
+    brandId: brandFromObject?.id ? String(brandFromObject.id) : null,
+    brandName: brandFromObject?.name,
+    isFavorite: product.is_favorite ?? false,
+    image: product.image || product.image_url || gallery[0] || null,
+    images: gallery,
+  };
+}
+
 export function adaptBootstrapResponse(raw: RawBootstrap): BootstrapData {
   const methods =
     raw.payment_methods
@@ -124,76 +213,60 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
   const categories: CatalogCategory[] = raw.categories.map((category) => ({
     id: String(category.id),
     name: category.name ?? category.title ?? `Category ${category.id}`,
+    code: category.code,
+    description: category.description,
+    image: category.image ?? category.image_url ?? null,
   }));
 
-  const adaptProduct = (product: RawCatalog["products"][number]): Product => {
-    const imagesFromList = (product.images ?? [])
-      .map((image) => {
-        if (!image) {
-          return null;
-        }
-        if (typeof image === "string") {
-          return image;
-        }
-        return image.image_url || image.image || null;
-      })
-      .filter((value): value is string => Boolean(value));
-
-    const gallery = [
-      ...imagesFromList,
-      ...(product.image ? [product.image] : []),
-      ...(product.image_url ? [product.image_url] : []),
-    ].filter((value): value is string => Boolean(value));
-
-    const categoryFromObject =
-      typeof product.category === "object" && product.category !== null
-        ? product.category
-        : null;
-
-    const categoryId =
-      product.category_id !== undefined && product.category_id !== null
-        ? String(product.category_id)
-        : categoryFromObject?.id !== undefined && categoryFromObject?.id !== null
-          ? String(categoryFromObject.id)
-          : typeof product.category === "string" || typeof product.category === "number"
-            ? String(product.category)
-            : null;
-
-    const stock =
-      product.stock !== undefined && product.stock !== null
-        ? product.stock
-        : product.stock_quantity !== undefined && product.stock_quantity !== null
-          ? product.stock_quantity
-          : product.has_stock === false
-            ? 0
-            : null;
-
-    return {
-      id: String(product.id),
-      name: product.name ?? product.title ?? "Product",
-      shortDescription: product.short_description,
-      description: product.description,
-      price: toNumber(product.price, 0),
-      currency: product.currency ?? "UZS",
-      stock,
-      categoryId,
-      categoryName:
-        categoryFromObject?.name ??
-        categoryFromObject?.title ??
-        categories.find((category) => category.id === categoryId)?.name,
-      image: product.image || product.image_url || gallery[0] || null,
-      images: gallery,
-    };
-  };
-
-  const promotedProducts: Product[] = (raw.promoted_products ?? []).map(adaptProduct);
-  const products: Product[] = raw.products.map(adaptProduct);
+  const promotedProducts: Product[] = (raw.promoted_products ?? []).map((p) =>
+    adaptProduct(p, categories),
+  );
+  const products: Product[] = raw.products.map((p) =>
+    adaptProduct(p, categories),
+  );
 
   return {
     categories,
     promotedProducts,
     products,
   };
+}
+
+export function adaptCategoriesResponse(
+  raw: RawCategories,
+): CatalogCategory[] {
+  return raw.map((category) => ({
+    id: String(category.id),
+    name: category.name ?? category.title ?? `Category ${category.id}`,
+    code: category.code,
+    description: category.description,
+    image: category.image ?? category.image_url ?? null,
+  }));
+}
+
+export function adaptCategoryDetailResponse(
+  raw: RawCategoryDetail,
+): CategoryDetailData {
+  const category: CatalogCategory = {
+    id: String(raw.category.id),
+    name: raw.category.name ?? raw.category.title ?? "Category",
+    code: raw.category.code,
+    description: raw.category.description,
+    image: raw.category.image ?? raw.category.image_url ?? null,
+  };
+
+  const brands: Brand[] = (raw.brands ?? []).map((b) => ({
+    id: String(b.id),
+    name: b.name ?? "Brand",
+    code: b.code,
+    description: b.description,
+  }));
+
+  const products: Product[] = raw.products.map((p) =>
+    adaptProduct(p, [category]),
+  );
+
+  return { category, brands, products };
 }
 
 export function adaptCheckoutResponse(raw: RawCheckout): CheckoutData {
@@ -219,6 +292,35 @@ export function adaptOrdersResponse(raw: RawOrders): OrdersData {
   };
 }
 
+export function adaptFavoritesResponse(raw: RawFavorites): FavoritesData {
+  return {
+    products: (raw.products ?? []).map((p) => adaptProduct(p)),
+  };
+}
+
+function adaptReview(raw: RawReview): Review {
+  return {
+    id: String(raw.id),
+    orderId: raw.order_id ? String(raw.order_id) : "",
+    comment: raw.comment ?? "",
+    requestedAt: raw.requested_at,
+    submittedAt: raw.submitted_at,
+    source: raw.source,
+    order: raw.order ? adaptOrder(raw.order) : undefined,
+  };
+}
+
+export function adaptReviewsResponse(raw: RawReviews): ReviewsData {
+  return {
+    reviews: (raw.reviews ?? []).map(adaptReview),
+    pendingOrders: (raw.pending_orders ?? []).map(adaptOrder),
+  };
+}
+
+export function adaptSubmitReviewResponse(raw: RawReview): Review {
+  return adaptReview(raw);
+}
+
 export function adaptProfileResponse(raw: RawProfile): ProfileData {
   return {
     guestMode: raw.guest_mode ?? false,
@@ -239,5 +341,7 @@ export function adaptProfileResponse(raw: RawProfile): ProfileData {
       : null,
     activeOrder: raw.active_order ? adaptOrder(raw.active_order) : null,
     orderHistory: (raw.order_history ?? []).map(adaptOrder),
+    favorites: (raw.favorites ?? []).map((p) => adaptProduct(p)),
+    pendingReviews: (raw.pending_reviews ?? []).map(adaptOrder),
   };
 }

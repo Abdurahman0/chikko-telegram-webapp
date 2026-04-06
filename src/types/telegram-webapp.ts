@@ -30,9 +30,17 @@ export type LocationPoint = {
   longitude: number;
 };
 
+export type Brand = {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+};
+
 export type Product = {
   id: string;
   name: string;
+  sku?: string;
   shortDescription?: string;
   description?: string;
   price: number;
@@ -40,6 +48,9 @@ export type Product = {
   stock?: number | null;
   categoryId?: string | null;
   categoryName?: string;
+  brandId?: string | null;
+  brandName?: string;
+  isFavorite?: boolean;
   image?: string | null;
   images: string[];
 };
@@ -47,6 +58,9 @@ export type Product = {
 export type CatalogCategory = {
   id: string;
   name: string;
+  code?: string;
+  description?: string;
+  image?: string | null;
 };
 
 export type OrderItem = {
@@ -89,6 +103,12 @@ export type CatalogData = {
   products: Product[];
 };
 
+export type CategoryDetailData = {
+  category: CatalogCategory;
+  brands: Brand[];
+  products: Product[];
+};
+
 export type CheckoutPayload = {
   full_name: string;
   phone: string;
@@ -114,12 +134,35 @@ export type OrdersData = {
   orders: Order[];
 };
 
+export type FavoritesData = {
+  products: Product[];
+};
+
+export type Review = {
+  id: string;
+  orderId: string;
+  comment: string;
+  requestedAt?: string;
+  submittedAt?: string;
+  source?: string;
+  order?: Order;
+};
+
+export type ReviewsData = {
+  reviews: Review[];
+  pendingOrders: Order[];
+};
+
 export type ProfileData = {
   guestMode: boolean;
   user: TelegramUser | null;
   customer: Customer | null;
   activeOrder: Order | null;
   orderHistory: Order[];
+  favorites: Product[];
+  pendingReviews: Order[];
 };
+
+export type CatalogSortOption = "cheap" | "expensive" | "new" | "popular";
 
 export type ApiErrorCode = "forbidden" | "bad_request" | "network" | "unknown";

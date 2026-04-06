@@ -6,6 +6,7 @@ export const uzMessages: Messages = {
     cart: "Savat",
     orders: "Buyurtmalar",
     profile: "Profil",
+    favorites: "Sevimlilar",
   },
   common: {
     loading: "Yuklanmoqda...",
@@ -35,6 +36,10 @@ export const uzMessages: Messages = {
     outOfStock: "Sotuvda yo'q",
     inStock: "Mavjud",
     details: "Batafsil",
+    sortPopular: "Ommabop",
+    sortCheap: "Arzonroq",
+    sortExpensive: "Qimmatroq",
+    sortNew: "Yangilari",
   },
   product: {
     quantity: "Miqdor",
@@ -148,5 +153,21 @@ export const uzMessages: Messages = {
     sat: "Shanba",
     sun: "Yakshanba",
     closed: "Dam olish",
+  },
+  favorites: {
+    title: "Sevimlilar",
+    subtitle: "Sizga yoqqan mahsulotlar",
+    emptyTitle: "Sevimlilar bo'sh",
+    emptyDescription: "Yoqtirgan mahsulotlaringizni shu yerda saqlang.",
+  },
+  reviews: {
+    title: "Fikr-mulohazalar",
+    subtitle: "Bizning xizmatimiz haqida fikringiz",
+    emptyTitle: "Fikrlar mavjud emas",
+    pendingTitle: "Baholash kutilmoqda",
+    commentPlaceholder: "Fikringizni qoldiring...",
+    submit: "Yuborish",
+    submitted: "Rahmat! Fikringiz qabul qilindi.",
+    historyTitle: "Mening fikrlarim",
   },
 };

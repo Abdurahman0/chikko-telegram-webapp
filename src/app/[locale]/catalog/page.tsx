@@ -10,12 +10,13 @@ import { Button } from "@/components/shared/button";
 import { Input } from "@/components/shared/input";
 import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
+import { isSupportedLocale } from "@/lib/i18n/config";
+import { cn } from "@/lib/utils/cn";
 import { useCatalog } from "@/features/catalog/use-catalog";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
 import { useAppSettingsStore } from "@/store/app-settings-store";
-import { isSupportedLocale } from "@/lib/i18n/config";
 
 export default function CatalogPage() {
   const params = useParams<{ locale: string }>();
@@ -45,8 +46,14 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const products = useCatalogStore((state) => state.products);
   const search = useCatalogStore((state) => state.search);
   const activeCategory = useCatalogStore((state) => state.activeCategory);
+  const sort = useCatalogStore((state) => state.sort);
+  const brand = useCatalogStore((state) => state.brand);
+  const priceFrom = useCatalogStore((state) => state.priceFrom);
+  const priceTo = useCatalogStore((state) => state.priceTo);
+  
   const setSearch = useCatalogStore((state) => state.setSearch);
   const setCategory = useCatalogStore((state) => state.setCategory);
+  const setSort = useCatalogStore((state) => state.setSort);
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
   const initData = useBootstrapStore((state) => state.initData);
   const addItem = useCartStore((state) => state.addItem);
@@ -135,6 +142,26 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
           onSelect={setCategory}
         />
 
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 no-scrollbar">
+          {(["popular", "new", "cheap", "expensive"] as const).map((option) => (
+            <button
+              key={option}
+              onClick={() => setSort(option)}
+              className={cn(
+                "whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-all shadow-sm border",
+                sort === option 
+                  ? "bg-brand text-white border-brand" 
+                  : "bg-surface text-app-muted border-surface-accent"
+              )}
+            >
+              {option === "popular" && messages.catalog.sortPopular}
+              {option === "new" && messages.catalog.sortNew}
+              {option === "cheap" && messages.catalog.sortCheap}
+              {option === "expensive" && messages.catalog.sortExpensive}
+            </button>
+          ))}
+        </div>
+
         {status === "loading" ? <ProductSkeletonGrid /> : null}
 
         {status === "error" ? (
@@ -147,6 +174,10 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                     initData,
                     category: activeCategory || undefined,
                     search: search || undefined,
+                    sort,
+                    brand: brand || undefined,
+                    priceFrom,
+                    priceTo,
                   })
                 }
               >

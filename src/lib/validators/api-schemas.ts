@@ -85,6 +85,20 @@ const rawCategorySchema = z
     name: z.string().optional(),
     title: z.string().optional(),
     code: z.string().optional(),
+    description: z.string().optional(),
+    image: z.string().optional().nullable(),
+    image_url: z.string().optional().nullable(),
+    is_active: z.boolean().optional(),
+  })
+  .passthrough();
+
+const rawBrandSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    name: z.string().optional(),
+    code: z.string().optional(),
+    description: z.string().optional(),
+    is_active: z.boolean().optional(),
   })
   .passthrough();
 
@@ -112,7 +126,8 @@ export const rawProductSchema = z
     currency: z.string().optional().default("UZS"),
     stock: z.number().optional().nullable(),
     stock_quantity: z.number().optional().nullable(),
-    has_stock: z.boolean().optional(),
+    has_stock: z.union([z.boolean(), z.string()]).optional(),
+    is_favorite: z.boolean().optional(),
     category_id: z.union([z.string(), z.number()]).optional().nullable(),
     category: z
       .union([
@@ -129,6 +144,20 @@ export const rawProductSchema = z
       ])
       .optional()
       .nullable(),
+    brand: z
+      .union([
+        z.string(),
+        z.number(),
+        z
+          .object({
+            id: z.union([z.string(), z.number()]).optional(),
+            name: z.string().optional(),
+            code: z.string().optional(),
+          })
+          .passthrough(),
+      ])
+      .optional()
+      .nullable(),
     image: z.string().url().optional().or(z.literal("")),
     image_url: z.string().url().optional().or(z.literal("")),
     images: z.array(rawProductImageSchema).optional().default([]),
@@ -139,6 +168,16 @@ export const catalogResponseSchema = z
   .object({
     categories: z.array(rawCategorySchema).default([]),
     promoted_products: z.array(rawProductSchema).optional().default([]),
+    products: z.array(rawProductSchema).default([]),
+  })
+  .passthrough();
+
+export const categoriesResponseSchema = z.array(rawCategorySchema);
+
+export const categoryDetailResponseSchema = z
+  .object({
+    category: rawCategorySchema,
+    brands: z.array(rawBrandSchema).optional().default([]),
     products: z.array(rawProductSchema).default([]),
   })
   .passthrough();
@@ -168,6 +207,33 @@ export const ordersResponseSchema = z
   })
   .passthrough();
 
+export const favoritesResponseSchema = z
+  .object({
+    products: z.array(rawProductSchema).default([]),
+  })
+  .passthrough();
+
+const rawReviewSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    order_id: z.union([z.string(), z.number()]).optional(),
+    comment: z.string().optional().default(""),
+    requested_at: z.string().optional(),
+    submitted_at: z.string().optional(),
+    source: z.string().optional(),
+    order: rawOrderSchema.optional().nullable(),
+  })
+  .passthrough();
+
+export const reviewsResponseSchema = z
+  .object({
+    reviews: z.array(rawReviewSchema).optional().default([]),
+    pending_orders: z.array(rawOrderSchema).optional().default([]),
+  })
+  .passthrough();
+
+export const submitReviewResponseSchema = rawReviewSchema;
+
 export const profileResponseSchema = z
   .object({
     guest_mode: z.boolean().optional().default(false),
@@ -192,5 +258,7 @@ export const profileResponseSchema = z
       .nullable(),
     active_order: rawOrderSchema.optional().nullable(),
     order_history: z.array(rawOrderSchema).optional().default([]),
+    favorites: z.array(rawProductSchema).optional().default([]),
+    pending_reviews: z.array(rawOrderSchema).optional().default([]),
   })
   .passthrough();

@@ -12,6 +12,10 @@ export function useCatalog() {
   const bootstrapStatus = useBootstrapStore((state) => state.status);
   const activeCategory = useCatalogStore((state) => state.activeCategory);
   const search = useCatalogStore((state) => state.search);
+  const brand = useCatalogStore((state) => state.brand);
+  const priceFrom = useCatalogStore((state) => state.priceFrom);
+  const priceTo = useCatalogStore((state) => state.priceTo);
+  const sort = useCatalogStore((state) => state.sort);
   const status = useCatalogStore((state) => state.status);
   const lastQueryKey = useCatalogStore((state) => state.lastQueryKey);
   const loadingQueryKey = useCatalogStore((state) => state.loadingQueryKey);
@@ -23,7 +27,7 @@ export function useCatalog() {
       return;
     }
 
-    const queryKey = `category=${activeCategory || ""};search=${search || ""}`;
+    const queryKey = `category=${activeCategory || ""};search=${search || ""};brand=${brand || ""};from=${priceFrom ?? ""};to=${priceTo ?? ""};sort=${sort || ""}`;
     const isSameSuccessfulQuery =
       status === "success" &&
       lastQueryKey === queryKey &&
@@ -42,6 +46,10 @@ export function useCatalog() {
         initData,
         category: activeCategory || undefined,
         search: search || undefined,
+        brand: brand || undefined,
+        priceFrom,
+        priceTo,
+        sort,
       });
     }, 300);
 
@@ -49,6 +57,10 @@ export function useCatalog() {
   }, [
     activeCategory,
     search,
+    brand,
+    priceFrom,
+    priceTo,
+    sort,
     initData,
     loadCatalog,
     hasBootstrapped,

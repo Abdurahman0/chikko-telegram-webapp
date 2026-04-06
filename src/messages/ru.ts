@@ -6,6 +6,7 @@ export const ruMessages: Messages = {
     cart: "Корзина",
     orders: "Заказы",
     profile: "Профиль",
+    favorites: "Избранное",
   },
   common: {
     loading: "Загрузка...",
@@ -35,6 +36,10 @@ export const ruMessages: Messages = {
     outOfStock: "Нет в наличии",
     inStock: "В наличии",
     details: "Подробнее",
+    sortPopular: "Популярные",
+    sortCheap: "Дешевле",
+    sortExpensive: "Дороже",
+    sortNew: "Новинки",
   },
   product: {
     quantity: "Количество",
@@ -147,5 +152,21 @@ export const ruMessages: Messages = {
     sat: "Суббота",
     sun: "Воскресенье",
     closed: "Выходной",
+  },
+  favorites: {
+    title: "Избранное",
+    subtitle: "Товары, которые вам понравились",
+    emptyTitle: "В избранном пока пусто",
+    emptyDescription: "Сохраняйте понравившиеся товары здесь.",
+  },
+  reviews: {
+    title: "Отзывы",
+    subtitle: "Ваше мнение о нашем сервисе",
+    emptyTitle: "Отзывов пока нет",
+    pendingTitle: "Ожидают оценки",
+    commentPlaceholder: "Оставьте свой отзыв...",
+    submit: "Отправить",
+    submitted: "Спасибо! Ваш отзыв принят.",
+    historyTitle: "Мои отзывы",
   },
 };

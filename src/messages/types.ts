@@ -4,6 +4,7 @@ export type Messages = {
     cart: string;
     orders: string;
     profile: string;
+    favorites: string;
   };
   common: {
     loading: string;
@@ -33,6 +34,10 @@ export type Messages = {
     outOfStock: string;
     inStock: string;
     details: string;
+    sortPopular: string;
+    sortCheap: string;
+    sortExpensive: string;
+    sortNew: string;
   };
   product: {
     quantity: string;
@@ -140,5 +145,21 @@ export type Messages = {
     sat: string;
     sun: string;
     closed: string;
+  };
+  favorites: {
+    title: string;
+    subtitle: string;
+    emptyTitle: string;
+    emptyDescription: string;
+  };
+  reviews: {
+    title: string;
+    subtitle: string;
+    emptyTitle: string;
+    pendingTitle: string;
+    commentPlaceholder: string;
+    submit: string;
+    submitted: string;
+    historyTitle: string;
   };
 };

@@ -11,9 +11,12 @@ import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { formatCurrency } from "@/lib/formatters/currency";
 import { isSupportedLocale } from "@/lib/i18n/config";
+import { cn } from "@/lib/utils/cn";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
+import { useFavoritesStore } from "@/store/favorites-store";
+import { FiHeart } from "react-icons/fi";
 
 export default function ProductPage() {
   const params = useParams<{ locale: string; id: string }>();
@@ -44,6 +47,13 @@ function ProductScreen({
   const increment = useCartStore((state) => state.increment);
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
+  const favoriteProducts = useFavoritesStore((state) => state.products);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  
+  const isFavorite = useMemo(
+    () => favoriteProducts.some((p) => p.id === productId),
+    [favoriteProducts, productId],
+  );
 
   const product = useMemo(
     () => products.find((item) => item.id === productId) ?? null,
@@ -87,7 +97,19 @@ function ProductScreen({
   return (
     <div className="pb-8">
       <FloatingBackButton href={`/${locale}/catalog`} />
-      <FloatingShareButton productId={product.id} productName={product.name} />
+      <div className="fixed right-4 top-4 z-50 flex flex-col gap-3">
+        <FloatingShareButton productId={product.id} productName={product.name} />
+        <button
+          onClick={() => toggleFavorite({ initData, productId: product.id })}
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-full shadow-soft transition-all active:scale-90",
+            isFavorite ? "bg-brand text-white" : "bg-surface text-app-muted"
+          )}
+          aria-label="Toggle favorite"
+        >
+          <FiHeart className={cn("h-6 w-6", isFavorite && "fill-current")} />
+        </button>
+      </div>
 
       <div className="overflow-hidden rounded-b-[2.5rem] bg-surface pb-5 shadow-soft">
         <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-surface-soft">

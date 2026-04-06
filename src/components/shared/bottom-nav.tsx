@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCartStore } from "@/store/cart-store";
 
-import { FiGrid, FiShoppingCart, FiPackage, FiUser } from "react-icons/fi";
+import { FiGrid, FiShoppingCart, FiPackage, FiUser, FiHeart } from "react-icons/fi";
 
 function NavIcon({
   type,
   className,
 }: {
-  type: "catalog" | "cart" | "orders" | "profile";
+  type: "catalog" | "cart" | "orders" | "profile" | "favorites";
   className?: string;
 }) {
   if (type === "catalog") {
@@ -20,6 +20,9 @@ function NavIcon({
   }
   if (type === "cart") {
     return <FiShoppingCart className={cn("h-5 w-5", className)} aria-hidden="true" />;
+  }
+  if (type === "favorites") {
+    return <FiHeart className={cn("h-5 w-5", className)} aria-hidden="true" />;
   }
   if (type === "orders") {
     return <FiPackage className={cn("h-5 w-5", className)} aria-hidden="true" />;
@@ -39,13 +42,14 @@ export function BottomNav({ locale }: { locale: string }) {
   const items = [
     { href: `/${locale}/catalog`, label: messages.nav.catalog, icon: "catalog" as const },
     { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true, icon: "cart" as const },
+    { href: `/${locale}/favorites`, label: messages.nav.favorites, icon: "favorites" as const },
     { href: `/${locale}/orders`, label: messages.nav.orders, icon: "orders" as const },
     { href: `/${locale}/profile`, label: messages.nav.profile, icon: "profile" as const },
   ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-surface-accent bg-surface/95 pb-[max(env(safe-area-inset-bottom),0.4rem)] pt-2 backdrop-blur-md">
-      <div className="grid w-full grid-cols-4 items-center gap-1 px-2 pb-2 pt-1">
+      <div className="grid w-full grid-cols-5 items-center gap-1 px-1 pb-2 pt-1">
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
