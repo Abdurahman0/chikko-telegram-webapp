@@ -44,6 +44,7 @@ export const ruMessages: Messages = {
     notFound: "Товар не найден",
     noEndpointNote:
       "Отдельного endpoint товара нет. Страница работает на данных каталога.",
+    inCart: "В корзине:",
   },
   cart: {
     title: "Корзина",
@@ -54,6 +55,7 @@ export const ruMessages: Messages = {
     subtotal: "Сумма",
     total: "Итого",
     checkout: "Оформить заказ",
+    unpaidOrderWarning: "У вас есть неоплаченный активный заказ. Пожалуйста, сначала оплатите его.",
   },
   checkout: {
     title: "Оформление заказа",

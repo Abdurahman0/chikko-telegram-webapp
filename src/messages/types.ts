@@ -41,6 +41,7 @@ export type Messages = {
     stockLeft: string;
     notFound: string;
     noEndpointNote: string;
+    inCart: string;
   };
   cart: {
     title: string;
@@ -51,6 +52,7 @@ export type Messages = {
     subtotal: string;
     total: string;
     checkout: string;
+    unpaidOrderWarning: string;
   };
   checkout: {
     title: string;

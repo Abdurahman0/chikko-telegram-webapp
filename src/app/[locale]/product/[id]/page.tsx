@@ -42,6 +42,7 @@ function ProductScreen({
   const status = useCatalogStore((state) => state.status);
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
   const addItem = useCartStore((state) => state.addItem);
+  const cartItems = useCartStore((state) => state.items);
 
   const product = useMemo(
     () => products.find((item) => item.id === productId) ?? null,
@@ -79,6 +80,8 @@ function ProductScreen({
       : [product.image].filter((value): value is string => Boolean(value));
   const currentImage = images[activeImage] ?? null;
   const isOut = typeof product.stock === "number" && product.stock <= 0;
+  
+  const inCartQuantity = cartItems[product.id]?.quantity || 0;
 
   return (
     <div className="pb-8">
@@ -147,7 +150,14 @@ function ProductScreen({
         </div>
 
         <div className="rounded-[2rem] bg-surface p-5 shadow-soft">
-          <p className="text-sm font-semibold">{messages.product.quantity}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">{messages.product.quantity}</p>
+            {inCartQuantity > 0 ? (
+              <span className="inline-flex items-center rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-bold text-brand-strong">
+                {messages.product.inCart} {inCartQuantity} {messages.common.pieces}
+              </span>
+            ) : null}
+          </div>
           <div className="mt-2 flex items-center gap-2">
             <Button variant="soft" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
               -

@@ -98,7 +98,7 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
 
           {hasUnpaidOrder ? (
             <div className="mt-4 rounded-xl bg-orange-100 p-3 text-center text-xs font-medium text-orange-700">
-              Sizda to'lanmagan faol buyurtma mavjud. Iltimos, oldin uni to'lang.
+              {messages.cart.unpaidOrderWarning}
             </div>
           ) : null}
 

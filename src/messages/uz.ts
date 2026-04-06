@@ -44,6 +44,7 @@ export const uzMessages: Messages = {
     notFound: "Mahsulot topilmadi",
     noEndpointNote:
       "Alohida mahsulot endpointi mavjud emas. Sahifa katalog ma'lumotlari asosida ishlaydi.",
+    inCart: "Savatda mavjud:",
   },
   cart: {
     title: "Savat",
@@ -54,6 +55,7 @@ export const uzMessages: Messages = {
     subtotal: "Oraliq summa",
     total: "Jami",
     checkout: "Rasmiylashtirish",
+    unpaidOrderWarning: "Sizda to'lanmagan faol buyurtma mavjud. Iltimos, oldin uni to'lang.",
   },
   checkout: {
     title: "Buyurtmani rasmiylashtirish",
