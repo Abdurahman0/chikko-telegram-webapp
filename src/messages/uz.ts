@@ -27,7 +27,7 @@ export const uzMessages: Messages = {
   catalog: {
     title: "Chikko Katalogi",
     subtitle: "Yoqimli tanlov va tez buyurtma",
-    searchPlaceholder: "Mahsulot qidirish",
+    searchPlaceholder: "Mahsulotlar va toifalarni qidirish",
     allCategories: "Barchasi",
     emptyTitle: "Mahsulot topilmadi",
     emptyDescription: "Filtr yoki qidiruvni o'zgartirib ko'ring.",

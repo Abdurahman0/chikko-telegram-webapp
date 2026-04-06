@@ -27,7 +27,7 @@ export const ruMessages: Messages = {
   catalog: {
     title: "Каталог Chikko",
     subtitle: "Приятный выбор и быстрый заказ",
-    searchPlaceholder: "Поиск товара",
+    searchPlaceholder: "Поиск товаров и категорий",
     allCategories: "Все",
     emptyTitle: "Товары не найдены",
     emptyDescription: "Попробуйте изменить фильтр или поиск.",
