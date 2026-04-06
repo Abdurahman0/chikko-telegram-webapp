@@ -29,7 +29,7 @@ export function FloatingReloadButton({
       )}
     >
       <span className="inline-flex h-5 w-5 items-center justify-center">
-        <IoRefresh className="h-5 w-5" aria-hidden="true" />
+        <IoRefresh className="h-5 w-5 -scale-x-100" aria-hidden="true" />
       </span>
     </button>
   );
