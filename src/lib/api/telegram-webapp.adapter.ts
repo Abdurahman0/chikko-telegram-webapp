@@ -120,14 +120,15 @@ function adaptProduct(
       if (typeof image === "string") {
         return image;
       }
-      return image.image_url || image.image || null;
+      // Handle the new nested object structure { image_url, image }
+      return (image as { image_url?: string; image?: string }).image_url || (image as { image_url?: string; image?: string }).image || null;
     })
     .filter((value): value is string => Boolean(value));
 
   const gallery = [
     ...imagesFromList,
-    ...(product.image ? [product.image] : []),
-    ...(product.image_url ? [product.image_url] : []),
+    ...(typeof product.image === "string" ? [product.image] : []),
+    ...(typeof product.image_url === "string" ? [product.image_url] : []),
   ].filter((value): value is string => Boolean(value));
 
   const categoryFromObject =

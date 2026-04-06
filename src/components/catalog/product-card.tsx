@@ -41,7 +41,7 @@ export function ProductCard({
     <div
       className={cn(
         "flex h-full flex-col rounded-[32px] bg-surface shadow-soft transition-all duration-300",
-        compact ? "min-h-[18.5rem] p-3.5" : "min-h-[21rem] p-5",
+        compact ? "min-h-[17rem] p-3" : "min-h-[19.5rem] p-4",
       )}
     >
       <Link
