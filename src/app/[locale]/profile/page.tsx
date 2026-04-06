@@ -99,6 +99,16 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
           </span>
         </Link>
 
+        <Link
+          href={`/${locale}/reviews`}
+          className="flex items-center justify-between rounded-2xl px-3 py-3 text-left hover:bg-surface-soft"
+        >
+          <span className="text-sm font-medium">{messages.reviews.title}</span>
+          <span className="text-app-muted">
+            <FiChevronRight className="h-5 w-5" />
+          </span>
+        </Link>
+
         <button
           type="button"
           onClick={() => setLanguageOpen(true)}

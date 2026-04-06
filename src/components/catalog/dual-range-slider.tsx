@@ -53,14 +53,7 @@ export function DualRangeSlider({
     }
   }, [maxVal, getPercent]);
 
-  // Get min and max values when their state changes
-  useEffect(() => {
-    if (minVal !== value[0] || maxVal !== value[1]) {
-      onChange([minVal, maxVal]);
-    }
-  }, [minVal, maxVal, onChange, value]);
-
-  // Update internal state if props change
+  // Update internal state if props change (from manual typing in parent)
   useEffect(() => {
     setMinVal(value[0]);
     setMaxVal(value[1]);
@@ -77,9 +70,10 @@ export function DualRangeSlider({
         step={step}
         value={minVal}
         onChange={(event) => {
-          const value = Math.min(Number(event.target.value), maxVal - step);
-          setMinVal(value);
-          minValRef.current = value;
+          const newValue = Math.min(Number(event.target.value), maxVal - step);
+          setMinVal(newValue);
+          minValRef.current = newValue;
+          onChange([newValue, maxVal]);
         }}
         className={cn(
           "thumb thumb--left pointer-events-none absolute z-[3] h-0 w-full outline-none",
@@ -93,9 +87,10 @@ export function DualRangeSlider({
         step={step}
         value={maxVal}
         onChange={(event) => {
-          const value = Math.max(Number(event.target.value), minVal + step);
-          setMaxVal(value);
-          maxValRef.current = value;
+          const newValue = Math.max(Number(event.target.value), minVal + step);
+          setMaxVal(newValue);
+          maxValRef.current = newValue;
+          onChange([minVal, newValue]);
         }}
         className="thumb thumb--right pointer-events-none absolute z-[4] h-0 w-full outline-none"
       />
