@@ -32,7 +32,7 @@ export default function OrderDetailPage({
   const router = useRouter();
   const { orders, status } = useOrdersData();
   const initData = useBootstrapStore((state) => state.initData);
-  const { pendingOrders, loadReviews } = useReviewsStore();
+  const { pendingOrders, reviews, loadReviews } = useReviewsStore();
 
   useEffect(() => {
     if (initData) {
@@ -41,7 +41,16 @@ export default function OrderDetailPage({
   }, [initData, loadReviews]);
 
   const order = useMemo(() => orders.find((o) => o.id === id), [orders, id]);
-  const isPendingReview = useMemo(() => pendingOrders.some(p => p.id === id), [pendingOrders, id]);
+  
+  const isPendingReview = useMemo(() => {
+    if (pendingOrders.some(p => p.id === id)) return true;
+    if (!order || !order.status) return false;
+    const s = order.status.toLowerCase();
+    const isCompleted = s.includes('completed') || s.includes('delivered') || s.includes('success') || s.includes('завершен') || s.includes('yەتkazib') || s.includes('yetkazib');
+    if (!isCompleted) return false;
+    const hasReview = reviews.some(r => r.orderId === order.id);
+    return !hasReview;
+  }, [pendingOrders, id, order, reviews]);
 
   if (status === "loading") {
     return (

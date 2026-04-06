@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { StateCard } from "@/components/shared/state-card";
@@ -9,6 +10,7 @@ import { Input } from "@/components/shared/input";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useReviewsStore } from "@/store/reviews-store";
+import { useOrdersStore } from "@/store/orders-store";
 import { isSupportedLocale } from "@/lib/i18n/config";
 import { formatCurrency } from "@/lib/formatters/currency";
 import { cn } from "@/lib/utils/cn";
@@ -26,7 +28,25 @@ export default function ReviewsPage() {
 function ReviewsScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
   const initData = useBootstrapStore((state) => state.initData);
-  const { reviews, pendingOrders, status, loadReviews, submitReview } = useReviewsStore();
+  const { reviews, pendingOrders: backendPending, status, loadReviews, submitReview } = useReviewsStore();
+  const orders = useOrdersStore((state) => state.orders);
+  
+  const pendingOrders = React.useMemo(() => {
+    const backendIds = new Set(backendPending.map(o => o.id));
+    const reviewedIds = new Set(reviews.map(r => r.orderId));
+    
+    const localPending = orders.filter(o => {
+      if (!o.status) return false;
+      const s = o.status.toLowerCase();
+      const isCompleted = s.includes('completed') || s.includes('delivered') || s.includes('success') || s.includes('завершен') || s.includes('yەتkazib') || s.includes('yetkazib');
+      if (!isCompleted) return false;
+      if (backendIds.has(o.id) || reviewedIds.has(o.id)) return false;
+      return true;
+    });
+    
+    return [...backendPending, ...localPending];
+  }, [backendPending, reviews, orders]);
+
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [comments, setComments] = useState<Record<string, string>>({});
 
