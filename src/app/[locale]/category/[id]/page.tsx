@@ -104,48 +104,50 @@ export default function CategoryPage({
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-6 pb-4 backdrop-blur-md transition-all duration-300">
-        <div className="flex items-center gap-3 mb-4">
+      {/* Compact Sticky Header */}
+      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-3 pb-2.5 backdrop-blur-md transition-all duration-300 border-b border-surface-accent/10">
+        <div className="flex items-center gap-2 mb-2.5">
           <button
             onClick={() => router.back()}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface shadow-sm border border-surface-accent/20"
+            className="flex h-10 w-8 shrink-0 items-center justify-start text-app-text active:scale-95 transition-transform"
           >
-            <FiArrowLeft className="h-5 w-5" />
+            <FiArrowLeft className="h-6 w-6 stroke-[2.2px]" />
           </button>
-          <div className="relative flex-1">
+          <div className="relative flex-1 group">
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={messages.catalog.searchPlaceholder}
-              className="h-10 rounded-xl border-none bg-surface-accent/30 pl-10 text-sm focus:ring-1 focus:ring-brand/20 transition-all shadow-inner"
+              className="h-10 rounded-xl border-none bg-surface-accent/25 pl-10 text-xs font-medium focus:ring-1 focus:ring-brand/10 transition-all shadow-inner"
             />
-            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-app-muted/60 h-4 w-4" />
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-app-muted/50 h-3.5 w-3.5" />
           </div>
         </div>
 
-        <div>
-          <h1 className="text-2xl font-black text-app-text tracking-tight capitalize">
-            {categoryName.toLowerCase()}
-          </h1>
-          <p className="text-sm font-medium text-app-muted/80">{productCount}</p>
-        </div>
+        <div className="flex items-end justify-between px-0.5">
+          <div className="flex-1">
+            <h1 className="text-xl font-black text-app-text tracking-tight capitalize leading-tight">
+              {categoryName.toLowerCase()}
+            </h1>
+            <p className="text-[11px] font-bold text-app-muted/60 uppercase tracking-wide mt-0.5">{productCount}</p>
+          </div>
 
-        {/* Control Bar */}
-        <div className="mt-4 flex items-center gap-3">
-          <button 
-            onClick={() => setIsSortOpen(true)}
-            className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-accent/30 text-app-text transition-colors active:bg-surface-accent"
-          >
-            <TbArrowsSort className="h-5 w-5" />
-          </button>
-          <button 
-            onClick={() => setIsFilterOpen(true)}
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-surface-accent/30 text-sm font-bold text-app-text transition-colors active:bg-surface-accent"
-          >
-            <FiSliders className="h-4 w-4" />
-            {messages.catalog.filterTitle}
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsSortOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+              aria-label="Sort"
+            >
+              <TbArrowsSort className="h-4.5 w-4.5" />
+            </button>
+            <button 
+              onClick={() => setIsFilterOpen(true)}
+              className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-surface-accent/20 text-[11px] font-black uppercase tracking-wider text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+            >
+              <FiSliders className="h-3.5 w-3.5" />
+              {messages.catalog.filterTitle}
+            </button>
+          </div>
         </div>
       </header>
 
