@@ -88,31 +88,14 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       errorMessage: null,
     });
     try {
-      let data;
-      if (category && category !== "") {
-        const detailData = await getCategoryProducts(initData, category, {
-          brand,
-          priceFrom,
-          priceTo,
-          search,
-          sort,
-        });
-        // Adapt detailData to the format expected by the rest of the store logic
-        data = {
-          categories: [], // chips already have categories
-          promotedProducts: [], 
-          products: detailData.products,
-        };
-      } else {
-        data = await getCatalog(initData, { 
-          category, 
-          search,
-          brand,
-          priceFrom,
-          priceTo,
-          sort 
-        });
-      }
+      const data = await getCatalog(initData, { 
+        category, 
+        search,
+        brand,
+        priceFrom,
+        priceTo,
+        sort 
+      });
 
       set((state: CatalogStore) => ({
         categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,

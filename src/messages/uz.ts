@@ -186,5 +186,6 @@ export const uzMessages: Messages = {
     submit: "Yuborish",
     submitted: "Rahmat! Fikringiz qabul qilindi.",
     historyTitle: "Mening fikrlarim",
+    leaveReview: "Fikr qoldirish",
   },
 };

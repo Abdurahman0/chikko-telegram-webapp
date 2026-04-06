@@ -61,7 +61,7 @@ export async function getCatalog(
 ): Promise<CatalogData> {
   const query = new URLSearchParams();
   if (params?.category) {
-    query.set("category", params.category);
+    query.set("category_id", params.category);
   }
   if (params?.brand) {
     query.set("brand", params.brand);

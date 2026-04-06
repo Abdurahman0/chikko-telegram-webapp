@@ -2,13 +2,16 @@
 
 import { use, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { FiArrowLeft, FiPackage, FiTruck, FiMapPin, FiUser, FiPhone, FiCreditCard } from "react-icons/fi";
+import Link from "next/link";
+import { FiArrowLeft, FiPackage, FiTruck, FiMapPin, FiUser, FiPhone, FiCreditCard, FiMessageSquare } from "react-icons/fi";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useOrdersData } from "@/features/orders/use-orders-data";
 import { formatCurrency } from "@/lib/formatters/currency";
 import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-status";
 import { StateCard } from "@/components/shared/state-card";
+import { useReviewsStore } from "@/store/reviews-store";
+import { useBootstrapStore } from "@/store/bootstrap-store";
 
 function getStatusColor(status?: string) {
   if (!status) return "amber";
@@ -28,8 +31,17 @@ export default function OrderDetailPage({
   const { messages } = useI18n();
   const router = useRouter();
   const { orders, status } = useOrdersData();
+  const initData = useBootstrapStore((state) => state.initData);
+  const { pendingOrders, loadReviews } = useReviewsStore();
+
+  useEffect(() => {
+    if (initData) {
+      void loadReviews({ initData });
+    }
+  }, [initData, loadReviews]);
 
   const order = useMemo(() => orders.find((o) => o.id === id), [orders, id]);
+  const isPendingReview = useMemo(() => pendingOrders.some(p => p.id === id), [pendingOrders, id]);
 
   if (status === "loading") {
     return (
@@ -204,6 +216,18 @@ export default function OrderDetailPage({
           <p className="text-center text-[10px] font-bold text-app-muted/40 uppercase tracking-widest pt-4">
              Buyurtma qilingan vaqti: {new Date(order.createdAt).toLocaleString(locale === 'uz' ? 'uz-UZ' : 'ru-RU')}
           </p>
+        )}
+
+        {isPendingReview && (
+          <div className="pt-2">
+            <Link 
+              href={`/${locale}/reviews`}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-4 font-bold text-white shadow-lg active:scale-95 transition-transform"
+            >
+              <FiMessageSquare className="h-5 w-5" />
+              {messages.reviews.leaveReview}
+            </Link>
+          </div>
         )}
       </main>
     </div>

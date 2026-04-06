@@ -185,5 +185,6 @@ export const ruMessages: Messages = {
     submit: "Отправить",
     submitted: "Спасибо! Ваш отзыв принят.",
     historyTitle: "Мои отзывы",
+    leaveReview: "Оставить отзыв",
   },
 };

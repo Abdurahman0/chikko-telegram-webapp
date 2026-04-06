@@ -178,5 +178,6 @@ export type Messages = {
     submit: string;
     submitted: string;
     historyTitle: string;
+    leaveReview: string;
   };
 };
