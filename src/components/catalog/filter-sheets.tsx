@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
@@ -120,9 +121,18 @@ export function CategoryPickerSheet({
   onBack: () => void;
 }) {
   const { messages } = useI18n();
+  const router = useRouter();
+  const params = useParams<{ locale: string }>();
+  const locale = params.locale;
+
   const activeCategory = useCatalogStore((state) => state.activeCategory);
-  const setCategory = useCatalogStore((state) => state.setCategory);
   const categories = useCatalogStore((state) => state.categories);
+
+  const handleSelect = (id: string) => {
+    const targetId = id === "" ? "all" : id;
+    router.push(`/${locale}/category/${targetId}`);
+    onClose();
+  };
 
   return (
     <Sheet 
@@ -142,7 +152,7 @@ export function CategoryPickerSheet({
         <div className="space-y-1 overflow-y-auto max-h-[50vh] pr-2 no-scrollbar">
           {/* All category */}
           <button
-            onClick={() => setCategory("")}
+            onClick={() => handleSelect("")}
             className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
           >
             <span className={cn("text-base font-semibold", activeCategory === "" ? "text-app-text" : "text-app-muted")}>
@@ -163,7 +173,7 @@ export function CategoryPickerSheet({
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => setCategory(category.id)}
+              onClick={() => handleSelect(category.id)}
               className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
             >
               <span className={cn("text-base font-semibold", activeCategory === category.id ? "text-app-text" : "text-app-muted")}>

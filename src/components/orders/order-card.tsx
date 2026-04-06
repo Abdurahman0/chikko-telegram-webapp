@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatCurrency } from "@/lib/formatters/currency";
 import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-status";
 import { cn } from "@/lib/utils/cn";
@@ -41,7 +42,10 @@ export function OrderCard({
   const paymentStatusClasses = getStatusColorClasses(order.paymentStatus);
 
   return (
-    <div className="rounded-3xl bg-surface p-4 shadow-soft">
+    <Link 
+      href={`/${locale}/orders/${order.id}`}
+      className="block rounded-3xl bg-surface p-4 shadow-soft active:scale-[0.98] transition-transform"
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold">{title}</p>
@@ -74,6 +78,6 @@ export function OrderCard({
           </span>
         </p>
       ) : null}
-    </div>
+    </Link>
   );
 }

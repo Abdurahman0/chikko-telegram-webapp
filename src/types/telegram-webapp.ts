@@ -81,6 +81,9 @@ export type Order = {
   currency: string;
   items: OrderItem[];
   createdAt?: string;
+  contactName?: string;
+  contactPhone?: string;
+  shippingAddress?: string;
 };
 
 export type Payment = {

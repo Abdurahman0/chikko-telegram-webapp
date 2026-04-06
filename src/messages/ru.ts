@@ -20,6 +20,7 @@ export const ruMessages: Messages = {
     goToCart: "Перейти в корзину",
     openCatalog: "Открыть каталог",
     price: "Цена",
+    back: "Назад",
   },
   bootstrap: {
     loading: "Запуск Chikko",
@@ -83,6 +84,7 @@ export const ruMessages: Messages = {
     fullName: "Полное имя",
     phone: "Телефон",
     address: "Адрес",
+    addressTitle: "Адрес доставки",
     location: "Локация",
     locationHint: "Выберите точку на карте или введите адрес",
     useCurrentLocation: "Использовать текущую геопозицию",

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { PropsWithChildren } from "react";
+import { AppInitializer } from "@/components/shared/app-initializer";
 import { AppShell } from "@/components/shared/app-shell";
 import { LocaleProvider } from "@/components/shared/locale-provider";
 import { TelegramBootstrap } from "@/components/telegram/telegram-bootstrap";
@@ -21,6 +22,7 @@ export default async function LocaleLayout({
 
   return (
     <LocaleProvider locale={locale}>
+      <AppInitializer />
       <AppShell locale={locale}>
         <TelegramBootstrap />
         {children}

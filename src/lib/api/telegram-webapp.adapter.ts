@@ -105,6 +105,9 @@ function adaptOrder(raw: RawOrder): Order {
     currency: raw.currency ?? "UZS",
     items,
     createdAt: raw.created_at,
+    contactName: raw.contact_name,
+    contactPhone: raw.contact_phone,
+    shippingAddress: raw.shipping_address,
   };
 }
 

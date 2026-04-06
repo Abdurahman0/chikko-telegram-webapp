@@ -18,6 +18,7 @@ export type Messages = {
     goToCart: string;
     openCatalog: string;
     price: string;
+    back: string;
   };
   bootstrap: {
     loading: string;
@@ -80,6 +81,7 @@ export type Messages = {
     fullName: string;
     phone: string;
     address: string;
+    addressTitle: string;
     location: string;
     locationHint: string;
     useCurrentLocation: string;

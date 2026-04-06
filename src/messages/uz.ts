@@ -20,6 +20,7 @@ export const uzMessages: Messages = {
     goToCart: "Savatga o'tish",
     openCatalog: "Katalogni ochish",
     price: "Narxi",
+    back: "Orqaga",
   },
   bootstrap: {
     loading: "Chikko ishga tushirilmoqda",
@@ -83,6 +84,7 @@ export const uzMessages: Messages = {
     fullName: "To'liq ism",
     phone: "Telefon",
     address: "Manzil",
+    addressTitle: "Yetkazib berish manzili",
     location: "Lokatsiya",
     locationHint: "Xaritadan nuqta tanlang yoki manzil kiriting",
     useCurrentLocation: "Joriy joylashuvni olish",

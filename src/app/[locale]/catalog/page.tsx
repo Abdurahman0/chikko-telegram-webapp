@@ -124,10 +124,9 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Optional: Reset category when landing on home if desired, 
-    // but the user mostly wanted the buttons and persistence fixed.
-    // We already handled the bottom nav reset.
-  }, []);
+    // Reset category when landing on home to ensure "All" is active
+    setCategory("");
+  }, [setCategory]);
 
   return (
     <div className="min-h-screen bg-app-bg pb-20">
