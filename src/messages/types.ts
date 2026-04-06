@@ -17,6 +17,7 @@ export type Messages = {
     continueShopping: string;
     goToCart: string;
     openCatalog: string;
+    price: string;
   };
   bootstrap: {
     loading: string;
@@ -49,6 +50,7 @@ export type Messages = {
     priceRange: string;
     priceFromLabel: string;
     priceToLabel: string;
+    brand: string;
   };
   product: {
     quantity: string;
@@ -58,6 +60,8 @@ export type Messages = {
     notFound: string;
     noEndpointNote: string;
     inCart: string;
+    details: string;
+    noDescription: string;
   };
   cart: {
     title: string;

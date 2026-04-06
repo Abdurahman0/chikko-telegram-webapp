@@ -16,7 +16,7 @@ import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
 import { useFavoritesStore } from "@/store/favorites-store";
-import { FiHeart } from "react-icons/fi";
+import { FiHeart, FiShoppingCart, FiMinus, FiPlus } from "react-icons/fi";
 
 export default function ProductPage() {
   const params = useParams<{ locale: string; id: string }>();
@@ -95,24 +95,33 @@ function ProductScreen({
   const inCartQuantity = cartItems[product.id]?.quantity || 0;
 
   return (
-    <div className="pb-8">
-      <FloatingBackButton href={`/${locale}/catalog`} />
-      <div className="fixed right-4 top-4 z-50 flex flex-col gap-3">
-        <FloatingShareButton productId={product.id} productName={product.name} />
-        <button
-          onClick={() => toggleFavorite({ initData, productId: product.id })}
-          className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-full shadow-soft transition-all active:scale-90",
-            isFavorite ? "bg-brand text-white" : "bg-surface text-app-muted"
-          )}
-          aria-label="Toggle favorite"
-        >
-          <FiHeart className={cn("h-6 w-6", isFavorite && "fill-current")} />
-        </button>
+    <div className="pb-32">
+      {/* Header Actions */}
+      <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 pt-4 pointer-events-none">
+        <div className="pointer-events-auto">
+          <FloatingBackButton href={`/${locale}/catalog`} className="static translate-y-0" />
+        </div>
+        <div className="flex gap-2 pointer-events-auto">
+          <button
+            onClick={() => toggleFavorite({ initData, productId: product.id })}
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-full shadow-soft backdrop-blur-md transition-all active:scale-90",
+              isFavorite ? "bg-white text-[#FF4B55]" : "bg-white/80 text-app-muted"
+            )}
+            aria-label="Toggle favorite"
+          >
+            <FiHeart className={cn("h-5 w-5", isFavorite && "fill-current")} />
+          </button>
+          <FloatingShareButton 
+            productId={product.id} 
+            productName={product.name} 
+            className="static translate-y-0 h-10 w-10 bg-white/80 backdrop-blur-md" 
+          />
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-b-[2.5rem] bg-surface pb-5 shadow-soft">
-        <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-surface-soft">
+        <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-[#F9FAFB]">
           {currentImage ? (
             <Image
               src={currentImage}
@@ -120,7 +129,7 @@ function ProductScreen({
               fill
               sizes="100vw"
               unoptimized
-              className="object-cover"
+              className="object-contain p-6"
             />
           ) : (
             <div className="text-2xl text-app-muted">
@@ -160,55 +169,70 @@ function ProductScreen({
         </div>
       </div>
 
-      <div className="mt-2 space-y-2">
-        <div className="rounded-[2rem] bg-surface p-5 shadow-soft">
-          <p className="text-xl font-bold">
-            {formatCurrency(product.price, locale)} {messages.common.som}
-          </p>
-          <p className={`mt-2 text-sm font-semibold ${isOut ? "text-danger" : "text-brand-strong"}`}>
-            {isOut
-              ? messages.product.outOfStock
-              : `${messages.product.stockLeft}: ${product.stock ?? messages.common.unknown}`}
-          </p>
+      <div className="mt-2 space-y-2 px-4 pb-32">
+        <div className="rounded-[2.5rem] bg-surface p-6 shadow-soft">
+          <h2 className="text-lg font-bold mb-3">{messages.product.details}</h2>
+          <div className="prose prose-sm max-w-none text-app-muted leading-relaxed">
+            {product.description || product.shortDescription || messages.product.noDescription}
+          </div>
         </div>
 
-        <div className="rounded-[2rem] bg-surface p-5 shadow-soft">
-          {inCartQuantity === 0 ? (
-            <Button
-              fullWidth
-              onClick={() => addItem(product, 1)}
-              disabled={isOut}
-            >
-              {messages.product.addToCart}
-            </Button>
-          ) : (
-            <div>
-              <p className="mb-4 text-center text-sm font-semibold text-brand-strong">
-                {messages.product.inCart} {inCartQuantity} {messages.common.pieces}
-              </p>
-              <div className="flex items-center justify-between gap-3">
+        {product.brandName && (
+          <div className="rounded-3xl bg-surface px-6 py-4 shadow-soft flex items-center justify-between">
+            <span className="text-sm font-semibold text-app-muted">{messages.catalog.brand}</span>
+            <span className="text-sm font-bold text-app-text">{product.brandName}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Fixed Sticky Shopping Bar */}
+      <div className="fixed inset-x-0 bottom-0 z-50 bg-surface/95 px-6 pb-[max(env(safe-area-inset-bottom),1.2rem)] pt-4 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.08)] safe-bottom border-t border-surface-accent/20">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-app-muted/60">{messages.common.price}</span>
+            <p className="text-lg font-black text-app-text tracking-tight">
+              {formatCurrency(product.price, locale)} <span className="text-xs font-bold opacity-60 ml-0.5">{messages.common.som}</span>
+            </p>
+          </div>
+
+          <div className="flex-1 max-w-[220px]">
+            {inCartQuantity === 0 ? (
+              <div className="flex items-center gap-2">
                 <Button
-                  variant="soft"
-                  className="flex-1"
+                  fullWidth
+                  className="h-12 rounded-2xl bg-brand text-sm font-black shadow-lg shadow-brand/20 active:scale-95 transition-transform"
+                  onClick={() => addItem(product, 1)}
+                  disabled={isOut}
+                >
+                  Savatchaga
+                </Button>
+                <button 
+                  onClick={() => addItem(product, 1)}
+                  disabled={isOut}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-strong active:scale-90 transition-transform"
+                >
+                  <FiShoppingCart className="h-5 w-5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between rounded-2xl bg-brand-soft p-1 h-12">
+                <button
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-strong shadow-sm active:scale-90 transition-transform"
                   onClick={() => decrement(product.id)}
                 >
-                  -
-                </Button>
-                <div className="w-12 text-center text-xl font-bold">{inCartQuantity}</div>
-                <Button
-                  variant="soft"
-                  className="flex-1"
+                  <FiMinus className="h-5 w-5" />
+                </button>
+                <span className="text-lg font-black text-brand-strong tabular-nums">{inCartQuantity}</span>
+                <button
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-strong shadow-sm active:scale-90 transition-transform disabled:opacity-50"
                   onClick={() => increment(product.id)}
-                  disabled={
-                    typeof product.stock === "number" &&
-                    inCartQuantity >= product.stock
-                  }
+                  disabled={typeof product.stock === "number" && inCartQuantity >= product.stock}
                 >
-                  +
-                </Button>
+                  <FiPlus className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -132,7 +132,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   return (
     <div className="min-h-screen bg-app-bg pb-20">
       {/* Hero Carousel */}
-      <div className="-mx-4 -mt-3 min-h-[160px] bg-surface-accent/20">
+      <div className="-mx-4 -mt-3 overflow-hidden">
         <PromotedCarousel locale={locale} products={promotedProducts} />
       </div>
 

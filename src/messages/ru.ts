@@ -19,6 +19,7 @@ export const ruMessages: Messages = {
     continueShopping: "Продолжить покупки",
     goToCart: "Перейти в корзину",
     openCatalog: "Открыть каталог",
+    price: "Цена",
   },
   bootstrap: {
     loading: "Запуск Chikko",
@@ -51,6 +52,7 @@ export const ruMessages: Messages = {
     priceRange: "Цена (UZS)",
     priceFromLabel: "от",
     priceToLabel: "до",
+    brand: "Бренд",
   },
   product: {
     quantity: "Количество",
@@ -61,6 +63,8 @@ export const ruMessages: Messages = {
     noEndpointNote:
       "Отдельного endpoint товара нет. Страница работает на данных каталога.",
     inCart: "В корзине:",
+    details: "Подробнее",
+    noDescription: "Описание отсутствует",
   },
   cart: {
     title: "Корзина",

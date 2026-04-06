@@ -38,14 +38,14 @@ export function FloatingShareButton({
   };
 
   const content = (
-    <FiShare className="relative -ml-[2px] h-[18px] w-[18px] stroke-[2.5px]" aria-hidden="true" />
+    <FiShare className="h-5 w-5 stroke-[2.5px]" aria-hidden="true" />
   );
 
   return (
     <button
       type="button"
       className={cn(
-        "fixed right-4 top-4 z-40 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-strong shadow-soft ring-1 ring-surface-accent active:bg-surface-soft transition-colors",
+        "inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-strong shadow-soft ring-1 ring-surface-accent/20 active:bg-surface-soft transition-colors",
         className,
       )}
       onClick={handleShare}

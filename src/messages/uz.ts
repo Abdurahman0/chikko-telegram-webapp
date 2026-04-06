@@ -19,6 +19,7 @@ export const uzMessages: Messages = {
     continueShopping: "Xaridni davom ettirish",
     goToCart: "Savatga o'tish",
     openCatalog: "Katalogni ochish",
+    price: "Narxi",
   },
   bootstrap: {
     loading: "Chikko ishga tushirilmoqda",
@@ -51,6 +52,7 @@ export const uzMessages: Messages = {
     priceRange: "Narx (UZS)",
     priceFromLabel: "dan",
     priceToLabel: "gacha",
+    brand: "Brend",
   },
   product: {
     quantity: "Miqdor",
@@ -61,6 +63,8 @@ export const uzMessages: Messages = {
     noEndpointNote:
       "Alohida mahsulot endpointi mavjud emas. Sahifa katalog ma'lumotlari asosida ishlaydi.",
     inCart: "Savatda mavjud:",
+    details: "Batafsil",
+    noDescription: "Tavsif mavjud emas",
   },
   cart: {
     title: "Savat",
