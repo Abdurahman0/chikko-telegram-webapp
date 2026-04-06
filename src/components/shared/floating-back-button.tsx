@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FiChevronLeft } from "react-icons/fi";
 import { cn } from "@/lib/utils/cn";
 
 export function FloatingBackButton({
@@ -16,17 +17,7 @@ export function FloatingBackButton({
   const router = useRouter();
 
   const content = (
-    <>
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
-        <path
-          d="M15 6 9 12l6 6"
-          stroke="currentColor"
-          strokeWidth="2.1"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </>
+    <FiChevronLeft className="h-[22px] w-[22px] stroke-[2.5px]" aria-hidden="true" />
   );
 
   const classes = cn(

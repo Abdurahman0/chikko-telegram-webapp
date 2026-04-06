@@ -3,20 +3,22 @@ import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-s
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Order } from "@/types/telegram-webapp";
 
-function isCanceledStatus(status?: string) {
+function getStatusColorClasses(status?: string) {
   if (!status) {
-    return false;
+    return "bg-surface-soft text-app-muted";
   }
   const normalized = status.toLowerCase();
-  return normalized === "canceled" || normalized === "cancelled";
-}
-
-function isPaidStatus(status?: string) {
-  if (!status) {
-    return false;
+  
+  if (["completed", "delivered", "success", "paid"].includes(normalized)) {
+    return "bg-emerald-100 text-emerald-700";
   }
-  const normalized = status.toLowerCase();
-  return normalized === "paid" || normalized === "success";
+  if (["canceled", "cancelled", "failed", "error"].includes(normalized)) {
+    return "bg-rose-100 text-rose-700";
+  }
+  if (["new", "pending", "processing"].includes(normalized)) {
+    return "bg-amber-100 text-amber-700";
+  }
+  return "bg-brand-soft text-brand-strong";
 }
 
 export function OrderCard({
@@ -34,9 +36,8 @@ export function OrderCard({
   paymentStatusLabel: string;
   currencyLabel: string;
 }) {
-  const isCanceled = isCanceledStatus(order.status);
-  const isPaymentCanceled = isCanceledStatus(order.paymentStatus);
-  const isPaymentPaid = isPaidStatus(order.paymentStatus);
+  const orderStatusClasses = getStatusColorClasses(order.status);
+  const paymentStatusClasses = getStatusColorClasses(order.paymentStatus);
 
   return (
     <div className="rounded-3xl bg-surface p-4 shadow-soft">
@@ -46,9 +47,7 @@ export function OrderCard({
           <p className="mt-1 text-xs text-app-muted">#{order.id}</p>
         </div>
         <div
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            isCanceled ? "bg-red-100 text-red-700" : "bg-brand-soft text-brand-strong"
-          }`}
+          className={`rounded-full px-3 py-1 text-[11px] font-bold ${orderStatusClasses}`}
         >
           {formatOrderStatus(order.status, locale) || "New"}
         </div>
@@ -63,13 +62,9 @@ export function OrderCard({
         <p className="mt-1 text-xs text-app-muted">
           {paymentStatusLabel}:{" "}
           <span
-            className={
-              isPaymentCanceled
-                ? "font-semibold text-red-700"
-                : isPaymentPaid
-                  ? "font-semibold text-brand-strong"
-                  : "font-medium text-app-muted"
-            }
+            className={`font-semibold ${
+              paymentStatusClasses.replace("bg-", "").split(" ").find(c => c.startsWith("text-")) || "text-app-muted"
+            }`}
           >
             {formatPaymentStatus(order.paymentStatus, locale)}
           </span>

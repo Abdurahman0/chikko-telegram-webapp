@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCartStore } from "@/store/cart-store";
 
+import { FiGrid, FiShoppingCart, FiPackage, FiUser } from "react-icons/fi";
+
 function NavIcon({
   type,
   className,
@@ -14,51 +16,15 @@ function NavIcon({
   className?: string;
 }) {
   if (type === "catalog") {
-    return (
-      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
-        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-      </svg>
-    );
+    return <FiGrid className={cn("h-5 w-5", className)} aria-hidden="true" />;
   }
   if (type === "cart") {
-    return (
-      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
-        <path
-          d="M3.5 5.5h2.6l1.9 8.2a1.4 1.4 0 0 0 1.4 1.1h7.8a1.4 1.4 0 0 0 1.4-1.1L20.2 8H7.1"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="10.2" cy="18.2" r="1.25" fill="currentColor" />
-        <circle cx="16.8" cy="18.2" r="1.25" fill="currentColor" />
-      </svg>
-    );
+    return <FiShoppingCart className={cn("h-5 w-5", className)} aria-hidden="true" />;
   }
   if (type === "orders") {
-    return (
-      <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
-        <path
-          d="M7 4h10a2 2 0 0 1 2 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2Z"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
+    return <FiPackage className={cn("h-5 w-5", className)} aria-hidden="true" />;
   }
-  return (
-    <svg viewBox="0 0 24 24" className={cn("h-4 w-4", className)} fill="none" aria-hidden="true">
-      <path
-        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <FiUser className={cn("h-5 w-5", className)} aria-hidden="true" />;
 }
 
 export function BottomNav({ locale }: { locale: string }) {
@@ -93,7 +59,7 @@ export function BottomNav({ locale }: { locale: string }) {
               )}
             >
               <span className="relative inline-flex items-center justify-center">
-                <NavIcon type={item.icon} className={item.isCart ? "h-5 w-5" : "h-4 w-4"} />
+                <NavIcon type={item.icon} className={item.isCart ? "stroke-[2.5px] h-5 w-5" : "stroke-[2.5px] h-5 w-5"} />
                 {item.isCart && cartQuantity > 0 ? (
                   <span
                     key={cartQuantity}

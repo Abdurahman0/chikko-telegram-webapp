@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
+import { FiChevronRight } from "react-icons/fi";
+import { TbBrandInstagram, TbBrandTelegram } from "react-icons/tb";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StateCard } from "@/components/shared/state-card";
 import { LanguageBottomSheet } from "@/components/profile/language-bottom-sheet";
@@ -94,7 +95,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
         >
           <span className="text-sm font-medium">{messages.profile.settingsTitle}</span>
           <span className="text-app-muted">
-            <ChevronRightIcon />
+            <FiChevronRight className="h-5 w-5" />
           </span>
         </Link>
 
@@ -106,7 +107,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
           <span className="text-sm font-medium">{messages.profile.language}</span>
           <span className="inline-flex items-center gap-2 text-sm text-app-muted">
             {languageLabel}
-            <ChevronRightIcon />
+            <FiChevronRight className="h-5 w-5" />
           </span>
         </button>
 
@@ -116,7 +117,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
         >
           <span className="text-sm font-medium">{messages.profile.aboutUs}</span>
           <span className="text-app-muted">
-            <ChevronRightIcon />
+            <FiChevronRight className="h-5 w-5" />
           </span>
         </Link>
 
@@ -126,7 +127,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
         >
           <span className="text-sm font-medium">{messages.profile.contactUs}</span>
           <span className="text-app-muted">
-            <ChevronRightIcon />
+            <FiChevronRight className="h-5 w-5" />
           </span>
         </Link>
       </div>
@@ -141,7 +142,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#E1306C] text-white shadow-[0_10px_20px_-12px_rgba(225,48,108,0.9)]"
             aria-label={messages.about.instagram}
           >
-            <FaInstagram className="h-5 w-5" />
+            <TbBrandInstagram className="h-[26px] w-[26px] stroke-[1.5px]" />
           </a>
           <a
             href="https://t.me/chikko_shop"
@@ -150,7 +151,7 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#229ED9] text-white shadow-[0_10px_20px_-12px_rgba(34,158,217,0.95)]"
             aria-label={messages.about.telegram}
           >
-            <FaTelegramPlane className="h-5 w-5" />
+            <TbBrandTelegram className="h-[26px] w-[26px] stroke-[1.5px] -ml-[2px]" />
           </a>
         </div>
       </div>
@@ -168,16 +169,3 @@ function ProfileScreen({ locale }: { locale: AppLocale }) {
   );
 }
 
-function ChevronRightIcon() {
-  return (
-    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-      <path
-        d="m7.5 4 5 6-5 6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
