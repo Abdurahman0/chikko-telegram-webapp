@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useCatalogStore } from "@/store/catalog-store";
 import { Sheet } from "@/components/shared/sheet";
+import { DualRangeSlider } from "@/components/catalog/dual-range-slider";
 
 export function FilterSheet({ 
   isOpen, 
@@ -24,7 +25,7 @@ export function FilterSheet({
   const setPriceRange = useCatalogStore((state) => state.setPriceRange);
 
   const [localFrom, setLocalFrom] = useState(priceFrom ?? 0);
-  const [localTo, setLocalTo] = useState(priceTo ?? 5000000);
+  const [localTo, setLocalTo] = useState(priceTo ?? 10000000);
 
   const activeCategory = categories.find(c => c.id === activeCategoryId);
   const categoryName = activeCategoryId === "" ? messages.catalog.allCategories : activeCategory?.name ?? messages.common.unknown;
@@ -61,9 +62,9 @@ export function FilterSheet({
                 type="number"
                 value={localFrom}
                 onChange={(e) => setLocalFrom(Number(e.target.value))}
-                className="h-12 w-full rounded-xl bg-surface-accent/20 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-brand/30"
+                className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted uppercase">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
                 {messages.catalog.priceFromLabel}
               </span>
             </div>
@@ -72,23 +73,24 @@ export function FilterSheet({
                 type="number"
                 value={localTo}
                 onChange={(e) => setLocalTo(Number(e.target.value))}
-                className="h-12 w-full rounded-xl bg-surface-accent/20 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-brand/30"
+                className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted uppercase">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
                 {messages.catalog.priceToLabel}
               </span>
             </div>
           </div>
 
-          <div className="px-2">
-            <input 
-              type="range" 
+          <div className="px-1 py-4">
+            <DualRangeSlider
               min={0}
               max={10000000}
-              step={100000}
-              value={localTo}
-              onChange={(e) => setLocalTo(Number(e.target.value))}
-              className="h-1.5 w-full accent-brand bg-surface-accent/50 rounded-full appearance-none cursor-pointer"
+              step={10000}
+              value={[localFrom, localTo]}
+              onChange={(val) => {
+                setLocalFrom(val[0]);
+                setLocalTo(val[1]);
+              }}
             />
           </div>
         </div>
@@ -96,7 +98,7 @@ export function FilterSheet({
         <div className="pt-4">
           <button
             onClick={handleApply}
-            className="w-full rounded-2xl bg-brand py-4 text-center font-bold text-white shadow-lg active:scale-95 transition-transform"
+            className="w-full rounded-3xl bg-brand py-5 text-center font-bold text-white shadow-[0_10px_20px_rgba(255,126,139,0.3)] active:scale-[0.98] transition-all"
           >
             {messages.catalog.show}
           </button>

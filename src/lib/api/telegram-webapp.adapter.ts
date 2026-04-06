@@ -215,7 +215,7 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
     name: category.name ?? category.title ?? `Category ${category.id}`,
     code: category.code,
     description: category.description,
-    image: category.image ?? category.image_url ?? null,
+    image: category.image_url || category.image || null,
   }));
 
   const promotedProducts: Product[] = (raw.promoted_products ?? []).map((p) =>
@@ -240,7 +240,7 @@ export function adaptCategoriesResponse(
     name: category.name ?? category.title ?? `Category ${category.id}`,
     code: category.code,
     description: category.description,
-    image: category.image ?? category.image_url ?? null,
+    image: category.image_url || category.image || null,
   }));
 }
 

@@ -126,24 +126,37 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   return (
     <div className="min-h-screen bg-app-bg pb-20">
       {/* Hero Carousel */}
-      <div className="-mx-4 -mt-3">
+      <div className="-mx-4 -mt-3 min-h-[160px] bg-surface-accent/20">
         <PromotedCarousel locale={locale} products={promotedProducts} />
       </div>
 
       {/* Floating Card Container */}
-      <div className="relative z-20 -mt-10 rounded-[40px] bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.08)]">
+      <div className="relative z-20 -mt-8 rounded-[40px] bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.08)]">
         <div className="px-5 pt-8 pb-4">
-          {/* Search Bar */}
-          <div className="relative mb-6">
-            <Input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={messages.catalog.searchPlaceholder}
-              className="h-14 rounded-2xl border-none bg-surface-accent/30 pl-12 pr-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all shadow-inner"
-            />
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted/60">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          {/* Search Bar & Reset */}
+          <div className="relative flex items-center gap-2 mb-6">
+            <div className="relative flex-1">
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={messages.catalog.searchPlaceholder}
+                className="h-14 rounded-2xl border-none bg-surface-accent/30 pl-12 pr-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all shadow-inner"
+              />
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted/60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </div>
             </div>
+            
+            <button 
+              onClick={() => {
+                setSearch("");
+                setCategory("");
+              }}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-accent/30 text-brand transition-transform active:rotate-180 duration-500 shadow-sm"
+              aria-label="Reset filters"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
           </div>
 
           {/* Categories Grid/Scroll */}

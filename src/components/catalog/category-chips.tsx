@@ -61,6 +61,7 @@ export function CategoryChips({
                 src={category.image} 
                 alt={category.name} 
                 fill
+                unoptimized
                 className="object-cover p-1.5"
               />
             ) : (
