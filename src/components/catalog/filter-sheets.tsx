@@ -24,14 +24,16 @@ export function FilterSheet({
   const priceTo = useCatalogStore((state) => state.priceTo);
   const setPriceRange = useCatalogStore((state) => state.setPriceRange);
 
-  const [localFrom, setLocalFrom] = useState(priceFrom ?? 0);
-  const [localTo, setLocalTo] = useState(priceTo ?? 10000000);
+  const [localFrom, setLocalFrom] = useState(priceFrom?.toString() ?? "0");
+  const [localTo, setLocalTo] = useState(priceTo?.toString() ?? "10000000");
 
   const activeCategory = categories.find(c => c.id === activeCategoryId);
   const categoryName = activeCategoryId === "" ? messages.catalog.allCategories : activeCategory?.name ?? messages.common.unknown;
 
   const handleApply = () => {
-    setPriceRange(localFrom, localTo);
+    const from = localFrom === "" ? 0 : Number(localFrom);
+    const to = localTo === "" ? 10000000 : Number(localTo);
+    setPriceRange(from, to);
     onClose();
   };
 
@@ -61,7 +63,7 @@ export function FilterSheet({
               <input
                 type="number"
                 value={localFrom}
-                onChange={(e) => setLocalFrom(Number(e.target.value))}
+                onChange={(e) => setLocalFrom(e.target.value)}
                 className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
@@ -72,7 +74,7 @@ export function FilterSheet({
               <input
                 type="number"
                 value={localTo}
-                onChange={(e) => setLocalTo(Number(e.target.value))}
+                onChange={(e) => setLocalTo(e.target.value)}
                 className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
@@ -86,10 +88,10 @@ export function FilterSheet({
               min={0}
               max={10000000}
               step={10000}
-              value={[localFrom, localTo]}
+              value={[localFrom === "" ? 0 : Number(localFrom), localTo === "" ? 10000000 : Number(localTo)]}
               onChange={(val) => {
-                setLocalFrom(val[0]);
-                setLocalTo(val[1]);
+                setLocalFrom(String(val[0]));
+                setLocalTo(String(val[1]));
               }}
             />
           </div>

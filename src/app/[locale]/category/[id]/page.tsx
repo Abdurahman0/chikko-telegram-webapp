@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiSearch, FiSliders } from "react-icons/fi";
 import { TbArrowsSort } from "react-icons/tb";
@@ -79,6 +79,12 @@ export default function CategoryPage({
   const setCategory = useCatalogStore((state) => state.setCategory);
   const search = useCatalogStore((state) => state.search);
   const setSearch = useCatalogStore((state) => state.setSearch);
+  const priceFrom = useCatalogStore((state) => state.priceFrom);
+  const priceTo = useCatalogStore((state) => state.priceTo);
+  const brand = useCatalogStore((state) => state.brand);
+  const sort = useCatalogStore((state) => state.sort);
+  const resetFilters = useCatalogStore((state) => state.resetFilters);
+
   const status = useCatalogStore((state) => state.status);
   const products = useCatalogStore((state) => state.products);
   const categories = useCatalogStore((state) => state.categories);
@@ -93,7 +99,9 @@ export default function CategoryPage({
   useCatalog();
 
   useEffect(() => {
-    setCategory(id === "all" ? "" : id);
+    // Default to empty (all) if id is "all" or missing
+    const targetId = !id || id === "all" ? "" : id;
+    setCategory(targetId);
   }, [id, setCategory]);
 
   const activeCategory = useCatalogStore((state) => state.activeCategory);
@@ -102,11 +110,15 @@ export default function CategoryPage({
   const categoryName = activeCategory === "" ? messages.catalog.allCategories : activeCategoryData?.name ?? messages.common.unknown;
   const productCount = messages.catalog.productCount.replace("{count}", String(products.length));
 
+  const hasActiveFilters = useMemo(() => {
+    return search !== "" || brand !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
+  }, [search, brand, priceFrom, priceTo, sort]);
+
   return (
     <div className="min-h-screen bg-app-bg pb-24">
-      {/* Compact Sticky Header */}
-      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-3 pb-2.5 backdrop-blur-md transition-all duration-300 border-b border-surface-accent/10">
-        <div className="flex items-center gap-2 mb-2.5">
+      {/* Scrollable Header (Not fixed) */}
+      <header className="relative z-10 bg-app-bg px-4 pt-3 pb-2 transition-all duration-300">
+        <div className="flex items-center gap-2 mb-2">
           <button
             onClick={() => router.back()}
             className="flex h-10 w-8 shrink-0 items-center justify-start text-app-text active:scale-95 transition-transform"
@@ -124,7 +136,7 @@ export default function CategoryPage({
           </div>
         </div>
 
-        <div className="flex items-end justify-between px-0.5">
+        <div className="flex items-end justify-between px-0.5 mt-1">
           <div className="flex-1">
             <h1 className="text-xl font-black text-app-text tracking-tight capitalize leading-tight">
               {categoryName.toLowerCase()}
@@ -132,22 +144,32 @@ export default function CategoryPage({
             <p className="text-[11px] font-bold text-app-muted/60 uppercase tracking-wide mt-0.5">{productCount}</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          {hasActiveFilters && (
             <button 
-              onClick={() => setIsSortOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
-              aria-label="Sort"
+              onClick={() => resetFilters()}
+              className="text-[10px] font-black uppercase tracking-widest text-[#FF4B55] active:opacity-60 transition-opacity mb-0.5"
             >
-              <TbArrowsSort className="h-4.5 w-4.5" />
+              Tozalash
             </button>
-            <button 
-              onClick={() => setIsFilterOpen(true)}
-              className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-surface-accent/20 text-[11px] font-black uppercase tracking-wider text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
-            >
-              <FiSliders className="h-3.5 w-3.5" />
-              {messages.catalog.filterTitle}
-            </button>
-          </div>
+          )}
+        </div>
+
+        {/* Control Bar (Relative) */}
+        <div className="mt-3 flex items-center gap-2">
+          <button 
+            onClick={() => setIsSortOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+            aria-label="Sort"
+          >
+            <TbArrowsSort className="h-4.5 w-4.5" />
+          </button>
+          <button 
+            onClick={() => setIsFilterOpen(true)}
+            className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-surface-accent/20 text-[11px] font-black uppercase tracking-wider text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+          >
+            <FiSliders className="h-3.5 w-3.5" />
+            {messages.catalog.filterTitle}
+          </button>
         </div>
       </header>
 

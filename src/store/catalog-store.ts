@@ -23,6 +23,7 @@ type CatalogStore = {
   lastFetchedAt: number;
   errorCode: "forbidden" | "bad_request" | "network" | "unknown" | null;
   errorMessage: string | null;
+  resetFilters: () => void;
   setCategory: (category: string) => void;
   setSearch: (search: string) => void;
   setBrand: (brand: string) => void;
@@ -66,6 +67,13 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
   lastFetchedAt: 0,
   errorCode: null,
   errorMessage: null,
+  resetFilters: () => set({
+    search: "",
+    brand: "",
+    priceFrom: undefined,
+    priceTo: undefined,
+    sort: "popular"
+  }),
   setCategory: (category: string) => set({ activeCategory: category }),
   setSearch: (search: string) => set({ search }),
   setBrand: (brand: string) => set({ brand }),
