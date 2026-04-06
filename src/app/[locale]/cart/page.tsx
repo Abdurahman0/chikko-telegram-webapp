@@ -11,6 +11,7 @@ import { formatCurrency } from "@/lib/formatters/currency";
 import { isSupportedLocale } from "@/lib/i18n/config";
 import { useCart } from "@/features/cart/use-cart";
 import { useCartStore } from "@/store/cart-store";
+import { useBootstrapStore } from "@/store/bootstrap-store";
 
 export default function CartPage() {
   const params = useParams<{ locale: string }>();
@@ -28,6 +29,14 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
   const decrement = useCartStore((state) => state.decrement);
   const removeItem = useCartStore((state) => state.removeItem);
   const clear = useCartStore((state) => state.clear);
+  const activeOrder = useBootstrapStore((state) => state.activeOrder);
+
+  const hasUnpaidOrder = Boolean(
+    activeOrder &&
+      !["paid", "success", "approved", "completed"].includes(
+        activeOrder.paymentStatus?.toLowerCase() || "",
+      ),
+  );
 
   return (
     <div className="space-y-4">
@@ -86,9 +95,24 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
               {formatCurrency(totals.total, locale)} {messages.common.som}
             </span>
           </div>
-          <Link href={`/${locale}/checkout`} className="mt-4 block">
-            <Button fullWidth>{messages.cart.checkout}</Button>
-          </Link>
+
+          {hasUnpaidOrder ? (
+            <div className="mt-4 rounded-xl bg-orange-100 p-3 text-center text-xs font-medium text-orange-700">
+              Sizda to'lanmagan faol buyurtma mavjud. Iltimos, oldin uni to'lang.
+            </div>
+          ) : null}
+
+          {hasUnpaidOrder ? (
+            <div className="mt-2 block">
+              <Button fullWidth disabled>
+                {messages.cart.checkout}
+              </Button>
+            </div>
+          ) : (
+            <Link href={`/${locale}/checkout`} className="mt-4 block">
+              <Button fullWidth>{messages.cart.checkout}</Button>
+            </Link>
+          )}
         </div>
       ) : null}
     </div>
