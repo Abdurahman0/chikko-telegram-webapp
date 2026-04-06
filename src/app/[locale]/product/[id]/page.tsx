@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/shared/button";
 import { FloatingBackButton } from "@/components/shared/floating-back-button";
+import { FloatingShareButton } from "@/components/shared/floating-share-button";
 import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { formatCurrency } from "@/lib/formatters/currency";
@@ -82,8 +83,9 @@ function ProductScreen({
   return (
     <div className="pb-8">
       <FloatingBackButton href={`/${locale}/catalog`} />
+      <FloatingShareButton productId={product.id} productName={product.name} />
 
-      <div className="bg-surface pb-4 shadow-soft sm:rounded-b-3xl">
+      <div className="overflow-hidden rounded-b-[2.5rem] bg-surface pb-5 shadow-soft">
         <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-surface-soft">
           {currentImage ? (
             <Image
@@ -133,7 +135,7 @@ function ProductScreen({
       </div>
 
       <div className="mt-2 space-y-2">
-        <div className="bg-surface p-4 shadow-soft sm:rounded-3xl">
+        <div className="rounded-[2rem] bg-surface p-5 shadow-soft">
           <p className="text-xl font-bold">
             {formatCurrency(product.price, locale)} {messages.common.som}
           </p>
@@ -144,7 +146,7 @@ function ProductScreen({
           </p>
         </div>
 
-        <div className="bg-surface p-4 shadow-soft sm:rounded-3xl">
+        <div className="rounded-[2rem] bg-surface p-5 shadow-soft">
           <p className="text-sm font-semibold">{messages.product.quantity}</p>
           <div className="mt-2 flex items-center gap-2">
             <Button variant="soft" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
