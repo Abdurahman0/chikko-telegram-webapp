@@ -37,44 +37,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
 
   const hasCartItems = Object.keys(cartItems).length > 0;
 
-  const text =
-    locale === "uz"
-      ? {
-          subtitle: "Ilova ishlashini boshqarish",
-          preferences: "Ilova sozlamalari",
-          hideUnavailable: "Mavjud bo'lmagan mahsulotlarni yashirish",
-          hideUnavailableHint: "Katalogda faqat mavjud mahsulotlar ko'rsatiladi",
-          stockBadge: "Mavjudlik yozuvini ko'rsatish",
-          stockBadgeHint: "Kartalarda “Mavjud / Sotuvda yo'q” holati chiqadi",
-          promotions: "Banner slayderini avtomatik aylantirish",
-          promotionsHint: "Katalog banneri avtomatik aylansin",
-          compactCards: "Ixcham kartalar",
-          compactCardsHint: "Katalogda yanada kompakt ko'rinish",
-          dataSection: "Mahalliy ma'lumotlar",
-          dataHint: "Qurilmadagi vaqtinchalik holat",
-          clearCart: "Savatni tozalash",
-          resetCheckout: "Buyurtma formasi maydonlarini tozalash",
-          alreadyEmpty: "Savat allaqachon bo'sh",
-          profileHint: "Til, biz haqimizda va kontaktlar Profil sahifasida.",
-        }
-      : {
-          subtitle: "Управление работой приложения",
-          preferences: "Настройки приложения",
-          hideUnavailable: "Скрывать товары не в наличии",
-          hideUnavailableHint: "В каталоге показываются только доступные товары",
-          stockBadge: "Показывать статус наличия",
-          stockBadgeHint: "На карточках виден статус “В наличии / Нет в наличии”",
-          promotions: "Автопрокрутка баннера",
-          promotionsHint: "Автоматическая смена баннера в каталоге",
-          compactCards: "Компактные карточки",
-          compactCardsHint: "Более плотный вид каталога",
-          dataSection: "Локальные данные",
-          dataHint: "Временные данные на этом устройстве",
-          clearCart: "Очистить корзину",
-          resetCheckout: "Очистить поля оформления заказа",
-          alreadyEmpty: "Корзина уже пустая",
-          profileHint: "Язык, о нас и контакты находятся в Профиле.",
-        };
+  const text = messages.settings;
 
   const resetCheckoutDraft = () => {
     setDraftField("fullName", "");

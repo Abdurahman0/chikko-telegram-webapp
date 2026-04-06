@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/shared/button";
+import { useI18n } from "@/components/shared/locale-provider";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { LocationPoint } from "@/types/telegram-webapp";
 
@@ -211,6 +212,7 @@ export function LocationPickerPlaceholder({
   onSelectLocation: (location: LocationPoint) => void;
   onPickLocation: () => void;
 }) {
+  const { messages } = useI18n();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<YMapInstance | null>(null);
   const placemarkRef = useRef<YPlacemarkInstance | null>(null);
@@ -251,8 +253,7 @@ export function LocationPickerPlaceholder({
           return;
         }
         if (!address) {
-          const fallbackAddress =
-            locale === "ru" ? "Адрес рядом с выбранной точкой" : "Tanlangan nuqta yaqinidagi manzil";
+          const fallbackAddress = messages.checkout.nearbyAddress;
           onAddressChangeRef.current(fallbackAddress);
           lastGeocodedAddressRef.current = fallbackAddress.toLowerCase();
           setMapError(true);

@@ -59,9 +59,7 @@ function SuccessScreen({ locale }: { locale: "uz" | "ru" }) {
             </svg>
           </span>
           <p className="text-sm text-app-muted">
-            {locale === "uz"
-              ? "Buyurtmangiz muvaffaqiyatli yaratildi."
-              : "Ваш заказ успешно создан."}
+            {messages.success.created}
           </p>
         </div>
 

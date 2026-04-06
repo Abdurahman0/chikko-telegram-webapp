@@ -109,7 +109,7 @@ export default function OrderDetailPage({
               {order.status?.toLowerCase().includes('delivered') ? <FiPackage className="h-5 w-5" /> : <FiTruck className="h-5 w-5" />}
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Buyurtma holati</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">{messages.orders.status}</p>
               <p className="text-base font-black">{formatOrderStatus(order.status, locale) || "New"}</p>
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function OrderDetailPage({
                 <div className="flex items-start gap-3">
                   <FiUser className="mt-0.5 h-4 w-4 text-app-muted/40" />
                   <div>
-                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">Qabul qiluvchi</p>
+                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">{messages.orders.recipient}</p>
                     <p className="text-sm font-bold text-app-text">{order.contactName}</p>
                   </div>
                 </div>
@@ -139,7 +139,7 @@ export default function OrderDetailPage({
                 <div className="flex items-start gap-3">
                   <FiPhone className="mt-0.5 h-4 w-4 text-app-muted/40" />
                   <div>
-                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">Telefon raqami</p>
+                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">{messages.orders.phone}</p>
                     <p className="text-sm font-bold text-app-text">{order.contactPhone}</p>
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export default function OrderDetailPage({
                 <div className="flex items-start gap-3">
                   <FiMapPin className="mt-0.5 h-4 w-4 text-app-muted/40" />
                   <div>
-                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">Manzil</p>
+                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">{messages.orders.address}</p>
                     <p className="text-sm font-bold text-app-text leading-relaxed">{order.shippingAddress}</p>
                   </div>
                 </div>
@@ -213,7 +213,7 @@ export default function OrderDetailPage({
            )}
            
            <div className="flex items-center justify-between pt-1">
-             <span className="text-base font-black uppercase tracking-[0.1em] text-app-text">Jami</span>
+             <span className="text-base font-black uppercase tracking-[0.1em] text-app-text">{messages.orders.total}</span>
              <span className="text-xl font-black text-brand">
                 {formatCurrency(order.totalAmount, locale)} {messages.common.som}
              </span>
@@ -223,7 +223,7 @@ export default function OrderDetailPage({
         {/* Footer info */}
         {order.createdAt && (
           <p className="text-center text-[10px] font-bold text-app-muted/40 uppercase tracking-widest pt-4">
-             Buyurtma qilingan vaqti: {new Date(order.createdAt).toLocaleString(locale === 'uz' ? 'uz-UZ' : 'ru-RU')}
+             {messages.orders.orderTime} {new Date(order.createdAt).toLocaleString(locale === 'uz' ? 'uz-UZ' : 'ru-RU')}
           </p>
         )}
 

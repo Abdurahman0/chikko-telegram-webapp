@@ -99,10 +99,12 @@ export type Messages = {
     failed: string;
     fullNameRequired: string;
     phoneRequired: string;
+    nearbyAddress: string;
   };
   success: {
     title: string;
     subtitle: string;
+    created: string;
     orderId: string;
     paymentMethod: string;
     total: string;
@@ -113,6 +115,13 @@ export type Messages = {
   orders: {
     title: string;
     subtitle: string;
+    status: string;
+    recipient: string;
+    phone: string;
+    address: string;
+    total: string;
+    orderTime: string;
+    items: string;
     activeOrder: string;
     historyOrder: string;
     orderItems: string;
@@ -121,6 +130,24 @@ export type Messages = {
     noHistoryEndpointDetail: string;
     guestModeTitle: string;
     guestModeDescription: string;
+  };
+  settings: {
+    subtitle: string;
+    preferences: string;
+    hideUnavailable: string;
+    hideUnavailableHint: string;
+    stockBadge: string;
+    stockBadgeHint: string;
+    promotions: string;
+    promotionsHint: string;
+    compactCards: string;
+    compactCardsHint: string;
+    dataSection: string;
+    dataHint: string;
+    clearCart: string;
+    resetCheckout: string;
+    alreadyEmpty: string;
+    profileHint: string;
   };
   profile: {
     title: string;
