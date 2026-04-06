@@ -31,15 +31,8 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
   const clear = useCartStore((state) => state.clear);
   const activeOrder = useBootstrapStore((state) => state.activeOrder);
 
-  const hasUnpaidOrder = Boolean(
-    activeOrder &&
-      !["canceled", "cancelled", "failed", "error"].includes(
-        activeOrder.status?.toLowerCase() || "",
-      ) &&
-      ["pending", "waiting", "waiting_payment", "new", ""].includes(
-        activeOrder.paymentStatus?.toLowerCase() || "",
-      ),
-  );
+  // Temporarily disabled: allow users to order regardless of active order status
+  const hasUnpaidOrder = false;
 
   return (
     <div className="space-y-4">
