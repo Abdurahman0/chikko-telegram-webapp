@@ -1,4 +1,4 @@
-﻿import type { AppLocale } from "@/lib/i18n/config";
+import type { AppLocale } from "@/lib/i18n/config";
 
 function fallbackLabel(value?: string | null) {
   if (!value) {
@@ -21,6 +21,7 @@ const orderStatusLabels: Record<string, { uz: string; ru: string }> = {
   paid: { uz: "To'langan", ru: "Оплачен" },
   canceled: { uz: "Bekor qilingan", ru: "Отменен" },
   cancelled: { uz: "Bekor qilingan", ru: "Отменен" },
+  approved: { uz: "Tasdiqlangan", ru: "Одобрен" },
 };
 
 const paymentStatusLabels: Record<string, { uz: string; ru: string }> = {
@@ -31,6 +32,7 @@ const paymentStatusLabels: Record<string, { uz: string; ru: string }> = {
   failed: { uz: "Muvaffaqiyatsiz", ru: "Неуспешно" },
   canceled: { uz: "Bekor qilingan", ru: "Отменен" },
   cancelled: { uz: "Bekor qilingan", ru: "Отменен" },
+  approved: { uz: "Tasdiqlangan", ru: "Одобрен" },
 };
 
 export function formatOrderStatus(status: string | undefined, locale: AppLocale) {

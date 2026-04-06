@@ -59,7 +59,7 @@ export function BottomNav({ locale }: { locale: string }) {
               )}
             >
               <span className="relative inline-flex items-center justify-center">
-                <NavIcon type={item.icon} className={item.isCart ? "stroke-[2.5px] h-5 w-5" : "stroke-[2.5px] h-5 w-5"} />
+                <NavIcon type={item.icon} className={item.isCart ? "h-5 w-5" : "h-5 w-5"} />
                 {item.isCart && cartQuantity > 0 ? (
                   <span
                     key={cartQuantity}

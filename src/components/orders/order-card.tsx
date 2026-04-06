@@ -9,7 +9,7 @@ function getStatusColorClasses(status?: string) {
   }
   const normalized = status.toLowerCase();
   
-  if (["completed", "delivered", "success", "paid"].includes(normalized)) {
+  if (["completed", "delivered", "success", "paid", "approved"].includes(normalized)) {
     return "bg-emerald-100 text-emerald-700";
   }
   if (["canceled", "cancelled", "failed", "error"].includes(normalized)) {
