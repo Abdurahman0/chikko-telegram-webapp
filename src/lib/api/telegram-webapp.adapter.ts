@@ -175,7 +175,7 @@ function adaptProduct(
     brandId: brandFromObject?.id ? String(brandFromObject.id) : null,
     brandName: brandFromObject?.name,
     isFavorite: product.is_favorite ?? false,
-    image: product.image || product.image_url || gallery[0] || null,
+    image: product.image_url || product.image || gallery[0] || null,
     images: gallery,
   };
 }
@@ -252,7 +252,7 @@ export function adaptCategoryDetailResponse(
     name: raw.category.name ?? raw.category.title ?? "Category",
     code: raw.category.code,
     description: raw.category.description,
-    image: raw.category.image ?? raw.category.image_url ?? null,
+    image: raw.category.image_url || raw.category.image || null,
   };
 
   const brands: Brand[] = (raw.brands ?? []).map((b) => ({

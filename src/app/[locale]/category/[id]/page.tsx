@@ -103,7 +103,7 @@ export default function CategoryPage({
   return (
     <div className="min-h-screen bg-app-bg pb-24">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-30 bg-app-bg/95 px-4 pt-10 pb-4 backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-app-bg/95 px-6 pt-10 pb-4 backdrop-blur-md">
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => router.back()}
@@ -148,11 +148,11 @@ export default function CategoryPage({
       </header>
 
       {/* Main Grid */}
-      <main className="px-4 pt-4">
+      <main className="px-6 pt-4">
         {status === "loading" ? (
           <ProductSkeletonGrid />
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 items-stretch">
+          <div className="grid grid-cols-2 gap-4 items-stretch">
             {products.map((product) => (
               <ProductCard
                 key={product.id}

@@ -40,8 +40,8 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        "flex h-full flex-col rounded-3xl bg-surface shadow-soft",
-        compact ? "min-h-[17.6rem] p-2.5" : "min-h-[18.8rem] p-3",
+        "flex h-full flex-col rounded-[32px] bg-surface shadow-soft transition-all duration-300",
+        compact ? "min-h-[18.5rem] p-3.5" : "min-h-[21rem] p-5",
       )}
     >
       <Link

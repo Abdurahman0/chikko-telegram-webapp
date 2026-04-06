@@ -132,7 +132,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
 
       {/* Floating Card Container */}
       <div className="relative z-20 -mt-8 rounded-[40px] bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.08)]">
-        <div className="px-5 pt-8 pb-4">
+        <div className="px-6 pt-8 pb-4">
           {/* Search Bar & Reset */}
           <div className="relative flex items-center gap-2 mb-6">
             <div className="relative flex-1">
@@ -176,11 +176,11 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
       </div>
 
       {/* Featured/All Products Section (Optional/Simplified) */}
-      <div className="mt-6 px-4">
+      <div className="mt-6 px-6">
         {status === "loading" ? <ProductSkeletonGrid /> : null}
 
         {status === "success" && hasProducts ? (
-          <div className="grid grid-cols-2 items-stretch gap-3">
+          <div className="grid grid-cols-2 items-stretch gap-4">
             {visibleProducts.slice(0, 10).map((product) => (
               <ProductCard
                 key={product.id}

@@ -62,7 +62,7 @@ export function CategoryChips({
                 alt={category.name} 
                 fill
                 unoptimized
-                className="object-cover p-1.5"
+                className="object-cover"
               />
             ) : (
               <div className="text-2xl opacity-40">📦</div>
