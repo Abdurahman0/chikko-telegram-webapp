@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react";
-import { ProductImage } from "@/components/shared/product-image";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Product } from "@/types/telegram-webapp";
 import { cn } from "@/lib/utils/cn";
@@ -196,11 +196,21 @@ export function PromotedCarousel({
               }
             }}
           >
-            <ProductImage
-              src={product.image}
-              alt={product.name}
-              className="aspect-square h-auto w-full bg-surface-soft object-cover"
-            />
+            {product.image ? (
+              <Image
+                src={product.image}
+                alt={product.name}
+                width={0}
+                height={0}
+                sizes="100vw"
+                unoptimized
+                className="h-auto w-full bg-surface-soft object-contain"
+              />
+            ) : (
+              <div className="flex aspect-square w-full items-center justify-center bg-surface-soft text-2xl text-app-muted">
+                {product.name.slice(0, 2).toUpperCase()}
+              </div>
+            )}
           </Link>
         ))}
       </div>

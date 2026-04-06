@@ -89,10 +89,11 @@ function ProductScreen({
             <Image
               src={currentImage}
               alt={product.name}
-              width={900}
-              height={900}
+              width={0}
+              height={0}
+              sizes="100vw"
               unoptimized
-              className="aspect-square h-auto w-full object-cover"
+              className="h-auto w-full object-contain"
             />
           ) : (
             <div className="flex aspect-square w-full items-center justify-center bg-surface-soft text-2xl text-app-muted">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ProductImage } from "@/components/shared/product-image";
+import Image from "next/image";
 import { Button } from "@/components/shared/button";
 import { formatCurrency } from "@/lib/formatters/currency";
 import type { AppLocale } from "@/lib/i18n/config";
@@ -45,14 +45,26 @@ export function ProductCard({
       )}
     >
       <Link href={`/${locale}/product/${product.id}`}>
-        <ProductImage
-          src={product.image}
-          alt={product.name}
-          className={cn(
-            "w-full rounded-2xl object-cover",
-            compact ? "h-[7.8rem]" : "h-[8.5rem]",
-          )}
-        />
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={0}
+            height={0}
+            sizes="(max-width: 768px) 50vw, 33vw"
+            unoptimized
+            className="h-auto w-full rounded-2xl bg-surface-soft object-contain"
+          />
+        ) : (
+          <div
+            className={cn(
+              "flex w-full items-center justify-center rounded-2xl bg-surface-accent text-sm text-app-muted",
+              compact ? "aspect-[4/3]" : "aspect-[4/3]",
+            )}
+          >
+            {product.name.slice(0, 2).toUpperCase()}
+          </div>
+        )}
       </Link>
       <div className={cn("flex flex-1 flex-col", compact ? "mt-2.5" : "mt-3")}>
         <Link
