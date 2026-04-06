@@ -33,7 +33,10 @@ function CartScreen({ locale }: { locale: "uz" | "ru" }) {
 
   const hasUnpaidOrder = Boolean(
     activeOrder &&
-      !["paid", "success", "approved", "completed"].includes(
+      !["canceled", "cancelled", "failed", "error"].includes(
+        activeOrder.status?.toLowerCase() || "",
+      ) &&
+      ["pending", "waiting", "waiting_payment", "new", ""].includes(
         activeOrder.paymentStatus?.toLowerCase() || "",
       ),
   );
