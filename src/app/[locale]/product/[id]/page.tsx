@@ -92,7 +92,7 @@ function ProductScreen({
               fill
               sizes="100vw"
               unoptimized
-              className="object-contain p-4"
+              className="object-cover"
             />
           ) : (
             <div className="text-2xl text-app-muted">

@@ -46,10 +46,7 @@ export function ProductCard({
     >
       <Link
         href={`/${locale}/product/${product.id}`}
-        className={cn(
-          "relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-surface-soft",
-          compact ? "h-[7.8rem]" : "h-[8.5rem]"
-        )}
+        className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl bg-surface-soft"
       >
         {product.image ? (
           <Image
@@ -58,7 +55,7 @@ export function ProductCard({
             fill
             sizes="(max-width: 768px) 50vw, 33vw"
             unoptimized
-            className="object-contain p-2"
+            className="object-cover"
           />
         ) : (
           <div className="text-sm text-app-muted">

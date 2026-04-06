@@ -189,7 +189,7 @@ export function PromotedCarousel({
           <Link
             key={`${product.id}-${idx}`}
             href={`/${locale}/product/${product.id}`}
-            className="relative block h-64 w-full shrink-0 bg-surface-soft"
+            className="relative block aspect-square w-full shrink-0 bg-surface-soft"
             onClick={(event) => {
               if (suppressClickRef.current) {
                 event.preventDefault();
@@ -203,7 +203,7 @@ export function PromotedCarousel({
                 fill
                 sizes="100vw"
                 unoptimized
-                className="object-contain p-2"
+                className="object-cover"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-2xl text-app-muted">
