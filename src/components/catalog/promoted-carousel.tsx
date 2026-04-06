@@ -199,7 +199,7 @@ export function PromotedCarousel({
             <ProductImage
               src={product.image}
               alt={product.name}
-              className="h-56 w-full bg-surface-soft object-contain"
+              className="aspect-square h-auto w-full bg-surface-soft object-cover"
             />
           </Link>
         ))}
