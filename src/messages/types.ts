@@ -1,5 +1,6 @@
 export type Messages = {
   nav: {
+    home: string;
     catalog: string;
     cart: string;
     orders: string;
@@ -38,6 +39,16 @@ export type Messages = {
     sortCheap: string;
     sortExpensive: string;
     sortNew: string;
+    sortHighRating: string;
+    sortTitle: string;
+    filterTitle: string;
+    categoryTitle: string;
+    productCount: string;
+    show: string;
+    continueLabel: string;
+    priceRange: string;
+    priceFromLabel: string;
+    priceToLabel: string;
   };
   product: {
     quantity: string;

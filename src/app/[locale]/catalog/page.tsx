@@ -120,83 +120,55 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
     }, 700);
   };
 
+  const { useRouter } = require("next/navigation");
+  const router = useRouter();
+
   return (
-    <div className="overflow-x-hidden">
+    <div className="min-h-screen bg-app-bg pb-20">
+      {/* Hero Carousel */}
       <div className="-mx-4 -mt-3">
         <PromotedCarousel locale={locale} products={promotedProducts} />
       </div>
-      <div className="sticky top-0 z-20 bg-app-bg/95 py-3 backdrop-blur-md">
-        <Input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder={messages.catalog.searchPlaceholder}
-          className="rounded-[18px] bg-white shadow-[0_1px_0_rgba(17,49,39,0.04)]"
-        />
+
+      {/* Floating Card Container */}
+      <div className="relative z-20 -mt-10 rounded-[40px] bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.08)]">
+        <div className="px-5 pt-8 pb-4">
+          {/* Search Bar */}
+          <div className="relative mb-6">
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={messages.catalog.searchPlaceholder}
+              className="h-14 rounded-2xl border-none bg-surface-accent/30 pl-12 pr-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all shadow-inner"
+            />
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted/60">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+          </div>
+
+          {/* Categories Grid/Scroll */}
+          <CategoryChips
+            categories={categories}
+            activeCategory={activeCategory}
+            allLabel={messages.catalog.allCategories}
+            onSelect={(id) => {
+              if (id === "") {
+                router.push(`/${locale}/category/all`);
+              } else {
+                router.push(`/${locale}/category/${id}`);
+              }
+            }}
+          />
+        </div>
       </div>
 
-      <div className="space-y-4 pt-2">
-        <CategoryChips
-          categories={categories}
-          activeCategory={activeCategory}
-          allLabel={messages.catalog.allCategories}
-          onSelect={setCategory}
-        />
-
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 no-scrollbar">
-          {(["popular", "new", "cheap", "expensive"] as const).map((option) => (
-            <button
-              key={option}
-              onClick={() => setSort(option)}
-              className={cn(
-                "whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-all shadow-sm border",
-                sort === option 
-                  ? "bg-brand text-white border-brand" 
-                  : "bg-surface text-app-muted border-surface-accent"
-              )}
-            >
-              {option === "popular" && messages.catalog.sortPopular}
-              {option === "new" && messages.catalog.sortNew}
-              {option === "cheap" && messages.catalog.sortCheap}
-              {option === "expensive" && messages.catalog.sortExpensive}
-            </button>
-          ))}
-        </div>
-
+      {/* Featured/All Products Section (Optional/Simplified) */}
+      <div className="mt-6 px-4">
         {status === "loading" ? <ProductSkeletonGrid /> : null}
-
-        {status === "error" ? (
-          <StateCard
-            title={messages.checkout.failed}
-            action={
-              <Button
-                onClick={() =>
-                  void loadCatalog({
-                    initData,
-                    category: activeCategory || undefined,
-                    search: search || undefined,
-                    sort,
-                    brand: brand || undefined,
-                    priceFrom,
-                    priceTo,
-                  })
-                }
-              >
-                {messages.common.retry}
-              </Button>
-            }
-          />
-        ) : null}
-
-        {status === "success" && !hasProducts ? (
-          <StateCard
-            title={messages.catalog.emptyTitle}
-            description={messages.catalog.emptyDescription}
-          />
-        ) : null}
 
         {status === "success" && hasProducts ? (
           <div className="grid grid-cols-2 items-stretch gap-3">
-            {visibleProducts.map((product) => (
+            {visibleProducts.slice(0, 10).map((product) => (
               <ProductCard
                 key={product.id}
                 locale={locale}

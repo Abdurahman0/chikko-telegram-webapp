@@ -40,7 +40,7 @@ export function BottomNav({ locale }: { locale: string }) {
   );
   const cartBadgeText = cartQuantity > 99 ? "99+" : String(cartQuantity);
   const items = [
-    { href: `/${locale}/catalog`, label: messages.nav.catalog, icon: "catalog" as const },
+    { href: `/${locale}/catalog`, label: messages.nav.home, icon: "catalog" as const },
     { href: `/${locale}/cart`, label: messages.nav.cart, isCart: true, icon: "cart" as const },
     { href: `/${locale}/favorites`, label: messages.nav.favorites, icon: "favorites" as const },
     { href: `/${locale}/orders`, label: messages.nav.orders, icon: "orders" as const },

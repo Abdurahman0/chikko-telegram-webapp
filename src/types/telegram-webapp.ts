@@ -163,6 +163,6 @@ export type ProfileData = {
   pendingReviews: Order[];
 };
 
-export type CatalogSortOption = "cheap" | "expensive" | "new" | "popular";
+export type CatalogSortOption = "cheap" | "expensive" | "new" | "popular" | "high_rating";
 
 export type ApiErrorCode = "forbidden" | "bad_request" | "network" | "unknown";

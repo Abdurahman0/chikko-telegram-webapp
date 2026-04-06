@@ -2,6 +2,7 @@ import type { Messages } from "./types";
 
 export const uzMessages: Messages = {
   nav: {
+    home: "Bosh sahifa",
     catalog: "Katalog",
     cart: "Savat",
     orders: "Buyurtmalar",
@@ -36,10 +37,20 @@ export const uzMessages: Messages = {
     outOfStock: "Sotuvda yo'q",
     inStock: "Mavjud",
     details: "Batafsil",
-    sortPopular: "Ommabop",
+    sortPopular: "Mashhur",
     sortCheap: "Arzonroq",
     sortExpensive: "Qimmatroq",
-    sortNew: "Yangilari",
+    sortNew: "Yangi kelganlar",
+    sortHighRating: "Yuqori reyting bilan",
+    sortTitle: "Avval ko'rsatish",
+    filterTitle: "Filterlar",
+    categoryTitle: "Barcha toifalar",
+    productCount: "{count} ta mahsulot",
+    show: "Ko'rsatish",
+    continueLabel: "Davom etish",
+    priceRange: "Narx (UZS)",
+    priceFromLabel: "dan",
+    priceToLabel: "gacha",
   },
   product: {
     quantity: "Miqdor",

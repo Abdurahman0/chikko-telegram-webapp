@@ -2,6 +2,7 @@ import type { Messages } from "./types";
 
 export const ruMessages: Messages = {
   nav: {
+    home: "Главная",
     catalog: "Каталог",
     cart: "Корзина",
     orders: "Заказы",
@@ -40,6 +41,16 @@ export const ruMessages: Messages = {
     sortCheap: "Дешевле",
     sortExpensive: "Дороже",
     sortNew: "Новинки",
+    sortHighRating: "С высоким рейтингом",
+    sortTitle: "Сначала показывать",
+    filterTitle: "Фильтры",
+    categoryTitle: "Все категории",
+    productCount: "{count} товаров",
+    show: "Показать",
+    continueLabel: "Продолжить",
+    priceRange: "Цена (UZS)",
+    priceFromLabel: "от",
+    priceToLabel: "до",
   },
   product: {
     quantity: "Количество",

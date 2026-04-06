@@ -73,7 +73,21 @@ export function ProductCard({
             {product.shortDescription || product.description || detailsLabel}
           </p>
         </Link>
-        <div className={cn("flex items-start justify-between gap-2", compact ? "mt-1.5 h-11" : "mt-2 h-12")}>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 px-0.5 mt-1 animate-in fade-in slide-in-from-bottom-1 duration-500">
+          <div className="flex items-center text-[#FFC107]">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          </div>
+          <span className="text-[10px] font-bold text-app-text">5.0</span>
+          <span className="text-[10px] font-medium text-app-muted/60 lowercase">
+            (Sharhlar yo'q)
+          </span>
+        </div>
+
+        <div className={cn("flex items-start justify-between gap-2", compact ? "mt-1.5" : "mt-2")}>
           <p className="text-base font-bold leading-none">
             <span className="block whitespace-nowrap">
               {formatCurrency(product.price, locale)}
