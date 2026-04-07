@@ -103,7 +103,7 @@ function ProductScreen({
         </div>
         <div className="flex gap-2 pointer-events-auto">
           <button
-            onClick={() => toggleFavorite({ initData, productId: product.id })}
+            onClick={() => toggleFavorite({ initData, product })}
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-full shadow-soft backdrop-blur-md transition-all active:scale-90",
               isFavorite ? "bg-white text-[#FF4B55]" : "bg-white/80 text-app-muted"
