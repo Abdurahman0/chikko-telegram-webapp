@@ -8,10 +8,10 @@ const rawOrderItemSchema = z
     product_name: z.string().optional(),
     name: z.string().optional(),
     title: z.string().optional(),
-    quantity: z.number().int().positive().default(1),
-    price: z.union([z.number(), z.string()]).optional(),
-    unit_price: z.union([z.number(), z.string()]).optional(),
-    line_total: z.union([z.number(), z.string()]).optional(),
+    quantity: z.union([z.number(), z.string(), z.null()]).optional().default(1),
+    price: z.union([z.number(), z.string(), z.null()]).optional(),
+    unit_price: z.union([z.number(), z.string(), z.null()]).optional(),
+    line_total: z.union([z.number(), z.string(), z.null()]).optional(),
     currency: z.string().optional().default("UZS"),
     image: z.string().optional().nullable().or(z.literal("")),
     image_url: z.string().optional().nullable().or(z.literal("")),
@@ -24,9 +24,9 @@ export const rawOrderSchema = z
     status: z.string().optional(),
     payment_status: z.string().optional(),
     paymentStatus: z.string().optional(),
-    total_amount: z.union([z.number(), z.string()]).optional(),
-    total: z.union([z.number(), z.string()]).optional(),
-    amount: z.union([z.number(), z.string()]).optional(),
+    total_amount: z.union([z.number(), z.string(), z.null()]).optional(),
+    total: z.union([z.number(), z.string(), z.null()]).optional(),
+    amount: z.union([z.number(), z.string(), z.null()]).optional(),
     currency: z.string().optional().default("UZS"),
     contact_name: z.string().optional(),
     contact_phone: z.string().optional(),
@@ -36,16 +36,17 @@ export const rawOrderSchema = z
       .array(
         z
           .object({
-            id: z.union([z.string(), z.number()]).optional(),
-            amount: z.union([z.number(), z.string()]).optional(),
-            status: z.string().optional(),
-            method: z.string().optional(),
+            id: z.union([z.string(), z.number(), z.null()]).optional(),
+            amount: z.union([z.number(), z.string(), z.null()]).optional(),
+            status: z.string().optional().nullable(),
+            method: z.string().optional().nullable(),
           })
           .passthrough(),
       )
+      .nullable()
       .optional()
       .default([]),
-    items: z.array(rawOrderItemSchema).optional().default([]),
+    items: z.array(rawOrderItemSchema).nullable().optional().default([]),
   })
   .passthrough();
 
@@ -217,23 +218,24 @@ export const favoritesResponseSchema = z
 
 const rawReviewSchema = z
   .object({
-    id: z.union([z.string(), z.number()]).optional(),
-    order_id: z.union([z.string(), z.number()]).optional(),
-    comment: z.string().optional().default(""),
-    requested_at: z.string().optional(),
-    submitted_at: z.string().optional(),
-    source: z.string().optional(),
+    id: z.union([z.string(), z.number(), z.null()]).optional(),
+    order_id: z.union([z.string(), z.number(), z.null()]).optional(),
+    comment: z.string().optional().nullable().default(""),
+    requested_at: z.string().optional().nullable(),
+    submitted_at: z.string().optional().nullable(),
+    source: z.string().optional().nullable(),
     order: rawOrderSchema.optional().nullable(),
-    rating: z.number().optional(),
+    rating: z.union([z.number(), z.string(), z.null()]).optional(),
   })
   .passthrough();
 
-export const reviewsResponseSchema = z
-  .object({
+export const reviewsResponseSchema = z.union([
+  z.object({
     reviews: z.array(rawReviewSchema).nullable().optional().default([]),
     pending_orders: z.array(rawOrderSchema).nullable().optional().default([]),
-  })
-  .passthrough();
+  }).passthrough(),
+  z.array(rawReviewSchema).transform(reviews => ({ reviews, pending_orders: [] }))
+]);
 
 export const submitReviewResponseSchema = rawReviewSchema;
 
