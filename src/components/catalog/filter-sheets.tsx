@@ -8,6 +8,7 @@ import { useI18n } from "@/components/shared/locale-provider";
 import { useCatalogStore } from "@/store/catalog-store";
 import { Sheet } from "@/components/shared/sheet";
 import { DualRangeSlider } from "@/components/catalog/dual-range-slider";
+import { triggerHaptic } from "@/lib/telegram/webapp";
 
 export function FilterSheet({ 
   isOpen, 
@@ -40,6 +41,7 @@ export function FilterSheet({
   const handleApply = () => {
     const from = localFrom === "" ? 0 : Number(localFrom);
     const to = localTo === "" ? 10000000 : Number(localTo);
+    triggerHaptic("medium");
     setPriceRange(from, to);
     onClose();
   };
@@ -88,7 +90,11 @@ export function FilterSheet({
                {messages.catalog.priceRange}
              </h3>
              <button 
-               onClick={() => { setLocalFrom("0"); setLocalTo("10000000"); }}
+               onClick={() => { 
+                 triggerHaptic("light");
+                 setLocalFrom("0"); 
+                 setLocalTo("10000000"); 
+               }}
                className="text-[11px] font-bold text-brand uppercase tracking-tight"
              >
                {messages.common.reset || "Reset"}
@@ -166,6 +172,7 @@ export function CategoryPickerSheet({
 
   const handleSelect = (id: string) => {
     const targetId = id === "" ? "all" : id;
+    triggerHaptic("medium");
     router.push(`/${locale}/category/${targetId}`);
     onClose();
   };
@@ -261,6 +268,7 @@ export function BrandPickerSheet({
   const setBrand = useCatalogStore((state) => state.setBrand);
 
   const handleSelect = (id: string) => {
+    triggerHaptic("medium");
     setBrand(id);
     onBack(); // Go back to filters instead of closing everything
   };

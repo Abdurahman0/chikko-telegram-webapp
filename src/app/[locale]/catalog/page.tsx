@@ -50,9 +50,11 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const search = useCatalogStore((state) => state.search);
 
   // Synchronize category to "All" ("") when on the Home page
-  if (activeCategory !== "") {
-    setCategory("");
-  }
+  useEffect(() => {
+    if (activeCategory !== "") {
+      setCategory("");
+    }
+  }, [activeCategory, setCategory]);
 
   useCatalog();
   const status = useCatalogStore((state) => state.status);
@@ -121,9 +123,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   };
 
   // Synchronize category to "All" ("") when on the Home page
-  if (activeCategory !== "") {
-    setCategory("");
-  }
+  // (Removed duplicate call from here, now handled by useEffect above)
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">

@@ -105,7 +105,17 @@ export function getTelegramWebApp() {
   if (typeof window === "undefined") {
     return null;
   }
-  return window.Telegram?.WebApp ?? null;
+  return (window as any).Telegram?.WebApp ?? null;
+}
+
+/**
+ * Triggers haptic feedback via Telegram WebApp API
+ */
+export function triggerHaptic(style: "light" | "medium" | "heavy" | "rigid" | "soft" = "medium") {
+  const webApp = getTelegramWebApp();
+  if (webApp?.HapticFeedback) {
+    webApp.HapticFeedback.impactOccurred(style);
+  }
 }
 
 export function ensureTelegramWebAppScript() {

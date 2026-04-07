@@ -14,6 +14,7 @@ import { ProductSkeletonGrid } from "@/components/catalog/product-skeleton-grid"
 import { Input } from "@/components/shared/input";
 import { Sheet } from "@/components/shared/sheet";
 import { FilterSheet, CategoryPickerSheet, BrandPickerSheet } from "@/components/catalog/filter-sheets";
+import { triggerHaptic } from "@/lib/telegram/webapp";
 
 function SortSheet({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { messages } = useI18n();
@@ -35,6 +36,7 @@ function SortSheet({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
           <button
             key={option.id}
             onClick={() => {
+              triggerHaptic("light");
               setSort(option.id);
               onClose();
             }}
@@ -91,19 +93,20 @@ export default function CategoryPage({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isBrandPickerOpen, setIsBrandPickerOpen] = useState(false);
-
+  
   useCatalog();
 
-  const activeCategory = useCatalogStore((state) => state.activeCategory);
   const brands = useCatalogStore((state) => state.brands);
   const setBrand = useCatalogStore((state) => state.setBrand);
+  const activeCategory = useCatalogStore((state) => state.activeCategory);
 
-  // Sync category ID from URL to store immediately to avoid first-render race conditions
-  const targetCategory = !id || id === "all" ? "" : id;
-  if (activeCategory !== targetCategory) {
-    // We update synchronously here; useCatalog will pick this up on its first run
-    setCategory(targetCategory);
-  }
+  // Sync category ID from URL to store
+  useEffect(() => {
+    const targetCategory = !id || id === "all" ? "" : id;
+    if (activeCategory !== targetCategory) {
+      setCategory(targetCategory);
+    }
+  }, [id, activeCategory, setCategory]);
 
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
   const activeBrandData = brands.find((b) => b.id === brandId);
@@ -155,9 +158,10 @@ export default function CategoryPage({
           {(hasActiveFilters) && (
             <button 
               onClick={() => {
+                triggerHaptic("medium");
                 resetFilters();
               }}
-              className="text-[11px] font-black uppercase tracking-widest text-brand hover:opacity-80 transition-opacity mb-1"
+              className="text-[11px] font-black uppercase tracking-widest text-brand"
             >
               {messages.common.reset}
             </button>
