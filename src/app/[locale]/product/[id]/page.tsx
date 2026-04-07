@@ -166,7 +166,7 @@ function ProductScreen({
             <h1 className="text-xl font-black text-app-text tracking-tight">{product.name}</h1>
             <div className="flex items-center gap-1.5 rounded-2xl bg-surface-soft px-3 py-1.5 border border-surface-accent/30 shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
                <FiStar className="h-4 w-4 fill-[#FFC107] text-[#FFC107]" />
-               <span className="text-sm font-black text-app-text">{product.rating ? product.rating.toFixed(1) : "5.0"}</span>
+               <span className="text-sm font-black text-app-text">{typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}</span>
                <span className="text-[10px] font-bold text-app-muted/50 uppercase tracking-tighter ml-0.5">
                   {product.reviewsCount && product.reviewsCount > 0 
                     ? product.reviewsCount 

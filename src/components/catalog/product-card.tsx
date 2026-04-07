@@ -118,7 +118,7 @@ export function ProductCard({
             </svg>
           </div>
           <span className="text-[11px] font-black text-app-text">
-            {product.rating ? product.rating.toFixed(1) : "5.0"}
+            {typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}
           </span>
           <span className="text-[10px] font-bold text-app-muted/50 lowercase tracking-tight">
             {product.reviewsCount && product.reviewsCount > 0 
