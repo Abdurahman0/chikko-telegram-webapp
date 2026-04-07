@@ -12,15 +12,15 @@ const rawOrderItemSchema = z
     price: z.union([z.number(), z.string()]).optional(),
     unit_price: z.union([z.number(), z.string()]).optional(),
     line_total: z.union([z.number(), z.string()]).optional(),
-    currency: z.string().default("UZS"),
-    image: z.string().optional().or(z.literal("")),
-    image_url: z.string().optional().or(z.literal("")),
+    currency: z.string().optional().default("UZS"),
+    image: z.string().optional().nullable().or(z.literal("")),
+    image_url: z.string().optional().nullable().or(z.literal("")),
   })
   .passthrough();
 
 export const rawOrderSchema = z
   .object({
-    id: z.union([z.string(), z.number()]),
+    id: z.union([z.string(), z.number()]).optional(),
     status: z.string().optional(),
     payment_status: z.string().optional(),
     paymentStatus: z.string().optional(),
@@ -94,7 +94,7 @@ const rawCategorySchema = z
 
 const rawBrandSchema = z
   .object({
-    id: z.union([z.string(), z.number()]),
+    id: z.union([z.string(), z.number()]).optional(),
     name: z.string().optional(),
     code: z.string().optional(),
     description: z.string().optional(),
@@ -158,11 +158,11 @@ export const rawProductSchema = z
       ])
       .optional()
       .nullable(),
-    image: z.string().optional().or(z.literal("")),
-    image_url: z.string().optional().or(z.literal("")),
-    images: z.array(rawProductImageSchema).optional().default([]),
-    rating: z.union([z.number(), z.string()]).optional(),
-    reviews_count: z.number().optional(),
+    image: z.string().optional().nullable().or(z.literal("")),
+    image_url: z.string().optional().nullable().or(z.literal("")),
+    images: z.array(rawProductImageSchema).optional().nullable().default([]),
+    rating: z.union([z.number(), z.string(), z.null()]).optional(),
+    reviews_count: z.union([z.number(), z.string(), z.null()]).optional(),
   })
   .passthrough();
 
@@ -217,7 +217,7 @@ export const favoritesResponseSchema = z
 
 const rawReviewSchema = z
   .object({
-    id: z.union([z.string(), z.number()]),
+    id: z.union([z.string(), z.number()]).optional(),
     order_id: z.union([z.string(), z.number()]).optional(),
     comment: z.string().optional().default(""),
     requested_at: z.string().optional(),
@@ -230,8 +230,8 @@ const rawReviewSchema = z
 
 export const reviewsResponseSchema = z
   .object({
-    reviews: z.array(rawReviewSchema).optional().default([]),
-    pending_orders: z.array(rawOrderSchema).optional().default([]),
+    reviews: z.array(rawReviewSchema).nullable().optional().default([]),
+    pending_orders: z.array(rawOrderSchema).nullable().optional().default([]),
   })
   .passthrough();
 

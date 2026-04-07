@@ -210,5 +210,6 @@ export type Messages = {
     ratingTitle: string;
     ratingRequired: string;
     commentTitle: string;
+    loadFailed: string;
   };
 };

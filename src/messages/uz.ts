@@ -218,5 +218,6 @@ export const uzMessages: Messages = {
     ratingTitle: "Sizning bahoingiz",
     ratingRequired: "Iltimos, baho bering",
     commentTitle: "Fikringizni qoldiring (ixtiyoriy)",
+    loadFailed: "Fikrlarni yuklab bo'lmadi. Iltimos, qayta urinib ko'ring.",
   },
 };

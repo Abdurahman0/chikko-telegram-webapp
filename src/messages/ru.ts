@@ -217,5 +217,6 @@ export const ruMessages: Messages = {
     ratingTitle: "Ваша оценка",
     ratingRequired: "Пожалуйста, поставьте оценку",
     commentTitle: "Ваш комментарий (необязательно)",
+    loadFailed: "Не удалось загрузить отзывы. Пожалуйста, попробуйте позже.",
   },
 };

@@ -154,7 +154,7 @@ function ReviewsScreen({ locale }: { locale: "uz" | "ru" }) {
 
       {status === "error" && (
         <StateCard
-          title={messages.checkout.failed}
+          title={messages.reviews.loadFailed}
           action={
             <Button onClick={() => loadReviews({ initData })}>
               {messages.common.retry}
