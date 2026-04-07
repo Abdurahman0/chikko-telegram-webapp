@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { CategoryChips } from "@/components/catalog/category-chips";
 import { ProductCard } from "@/components/catalog/product-card";
 import { ProductSkeletonGrid } from "@/components/catalog/product-skeleton-grid";
@@ -39,6 +39,8 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   };
 
   const { messages } = useI18n();
+  const router = useRouter();
+
   useCatalog();
   const status = useCatalogStore((state) => state.status);
   const categories = useCatalogStore((state) => state.categories);
@@ -46,16 +48,8 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const products = useCatalogStore((state) => state.products);
   const search = useCatalogStore((state) => state.search);
   const activeCategory = useCatalogStore((state) => state.activeCategory);
-  const sort = useCatalogStore((state) => state.sort);
-  const brand = useCatalogStore((state) => state.brand);
-  const priceFrom = useCatalogStore((state) => state.priceFrom);
-  const priceTo = useCatalogStore((state) => state.priceTo);
-  
   const setSearch = useCatalogStore((state) => state.setSearch);
   const setCategory = useCatalogStore((state) => state.setCategory);
-  const setSort = useCatalogStore((state) => state.setSort);
-  const loadCatalog = useCatalogStore((state) => state.loadCatalog);
-  const initData = useBootstrapStore((state) => state.initData);
   const addItem = useCartStore((state) => state.addItem);
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
@@ -120,35 +114,31 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
     }, 700);
   };
 
-  const { useRouter } = require("next/navigation");
-  const router = useRouter();
-
   useEffect(() => {
-    // Reset category when landing on home to ensure "All" is active
     setCategory("");
   }, [setCategory]);
 
   return (
-    <div className="min-h-screen bg-app-bg pb-20">
+    <div className="min-h-screen bg-app-bg pb-24">
       {/* Hero Carousel */}
-      <div className="-mx-4 -mt-3 overflow-hidden">
+      <div className="-mx-4 -mt-3 overflow-hidden shadow-md">
         <PromotedCarousel locale={locale} products={promotedProducts} />
       </div>
 
       {/* Floating Card Container */}
-      <div className="relative z-20 -mt-8 rounded-[40px] bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.08)]">
-        <div className="px-4 pt-8 pb-4">
+      <div className="relative z-20 -mt-10 rounded-t-[44px] bg-surface shadow-[0_-12px_40px_rgba(0,0,0,0.06),0_20px_40px_rgba(0,0,0,0.12)]">
+        <div className="px-5 pt-10 pb-6">
           {/* Search Bar & Reset */}
-          <div className="relative flex items-center gap-2 mb-6">
-            <div className="relative flex-1">
+          <div className="relative flex items-center gap-3 mb-8">
+            <div className="relative flex-1 group">
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={messages.catalog.searchPlaceholder}
-                className="h-14 rounded-2xl border-none bg-surface-accent/30 pl-12 pr-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all shadow-inner"
+                className="h-14 rounded-2xl border-none bg-surface-accent/20 pl-12 pr-4 text-[14px] font-bold focus:ring-[3px] focus:ring-brand/10 transition-all shadow-inner"
               />
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted/60">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted/30 group-focus-within:text-brand transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               </div>
             </div>
             
@@ -157,11 +147,19 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
                 setSearch("");
                 setCategory("");
               }}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-accent/30 text-brand transition-transform active:rotate-180 duration-500 shadow-sm"
+              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-accent/20 text-brand transition-all active:scale-90 active:bg-surface-accent/40 shadow-sm group"
               aria-label="Reset filters"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-active:rotate-180 duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             </button>
+          </div>
+
+          {/* New Catalog Title */}
+          <div className="flex items-center justify-between mb-5 px-1">
+             <h2 className="text-[14px] font-black uppercase tracking-widest text-app-text/90">
+               {messages.catalog.categoryTitle}
+             </h2>
+             <div className="h-px flex-1 mx-4 bg-surface-accent/30" />
           </div>
 
           {/* Categories Grid/Scroll */}
@@ -170,40 +168,57 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
             activeCategory={activeCategory}
             allLabel={messages.catalog.allCategories}
             onSelect={(id) => {
-              if (id === "") {
-                router.push(`/${locale}/category/all`);
-              } else {
-                router.push(`/${locale}/category/${id}`);
-              }
+              const targetId = id === "" ? "all" : id;
+              router.push(`/${locale}/category/${targetId}`);
             }}
           />
         </div>
       </div>
 
-      {/* Featured/All Products Section (Optional/Simplified) */}
-      <div className="mt-6 px-3">
+      {/* Featured/All Products Section */}
+      <div className="mt-8 px-3.5">
         {status === "loading" ? <ProductSkeletonGrid /> : null}
 
         {status === "success" && hasProducts ? (
-          <div className="grid grid-cols-2 items-stretch gap-2.5">
-            {visibleProducts.slice(0, 10).map((product) => (
-              <ProductCard
-                key={product.id}
-                locale={locale}
-                product={product}
-                addToCartLabel={messages.catalog.addToCart}
-                outOfStockLabel={messages.catalog.outOfStock}
-                inStockLabel={messages.catalog.inStock}
-                detailsLabel={messages.catalog.details}
-                currencyLabel={messages.common.som}
-                quantity={cartItems[product.id]?.quantity ?? 0}
-                compact={compactCards}
-                showStockLabel={showStockLabel}
-                onIncrement={handleAddToCart}
-                onDecrement={decrement}
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-1.5">
+               <h2 className="text-[14px] font-black uppercase tracking-widest text-app-text/90">
+                 {messages.catalog.sortPopular}
+               </h2>
+               <button 
+                 onClick={() => router.push(`/${locale}/category/all`)}
+                 className="text-[11px] font-black uppercase tracking-widest text-brand"
+               >
+                 {messages.catalog.viewAll}
+               </button>
+            </div>
+            
+            <div className="grid grid-cols-2 items-stretch gap-3 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {visibleProducts.slice(0, 10).map((product) => (
+                <ProductCard
+                  key={product.id}
+                  locale={locale}
+                  product={product}
+                  addToCartLabel={messages.catalog.addToCart}
+                  outOfStockLabel={messages.catalog.outOfStock}
+                  inStockLabel={messages.catalog.inStock}
+                  detailsLabel={messages.catalog.details}
+                  currencyLabel={messages.common.som}
+                  quantity={cartItems[product.id]?.quantity ?? 0}
+                  compact={compactCards}
+                  showStockLabel={showStockLabel}
+                  onIncrement={handleAddToCart}
+                  onDecrement={decrement}
+                />
+              ))}
+            </div>
           </div>
+        ) : status === "success" && !hasProducts ? (
+           <div className="flex flex-col items-center justify-center pt-10 pb-20 text-center opacity-60">
+              <div className="mb-4 text-4xl grayscale">📦</div>
+              <h3 className="text-lg font-bold text-app-text">{messages.catalog.emptyTitle}</h3>
+              <p className="text-sm text-app-muted">{messages.catalog.emptyDescription}</p>
+           </div>
         ) : null}
       </div>
 
@@ -211,14 +226,14 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
         {flyItems.map((item) => (
           <div
             key={item.id}
-            className="absolute h-6 w-6 overflow-hidden rounded-full border border-white bg-brand-soft shadow-md"
+            className="absolute h-8 w-8 overflow-hidden rounded-xl border-2 border-white bg-brand shadow-xl z-50"
             style={{
               left: item.started ? item.endX : item.startX,
               top: item.started ? item.endY : item.startY,
-              opacity: item.started ? 0.35 : 1,
-              transform: `translate(-50%, -50%) scale(${item.started ? 0.58 : 1})`,
+              opacity: item.started ? 0.2 : 1,
+              transform: `translate(-50%, -50%) scale(${item.started ? 0.4 : 1})`,
               transition:
-                "left 620ms cubic-bezier(0.22, 1, 0.36, 1), top 620ms cubic-bezier(0.22, 1, 0.36, 1), transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease",
+                "left 650ms cubic-bezier(0.22, 1, 0.36, 1), top 650ms cubic-bezier(0.22, 1, 0.36, 1), transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 650ms ease",
               backgroundImage: item.image ? `url(${item.image})` : undefined,
               backgroundSize: "cover",
               backgroundPosition: "center",

@@ -12,11 +12,13 @@ import { DualRangeSlider } from "@/components/catalog/dual-range-slider";
 export function FilterSheet({ 
   isOpen, 
   onClose,
-  onOpenCategories 
+  onOpenCategories,
+  onOpenBrands
 }: { 
   isOpen: boolean; 
   onClose: () => void;
   onOpenCategories: () => void;
+  onOpenBrands: () => void;
 }) {
   const { messages } = useI18n();
   const activeCategoryId = useCatalogStore((state) => state.activeCategory);
@@ -26,7 +28,6 @@ export function FilterSheet({
   const setPriceRange = useCatalogStore((state) => state.setPriceRange);
   const brandId = useCatalogStore((state) => state.brand);
   const brands = useCatalogStore((state) => state.brands);
-  const setBrand = useCatalogStore((state) => state.setBrand);
 
   const [localFrom, setLocalFrom] = useState(priceFrom?.toString() ?? "0");
   const [localTo, setLocalTo] = useState(priceTo?.toString() ?? "10000000");
@@ -34,7 +35,7 @@ export function FilterSheet({
   const activeCategory = categories.find(c => c.id === activeCategoryId);
   const activeBrand = brands.find(b => b.id === brandId);
   const categoryName = activeCategoryId === "" ? messages.catalog.allCategories : activeCategory?.name ?? messages.common.unknown;
-  const brandName = activeBrand?.name;
+  const brandName = activeBrand?.name ?? (messages.catalog.allBrands || "All Brands");
 
   const handleApply = () => {
     const from = localFrom === "" ? 0 : Number(localFrom);
@@ -45,51 +46,54 @@ export function FilterSheet({
 
   return (
     <Sheet isOpen={isOpen} onClose={onClose} title={messages.catalog.filterTitle}>
-      <div className="space-y-8">
+      <div className="space-y-6 pb-2">
         {/* Category Selector Link */}
-        <button 
-          onClick={onOpenCategories}
-          className="flex w-full items-center justify-between border-b border-surface-accent/30 pr-1 pb-4"
-        >
-          <div className="text-left">
-            <span className="block text-sm font-bold text-app-text">{messages.catalog.categoryTitle}</span>
-            <span className="text-sm font-medium text-app-muted">
-              {categoryName}{brandName ? ` • ${brandName}` : ""}
-            </span>
-          </div>
-          <FiChevronRight className="text-app-muted/60" />
-        </button>
+        <div className="space-y-3">
+           <button 
+             onClick={onOpenCategories}
+             className="flex w-full items-center justify-between rounded-2xl bg-surface-accent/15 p-4 transition-all active:scale-[0.98] border border-transparent hover:border-brand/10 hover:bg-surface-accent/25 group"
+           >
+             <div className="text-left">
+               <span className="block text-[11px] font-black uppercase tracking-wider text-app-muted/60 mb-0.5">{messages.catalog.categoryTitle}</span>
+               <span className="text-[15px] font-bold text-app-text group-hover:text-brand transition-colors">
+                 {categoryName}
+               </span>
+             </div>
+             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
+                <FiChevronRight className="text-brand h-4 w-4" />
+             </div>
+           </button>
 
-        {/* Brand Selection Section */}
-        {brands.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-app-text">
-              {messages.catalog.brand}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {brands.map((b) => (
-                <button
-                  key={b.id}
-                  onClick={() => setBrand(b.id === brandId ? "" : b.id)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
-                    brandId === b.id
-                      ? "bg-brand border-brand text-white shadow-md shadow-brand/20"
-                      : "bg-surface-accent/10 border-transparent text-app-muted hover:bg-surface-accent/20"
-                  )}
-                >
-                  {b.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+           {/* Brand Selector Link */}
+           <button 
+             onClick={onOpenBrands}
+             className="flex w-full items-center justify-between rounded-2xl bg-surface-accent/15 p-4 transition-all active:scale-[0.98] border border-transparent hover:border-brand/10 hover:bg-surface-accent/25 group"
+           >
+             <div className="text-left">
+               <span className="block text-[11px] font-black uppercase tracking-wider text-app-muted/60 mb-0.5">{messages.catalog.brandTitle || "Brand"}</span>
+               <span className="text-[15px] font-bold text-app-text group-hover:text-brand transition-colors">
+                 {brandName}
+               </span>
+             </div>
+             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
+                <FiChevronRight className="text-brand h-4 w-4" />
+             </div>
+           </button>
+        </div>
 
         {/* Price Range Section */}
-        <div className="space-y-6">
-          <h3 className="text-sm font-bold text-app-text">
-            {messages.catalog.priceRange}
-          </h3>
+        <div className="space-y-4 pt-2">
+           <div className="flex items-center justify-between px-1">
+             <h3 className="text-[11px] font-black uppercase tracking-wider text-app-muted/60">
+               {messages.catalog.priceRange}
+             </h3>
+             <button 
+               onClick={() => { setLocalFrom("0"); setLocalTo("10000000"); }}
+               className="text-[11px] font-bold text-brand uppercase tracking-tight"
+             >
+               {messages.common.reset || "Reset"}
+             </button>
+           </div>
           
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
@@ -97,9 +101,9 @@ export function FilterSheet({
                 type="number"
                 value={localFrom}
                 onChange={(e) => setLocalFrom(e.target.value)}
-                className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
+                className="h-14 w-full rounded-2xl bg-surface-accent/15 px-4 pt-1.5 text-[15px] font-black focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none ring-1 ring-black/5"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-app-muted/40 uppercase tracking-widest pointer-events-none">
                 {messages.catalog.priceFromLabel}
               </span>
             </div>
@@ -108,15 +112,15 @@ export function FilterSheet({
                 type="number"
                 value={localTo}
                 onChange={(e) => setLocalTo(e.target.value)}
-                className="h-14 w-full rounded-2xl bg-brand-soft/10 px-4 pt-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none"
+                className="h-14 w-full rounded-2xl bg-surface-accent/15 px-4 pt-1.5 text-[15px] font-black focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all border-none ring-1 ring-black/5"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-app-muted/60 uppercase tracking-wider">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-app-muted/40 uppercase tracking-widest pointer-events-none">
                 {messages.catalog.priceToLabel}
               </span>
             </div>
           </div>
 
-          <div className="px-1 py-4">
+          <div className="px-2 py-6">
             <DualRangeSlider
               min={0}
               max={10000000}
@@ -133,7 +137,7 @@ export function FilterSheet({
         <div className="pt-4">
           <button
             onClick={handleApply}
-            className="w-full rounded-3xl bg-brand py-5 text-center font-bold text-white shadow-[0_10px_20px_rgba(255,126,139,0.3)] active:scale-[0.98] transition-all"
+            className="w-full rounded-3xl bg-brand py-5 text-center font-black text-[15px] uppercase tracking-wider text-white shadow-[0_12px_24px_rgba(255,126,139,0.35)] active:scale-[0.97] transition-all"
           >
             {messages.catalog.show}
           </button>
@@ -159,9 +163,6 @@ export function CategoryPickerSheet({
 
   const activeCategory = useCatalogStore((state) => state.activeCategory);
   const categories = useCatalogStore((state) => state.categories);
-  const brands = useCatalogStore((state) => state.brands);
-  const brand = useCatalogStore((state) => state.brand);
-  const setBrand = useCatalogStore((state) => state.setBrand);
 
   const handleSelect = (id: string) => {
     const targetId = id === "" ? "all" : id;
@@ -175,27 +176,28 @@ export function CategoryPickerSheet({
       onClose={onClose} 
       title={""} 
     >
-      <div className="space-y-4">
-        {/* Special Header with Back Button */}
-        <div className="flex items-center gap-4 mb-4">
-          <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-accent/30">
-            <FiChevronLeft className="h-5 w-5" />
+      <div className="space-y-4 pb-4">
+        <div className="flex items-center gap-4 mb-2">
+          <button onClick={onBack} className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-90">
+            <FiChevronLeft className="h-6 w-6" />
           </button>
-          <h2 className="text-xl font-bold">{messages.catalog.categoryTitle}</h2>
+          <h2 className="text-xl font-black tracking-tight">{messages.catalog.categoryTitle}</h2>
         </div>
 
-        <div className="space-y-1 overflow-y-auto max-h-[50vh] pr-2 no-scrollbar">
-          {/* All category */}
+        <div className="space-y-1.5 overflow-y-auto max-h-[60vh] pr-1 no-scrollbar pt-2">
           <button
             onClick={() => handleSelect("")}
-            className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
+            className={cn(
+              "flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300",
+              activeCategory === "" ? "bg-brand/5 border border-brand/20" : "hover:bg-surface-accent/10 border border-transparent"
+            )}
           >
-            <span className={cn("text-base font-semibold", activeCategory === "" ? "text-app-text" : "text-app-muted")}>
+            <span className={cn("text-[16px] font-bold", activeCategory === "" ? "text-brand" : "text-app-text/70")}>
               {messages.catalog.allCategories}
             </span>
             <div className={cn(
-              "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
-              activeCategory === "" ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
+              "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 scale-110",
+              activeCategory === "" ? "border-brand bg-brand shadow-[0_2px_8px_rgba(255,126,139,0.3)]" : "border-surface-accent bg-transparent"
             )}>
               {activeCategory === "" && (
                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
@@ -206,64 +208,133 @@ export function CategoryPickerSheet({
           </button>
 
           {categories.map((category) => (
-            <div key={category.id}>
-              <button
-                onClick={() => handleSelect(category.id)}
-                className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
-              >
-                <span className={cn("text-base font-semibold", activeCategory === category.id ? "text-app-text" : "text-app-muted")}>
-                  {category.name}
-                </span>
-                <div className={cn(
-                  "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
-                  activeCategory === category.id ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
-                )}>
-                  {activeCategory === category.id && (
-                     <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-                        <polyline points="20 6 9 17 4 12" />
-                     </svg>
-                  )}
-                </div>
-              </button>
-
-              {activeCategory === category.id && brands.length > 0 && (
-                <div className="ml-4 mt-1 space-y-1 mb-2 border-l-2 border-surface-accent/10 pl-2">
-                  {brands.map((b) => (
-                    <button
-                      key={b.id}
-                      onClick={() => {
-                        setBrand(b.id);
-                        onClose();
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl p-3 transition-colors hover:bg-surface-accent/10"
-                    >
-                      <span className={cn("text-[15px] font-medium", brand === b.id ? "text-brand" : "text-app-muted/80")}>
-                        {b.name}
-                      </span>
-                      <div className={cn(
-                        "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
-                        brand === b.id ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
-                      )}>
-                        {brand === b.id && (
-                           <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5">
-                              <polyline points="20 6 9 17 4 12" />
-                           </svg>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+            <button
+              key={category.id}
+              onClick={() => handleSelect(category.id)}
+              className={cn(
+                "flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300",
+                activeCategory === category.id ? "bg-brand/5 border border-brand/20" : "hover:bg-surface-accent/10 border border-transparent"
               )}
-            </div>
+            >
+              <span className={cn("text-[16px] font-bold", activeCategory === category.id ? "text-brand" : "text-app-text/70")}>
+                {category.name}
+              </span>
+              <div className={cn(
+                "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 scale-110",
+                activeCategory === category.id ? "border-brand bg-brand shadow-[0_2px_8px_rgba(255,126,139,0.3)]" : "border-surface-accent bg-transparent"
+              )}>
+                {activeCategory === category.id && (
+                   <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                      <polyline points="20 6 9 17 4 12" />
+                   </svg>
+                )}
+              </div>
+            </button>
           ))}
         </div>
         
-        <div className="pt-6">
+        <div className="pt-4 px-1">
           <button
             onClick={onBack}
-            className="w-full rounded-2xl bg-brand py-4 text-center font-bold text-white shadow-lg active:scale-95 transition-transform"
+            className="w-full rounded-2xl bg-surface-accent/20 py-4 text-center font-black text-app-text/80 h-14 active:scale-95 transition-all text-sm uppercase tracking-widest"
           >
-            {messages.catalog.continueLabel}
+            {messages.common.back || "Back"}
+          </button>
+        </div>
+      </div>
+    </Sheet>
+  );
+}
+
+export function BrandPickerSheet({ 
+  isOpen, 
+  onClose,
+  onBack 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  onBack: () => void;
+}) {
+  const { messages } = useI18n();
+  const brands = useCatalogStore((state) => state.brands);
+  const brandId = useCatalogStore((state) => state.brand);
+  const setBrand = useCatalogStore((state) => state.setBrand);
+
+  const handleSelect = (id: string) => {
+    setBrand(id);
+    onBack(); // Go back to filters instead of closing everything
+  };
+
+  return (
+    <Sheet 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={""} 
+    >
+      <div className="space-y-4 pb-4">
+        <div className="flex items-center gap-4 mb-2">
+          <button onClick={onBack} className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-90">
+            <FiChevronLeft className="h-6 w-6" />
+          </button>
+          <h2 className="text-xl font-black tracking-tight">{messages.catalog.brandTitle || "Brands"}</h2>
+        </div>
+
+        <div className="space-y-1.5 overflow-y-auto max-h-[60vh] pr-1 no-scrollbar pt-2">
+          {/* All Brands option */}
+          <button
+            onClick={() => handleSelect("")}
+            className={cn(
+              "flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300",
+              brandId === "" ? "bg-brand/5 border border-brand/20" : "hover:bg-surface-accent/10 border border-transparent"
+            )}
+          >
+            <span className={cn("text-[16px] font-bold", brandId === "" ? "text-brand" : "text-app-text/70")}>
+              {messages.catalog.allBrands || "All Brands"}
+            </span>
+            <div className={cn(
+              "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 scale-110",
+              brandId === "" ? "border-brand bg-brand shadow-[0_2px_8px_rgba(255,126,139,0.3)]" : "border-surface-accent bg-transparent"
+            )}>
+              {brandId === "" && (
+                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                    <polyline points="20 6 9 17 4 12" />
+                 </svg>
+              )}
+            </div>
+          </button>
+
+          {brands.map((brand) => (
+            <button
+              key={brand.id}
+              onClick={() => handleSelect(brand.id)}
+              className={cn(
+                "flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300",
+                brandId === brand.id ? "bg-brand/5 border border-brand/20" : "hover:bg-surface-accent/10 border border-transparent"
+              )}
+            >
+              <span className={cn("text-[16px] font-bold", brandId === brand.id ? "text-brand" : "text-app-text/70")}>
+                {brand.name}
+              </span>
+              <div className={cn(
+                "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 scale-110",
+                brandId === brand.id ? "border-brand bg-brand shadow-[0_2px_8px_rgba(255,126,139,0.3)]" : "border-surface-accent bg-transparent"
+              )}>
+                {brandId === brand.id && (
+                   <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                      <polyline points="20 6 9 17 4 12" />
+                   </svg>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+        
+        <div className="pt-4 px-1">
+          <button
+            onClick={onBack}
+            className="w-full rounded-2xl bg-surface-accent/20 py-4 text-center font-black text-app-text/80 h-14 active:scale-95 transition-all text-sm uppercase tracking-widest"
+          >
+             {messages.common.back || "Back"}
           </button>
         </div>
       </div>

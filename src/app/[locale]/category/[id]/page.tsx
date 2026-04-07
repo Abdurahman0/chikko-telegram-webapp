@@ -13,9 +13,8 @@ import { ProductCard } from "@/components/catalog/product-card";
 import { ProductSkeletonGrid } from "@/components/catalog/product-skeleton-grid";
 import { Input } from "@/components/shared/input";
 import { Sheet } from "@/components/shared/sheet";
-import { FilterSheet, CategoryPickerSheet } from "@/components/catalog/filter-sheets";
+import { FilterSheet, CategoryPickerSheet, BrandPickerSheet } from "@/components/catalog/filter-sheets";
 
-// Temporary sheet components, will be moved to separate files in Phase 14
 function SortSheet({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { messages } = useI18n();
   const sort = useCatalogStore((state) => state.sort);
@@ -31,7 +30,7 @@ function SortSheet({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 
   return (
     <Sheet isOpen={isOpen} onClose={onClose} title={messages.catalog.sortTitle}>
-      <div className="space-y-1">
+      <div className="space-y-1.5 pb-2">
         {options.map((option) => (
           <button
             key={option.id}
@@ -39,29 +38,26 @@ function SortSheet({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
               setSort(option.id);
               onClose();
             }}
-            className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/20"
+            className={cn(
+              "flex w-full items-center justify-between rounded-2xl p-4 transition-all duration-300",
+              sort === option.id ? "bg-brand/5 border border-brand/20 shadow-sm" : "hover:bg-surface-accent/10 border border-transparent"
+            )}
           >
-            <span className={cn("text-base font-semibold", sort === option.id ? "text-app-text" : "text-app-muted")}>
+            <span className={cn("text-base font-bold transition-colors", sort === option.id ? "text-brand" : "text-app-text/70")}>
               {option.label}
             </span>
-            {sort === option.id && (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand p-1">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-            )}
+            <div className={cn(
+              "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 scale-110",
+              sort === option.id ? "border-brand bg-brand shadow-[0_2px_8px_rgba(255,126,139,0.3)]" : "border-surface-accent bg-transparent"
+            )}>
+              {sort === option.id && (
+                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                    <polyline points="20 6 9 17 4 12" />
+                 </svg>
+              )}
+            </div>
           </button>
         ))}
-        
-        <div className="pt-4">
-          <button
-            onClick={onClose}
-            className="w-full rounded-2xl bg-brand py-4 text-center font-bold text-white shadow-lg active:scale-95 transition-transform"
-          >
-            {messages.catalog.show}
-          </button>
-        </div>
       </div>
     </Sheet>
   );
@@ -81,7 +77,7 @@ export default function CategoryPage({
   const setSearch = useCatalogStore((state) => state.setSearch);
   const priceFrom = useCatalogStore((state) => state.priceFrom);
   const priceTo = useCatalogStore((state) => state.priceTo);
-  const brand = useCatalogStore((state) => state.brand);
+  const brandId = useCatalogStore((state) => state.brand);
   const sort = useCatalogStore((state) => state.sort);
   const resetFilters = useCatalogStore((state) => state.resetFilters);
 
@@ -95,8 +91,8 @@ export default function CategoryPage({
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isBrandPickerOpen, setIsBrandPickerOpen] = useState(false);
 
-  // Initialize and update catalog data
   useCatalog();
 
   const activeCategory = useCatalogStore((state) => state.activeCategory);
@@ -104,23 +100,18 @@ export default function CategoryPage({
   const setBrand = useCatalogStore((state) => state.setBrand);
 
   useEffect(() => {
-    // Default to empty (all) if id is "all" or missing
     const targetId = !id || id === "all" ? "" : id;
     setCategory(targetId);
   }, [id, setCategory]);
 
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
-  const activeBrandData = brands.find((b) => b.id === brand);
+  const activeBrandData = brands.find((b) => b.id === brandId);
 
   const categoryName = activeCategory === "" ? messages.catalog.allCategories : activeCategoryData?.name ?? messages.common.unknown;
-  
-  // Header title should show Brand if brand filter is active
-  const headerTitle = brand && activeBrandData ? activeBrandData.name : categoryName;
-  
+  const headerTitle = brandId && activeBrandData ? activeBrandData.name : categoryName;
   const productCount = messages.catalog.productCount.replace("{count}", String(products.length));
 
   const totalCategoryProducts = useMemo(() => {
-    // If we have brands, sum their counts if possible, otherwise use products.length when no brand filter
     if (brands.length > 0) {
       return brands.reduce((acc, b) => acc + (b.productsCount ?? 0), 0);
     }
@@ -128,25 +119,22 @@ export default function CategoryPage({
   }, [brands, products]);
 
   const hasActiveFilters = useMemo(() => {
-    return search !== "" || brand !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
-  }, [search, brand, priceFrom, priceTo, sort]);
+    return search !== "" || brandId !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
+  }, [search, brandId, priceFrom, priceTo, sort]);
 
   useEffect(() => {
-    // Reset toggle when category changes
     setShowAllProducts(false);
   }, [activeCategory]);
 
-  // Main Content logic
-  const isBrandListView = !brand && brands.length > 0 && !showAllProducts;
+  const isBrandListView = !brandId && brands.length > 0 && !showAllProducts;
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">
-      {/* ... header code same ... */}
       <header className="relative z-10 bg-app-bg px-4 pt-3 pb-2 transition-all duration-300">
         <div className="flex items-center gap-2 mb-2">
           <button
             onClick={() => router.back()}
-            className="flex h-10 w-8 shrink-0 items-center justify-start text-app-text active:scale-95 transition-transform"
+            className="flex h-10 w-8 shrink-0 items-center justify-start text-app-text active:scale-90 transition-transform"
           >
             <FiArrowLeft className="h-6 w-6 stroke-[2.2px]" />
           </button>
@@ -155,18 +143,18 @@ export default function CategoryPage({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={messages.catalog.searchPlaceholder}
-              className="h-10 rounded-xl border-none bg-surface-accent/25 pl-10 text-xs font-medium focus:ring-1 focus:ring-brand/10 transition-all shadow-inner"
+              className="h-11 rounded-xl border-none bg-surface-accent/25 pl-10 text-[13px] font-bold focus:ring-2 focus:ring-brand/10 transition-all shadow-inner"
             />
-            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-app-muted/50 h-3.5 w-3.5" />
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-app-muted/40 h-4 w-4" />
           </div>
         </div>
 
-        <div className="flex items-end justify-between px-0.5 mt-1">
+        <div className="flex items-end justify-between px-0.5 mt-2">
           <div className="flex-1">
-            <h1 className="text-xl font-black text-app-text tracking-tight capitalize leading-tight">
+            <h1 className="text-2xl font-black text-app-text tracking-tight capitalize leading-none">
               {headerTitle.toLowerCase()}
             </h1>
-            <p className="text-[11px] font-bold text-app-muted/60 uppercase tracking-wide mt-0.5">{productCount}</p>
+            <p className="text-[12px] font-black text-app-muted/50 uppercase tracking-widest mt-1">{productCount}</p>
           </div>
 
           {(hasActiveFilters || showAllProducts) && (
@@ -175,36 +163,36 @@ export default function CategoryPage({
                 resetFilters();
                 setShowAllProducts(false);
               }}
-              className="text-[10px] font-black uppercase tracking-widest text-[#FF4B55] active:opacity-60 transition-opacity mb-0.5"
+              className="text-[11px] font-black uppercase tracking-widest text-brand hover:opacity-80 transition-opacity mb-1"
             >
-              Tozalash
+              {messages.common.reset}
             </button>
           )}
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-2.5">
           <button 
             onClick={() => setIsSortOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-95 active:bg-surface-accent/40 shadow-sm border border-black/5"
             aria-label="Sort"
           >
-            <TbArrowsSort className="h-4.5 w-4.5" />
+            <TbArrowsSort className="h-5 w-5" />
           </button>
           <button 
             onClick={() => setIsFilterOpen(true)}
-            className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-surface-accent/20 text-[11px] font-black uppercase tracking-wider text-app-text transition-all active:bg-surface-accent/40 shadow-sm"
+            className="flex h-10 items-center gap-2 px-4 rounded-full bg-surface-accent/20 text-[11px] font-black uppercase tracking-widest text-app-text transition-all active:scale-95 active:bg-surface-accent/40 shadow-sm border border-black/5"
           >
-            <FiSliders className="h-3.5 w-3.5" />
+            <FiSliders className="h-4 w-4 text-brand" />
             {messages.catalog.filterTitle}
           </button>
           
-          {(brand || showAllProducts) && (
+          {(brandId || showAllProducts) && (
             <button 
               onClick={() => {
                 setBrand("");
                 setShowAllProducts(false);
               }}
-              className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-brand/10 text-[11px] font-black uppercase tracking-wider text-brand transition-all active:bg-brand/20 shadow-sm"
+              className="flex h-10 items-center gap-1.5 px-4 rounded-full bg-brand/10 text-[11px] font-black uppercase tracking-widest text-brand transition-all active:scale-95 active:bg-brand/20 shadow-sm border border-brand/5"
             >
               {messages.catalog.allBrands}
             </button>
@@ -216,49 +204,58 @@ export default function CategoryPage({
         {status === "loading" ? (
           <ProductSkeletonGrid />
         ) : isBrandListView ? (
-          <div className="bg-app-bg rounded-t-3xl ">
+          <div className="bg-app-bg rounded-t-3xl">
             <button
                onClick={() => setShowAllProducts(true)}
-               className="flex w-full items-center justify-between border-b border-surface-accent/10 py-5 active:bg-surface-accent/5 transition-colors"
+               className="flex w-full items-center justify-between border-b border-surface-accent/10 py-5 active:bg-surface-accent/5 transition-colors group"
             >
-              <span className="text-sm font-bold text-app-text">
-                {messages.catalog.allProductsInCategory}
-              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-[15px] font-black text-app-text group-hover:text-brand transition-colors">
+                  {messages.catalog.allProductsInCategory}
+                </span>
+                <span className="text-[11px] font-bold text-app-muted/50 uppercase tracking-wide mt-0.5">
+                  {messages.catalog.viewAll || "Hamma mahsulotlar"}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
-                <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-surface-accent/20 px-2 text-[10px] font-black text-brand/80">
+                <span className="flex h-6 min-w-[28px] items-center justify-center rounded-full bg-brand/10 px-2.5 text-[11px] font-black text-brand">
                   {totalCategoryProducts}
                 </span>
-                <FiChevronRight className="text-app-muted/40 h-4 w-4" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-accent/10">
+                   <FiChevronRight className="text-app-muted/40 h-4 w-4" />
+                </div>
               </div>
             </button>
 
-            <div className="divide-y divide-surface-accent/5">
+            <div className="divide-y divide-surface-accent/10">
               {brands.map((b) => (
                 <button
                   key={b.id}
                   onClick={() => setBrand(b.id)}
                   className="flex w-full items-center justify-between py-5 active:bg-surface-accent/5 transition-colors group"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-full bg-surface-accent/10 flex items-center justify-center text-lg font-black text-app-text/30 group-active:bg-brand/10 group-active:text-brand transition-all">
+                  <div className="flex items-center gap-4 text-left">
+                    <div className="h-14 w-14 rounded-full bg-surface-accent/15 flex items-center justify-center text-xl font-black text-app-text/30 group-active:bg-brand/10 group-active:text-brand transition-all border border-black/[0.03]">
                       {b.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-[15px] font-bold text-app-text group-active:text-brand transition-colors">
-                      {b.name}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-[16px] font-bold text-app-text group-active:text-brand transition-colors">
+                        {b.name}
+                      </span>
+                      <span className="text-[11px] font-bold text-app-muted/40 uppercase tracking-tight">{b.productsCount || 0} {messages.common.pieces || "dona"}</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-surface-accent/20 px-2 text-[10px] font-black text-brand/80">
-                      {b.productsCount ?? 0}
-                    </span>
-                    <FiChevronRight className="text-app-muted/40 h-4 w-4" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-accent/10 group-active:bg-brand/10 group-active:text-brand">
+                       <FiChevronRight className="text-app-muted/40 h-4 w-4 group-active:text-brand" />
+                    </div>
                   </div>
                 </button>
               ))}
             </div>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2.5 items-stretch">
+          <div className="grid grid-cols-2 gap-2.5 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500">
             {products.map((product) => (
               <ProductCard
                 key={product.id}
@@ -278,10 +275,16 @@ export default function CategoryPage({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center pt-20 text-center">
-            <div className="mb-4 text-4xl opacity-20">🔍</div>
-            <h3 className="text-lg font-bold text-app-text">{messages.catalog.emptyTitle}</h3>
-            <p className="text-sm text-app-muted">{messages.catalog.emptyDescription}</p>
+          <div className="flex flex-col items-center justify-center pt-24 text-center">
+            <div className="mb-6 h-20 w-20 rounded-full bg-surface-accent/10 flex items-center justify-center text-4xl opacity-40 grayscale">🔍</div>
+            <h3 className="text-xl font-black text-app-text tracking-tight">{messages.catalog.emptyTitle}</h3>
+            <p className="mt-2 text-[13px] font-medium text-app-muted max-w-[240px] leading-relaxed">{messages.catalog.emptyDescription}</p>
+            <button 
+              onClick={() => resetFilters()} 
+              className="mt-8 rounded-2xl bg-brand/10 px-6 py-3 text-[12px] font-black uppercase tracking-widest text-brand active:scale-95 transition-all"
+            >
+               {messages.catalog.tryAnotherSearch || "Tozalash"}
+            </button>
           </div>
         )}
       </main>
@@ -296,6 +299,10 @@ export default function CategoryPage({
           setIsFilterOpen(false);
           setIsPickerOpen(true);
         }}
+        onOpenBrands={() => {
+          setIsFilterOpen(false);
+          setIsBrandPickerOpen(true);
+        }}
       />
 
       <CategoryPickerSheet 
@@ -303,6 +310,15 @@ export default function CategoryPage({
         onClose={() => setIsPickerOpen(false)} 
         onBack={() => {
           setIsPickerOpen(false);
+          setIsFilterOpen(true);
+        }}
+      />
+
+      <BrandPickerSheet
+        isOpen={isBrandPickerOpen}
+        onClose={() => setIsBrandPickerOpen(false)} 
+        onBack={() => {
+          setIsBrandPickerOpen(false);
           setIsFilterOpen(true);
         }}
       />

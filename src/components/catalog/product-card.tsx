@@ -63,13 +63,13 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        "flex h-full flex-col rounded-[32px] bg-surface shadow-soft transition-all duration-300",
-        compact ? "min-h-[17rem] p-3" : "min-h-[19.5rem] p-4",
+        "flex h-full flex-col rounded-[28px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)] transition-all duration-500 hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-black/[0.02]",
+        compact ? "min-h-[16.5rem] p-2.5" : "min-h-[19rem] p-3.5",
       )}
     >
       <Link
         href={`/${locale}/product/${product.id}`}
-        className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl bg-surface-soft"
+        className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[24px] bg-surface-accent/15 group"
       >
         {product.image ? (
           <Image
@@ -78,10 +78,10 @@ export function ProductCard({
             fill
             sizes="(max-width: 768px) 50vw, 33vw"
             unoptimized
-            className="object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="text-sm text-app-muted">
+          <div className="text-sm font-black text-app-muted/30 uppercase tracking-widest">
             {product.name.slice(0, 2).toUpperCase()}
           </div>
         )}
@@ -92,101 +92,94 @@ export function ProductCard({
           className={cn(
             "absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300",
             isFavorite 
-              ? "bg-brand text-[#FF4B55] shadow-[0_4px_10px_rgba(255,126,139,0.3)]" 
-              : "bg-white/80 text-app-muted/60 backdrop-blur-md shadow-sm active:scale-90"
+              ? "bg-brand text-white shadow-[0_4px_12px_rgba(255,126,139,0.4)]" 
+              : "bg-white/80 text-app-muted/60 backdrop-blur-md shadow-sm border border-black/5 active:scale-90"
           )}
         >
-          <FiHeart className={cn("h-5 w-5", isFavorite && "fill-current")} />
+          <FiHeart className={cn("h-4.5 w-4.5 transition-transform", isFavorite ? "fill-current scale-110" : "scale-100")} />
         </button>
       </Link>
-      <div className={cn("flex flex-1 flex-col", compact ? "mt-2.5" : "mt-3")}>
+      
+      <div className={cn("flex flex-1 flex-col", compact ? "mt-2" : "mt-3")}>
         <Link
           href={`/${locale}/product/${product.id}`}
-          className={cn("block", compact ? "min-h-[3rem]" : "min-h-[3.45rem]")}
+          className={cn("block group", compact ? "min-h-[3rem]" : "min-h-[3.35rem]")}
         >
-          <p className="truncate text-sm font-semibold leading-5">{product.name}</p>
-          <p className="truncate-2 mt-1 h-8 text-xs leading-4 text-app-muted">
+          <p className="truncate text-[14px] font-black leading-5 text-app-text transition-colors group-hover:text-brand">{product.name}</p>
+          <p className="truncate-2 mt-1 h-7 text-[11px] font-medium leading-relaxed text-app-muted/70">
             {product.shortDescription || product.description || detailsLabel}
           </p>
         </Link>
 
         {/* Rating */}
-        <div className="flex items-center gap-1.5 px-0.5 mt-1.5 animate-in fade-in slide-in-from-bottom-1 duration-500">
+        <div className="flex items-center gap-1 mt-1.5 animate-in fade-in slide-in-from-bottom-2 duration-700">
           <div className="flex items-center text-[#FFC107]">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 transition-transform hover:scale-110">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 transition-transform group-hover:scale-110">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z" />
             </svg>
           </div>
-          <span className="text-[11px] font-black text-app-text">
+          <span className="text-[11px] font-black text-app-text/80">
             {typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}
           </span>
-          <span className="text-[10px] font-bold text-app-muted/50 uppercase tracking-tighter ml-0.5">
-            {typeof product.reviewsCount === "number" ? product.reviewsCount : 0}
+          <span className="text-[10px] font-bold text-app-muted/40 uppercase tracking-tighter ml-1">
+            ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
           </span>
         </div>
 
-        <div className={cn("flex items-start justify-between gap-2", compact ? "mt-1.5" : "mt-2")}>
-          <p className="text-base font-bold leading-none">
-            <span className="block whitespace-nowrap">
-              {formatCurrency(product.price, locale)}
+        <div className={cn("flex items-end justify-between gap-2", compact ? "mt-1.5" : "mt-2.5")}>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black uppercase tracking-widest text-app-muted/50 mb-0.5 leading-none">
+                {messages.common.price || "Narxi"}
             </span>
-            <span className="mt-0.5 block whitespace-nowrap text-[0.92rem]">
-              {currencyLabel}
-            </span>
-          </p>
-          {showStockLabel ? (
-            <p
-              className={`whitespace-nowrap text-xs font-medium ${
-                isOut ? "text-danger" : "text-brand-strong"
-              }`}
-            >
-              {isOut ? outOfStockLabel : inStockLabel}
+            <p className="text-[16px] font-black leading-none text-app-text tracking-tight">
+              {formatCurrency(product.price, locale)} <span className="text-[11px] ml-0.5">{currencyLabel}</span>
             </p>
-          ) : (
-            <span />
+          </div>
+          {showStockLabel && isOut && (
+            <p className="whitespace-nowrap text-[10px] font-black uppercase tracking-widest text-[#FF4B55] mb-1">
+              {outOfStockLabel}
+            </p>
           )}
         </div>
-        <div className={cn("relative", compact ? "mt-2 h-8" : "mt-3 h-9")}>
+        
+        <div className={cn("relative", compact ? "mt-2.5 h-10" : "mt-3.5 h-11")}>
           {quantity > 0 ? (
-            <div className="absolute inset-0 flex items-center justify-between rounded-2xl bg-brand p-1 shadow-md shadow-brand/20 animate-in fade-in zoom-in-95 duration-300">
+            <div className="absolute inset-0 flex items-center justify-between rounded-2xl bg-brand p-1 shadow-[0_4px_12px_rgba(255,126,139,0.3)] animate-in fade-in zoom-in-95 duration-500">
               <button
                 type="button"
                 aria-label="Decrease quantity"
-                className={cn(
-                  "flex items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30",
-                  compact ? "h-6 w-6" : "h-7 w-7",
-                )}
+                className="flex h-full aspect-square items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30"
                 onClick={() => onDecrement(product.id)}
               >
-                <span className="text-lg font-black leading-none transform -translate-y-[1px]">-</span>
+                <span className="text-xl font-black leading-none transform -translate-y-[1px]">-</span>
               </button>
-              <span className="text-sm font-black text-white px-2">{quantity}</span>
+              <span className="text-[15px] font-black text-white px-2 mb-0.5">{quantity}</span>
               <button
                 type="button"
                 aria-label="Increase quantity"
-                className={cn(
-                  "flex items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30",
-                  compact ? "h-6 w-6" : "h-7 w-7",
-                )}
+                className="flex h-full aspect-square items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30"
                 onClick={(event) =>
                   onIncrement(product, event.currentTarget as HTMLElement)
                 }
               >
-                <span className="text-lg font-black leading-none transform -translate-y-[1px]">+</span>
+                <span className="text-xl font-black leading-none transform -translate-y-[1px]">+</span>
               </button>
             </div>
           ) : (
-            <Button
-              fullWidth
-              variant="primary"
-              className={cn("rounded-2xl font-black text-[11px] uppercase tracking-wider transition-all active:scale-95", compact ? "h-8" : "h-9")}
+            <button
+              className={cn(
+                "w-full h-full rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-sm border border-transparent",
+                isOut 
+                   ? "bg-surface-accent/20 text-app-muted cursor-not-allowed opacity-50" 
+                   : "bg-brand text-white shadow-[0_4px_12px_rgba(255,126,139,0.25)] hover:bg-brand/90"
+              )}
               onClick={(event) =>
                 onIncrement(product, event.currentTarget as HTMLElement)
               }
               disabled={isOut}
             >
               {addToCartLabel}
-            </Button>
+            </button>
           )}
         </div>
       </div>

@@ -19,6 +19,7 @@ export type Messages = {
     openCatalog: string;
     price: string;
     back: string;
+    reset: string;
   };
   bootstrap: {
     loading: string;
@@ -52,6 +53,8 @@ export type Messages = {
     priceFromLabel: string;
     priceToLabel: string;
     brand: string;
+    brandTitle: string;
+    viewAll: string;
     allProductsInCategory: string;
     allBrands: string;
   };
