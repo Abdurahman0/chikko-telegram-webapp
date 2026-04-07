@@ -133,9 +133,8 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
           promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
           products: data.products,
-          // When in "all", we don't have a specific brand list from the backend for the whole catalog
-          // through the catalog endpoint. We could merge from categories, but that's complex here.
-          brands: [], 
+          // Preserve brands from state since getCatalog response doesn't include them
+          brands: state.brands, 
           status: "success",
           lastQueryKey: queryKey,
           loadingQueryKey: null,

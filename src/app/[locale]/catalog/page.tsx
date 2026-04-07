@@ -114,9 +114,8 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
     }, 700);
   };
 
-  useEffect(() => {
-    setCategory("");
-  }, [setCategory]);
+  // The category is managed by navigation/user-selection; removing the forceful reset on mount 
+  // to prevent race conditions and ensure the UI reflects the current store state.
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">

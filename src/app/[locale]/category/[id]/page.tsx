@@ -99,10 +99,12 @@ export default function CategoryPage({
   const brands = useCatalogStore((state) => state.brands);
   const setBrand = useCatalogStore((state) => state.setBrand);
 
-  useEffect(() => {
-    const targetId = !id || id === "all" ? "" : id;
-    setCategory(targetId);
-  }, [id, setCategory]);
+  // Sync category ID from URL to store immediately to avoid first-render race conditions
+  const targetCategory = !id || id === "all" ? "" : id;
+  if (activeCategory !== targetCategory) {
+    // We update synchronously here; useCatalog will pick this up on its first run
+    setCategory(targetCategory);
+  }
 
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
   const activeBrandData = brands.find((b) => b.id === brandId);
