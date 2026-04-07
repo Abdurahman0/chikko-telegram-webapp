@@ -82,7 +82,7 @@ export default function ReviewsPage() {
 function ReviewsScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
   const initData = useBootstrapStore((state) => state.initData);
-  const { reviews, pendingOrders: backendPending, status, loadReviews, submitReview } = useReviewsStore();
+  const { reviews, pendingOrders: backendPending, status, errorCode, errorMessage, loadReviews, submitReview } = useReviewsStore();
   const orders = useOrdersStore((state) => state.orders);
   
   const pendingOrders = React.useMemo(() => {
@@ -155,6 +155,7 @@ function ReviewsScreen({ locale }: { locale: "uz" | "ru" }) {
       {status === "error" && (
         <StateCard
           title={messages.reviews.loadFailed}
+          description={errorMessage || errorCode || undefined}
           action={
             <Button onClick={() => loadReviews({ initData })}>
               {messages.common.retry}
