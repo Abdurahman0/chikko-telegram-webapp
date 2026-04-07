@@ -21,9 +21,9 @@ const rawOrderItemSchema = z
 export const rawOrderSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
-    status: z.string().optional(),
-    payment_status: z.string().optional(),
-    paymentStatus: z.string().optional(),
+    status: z.string().optional().nullable(),
+    payment_status: z.string().optional().nullable(),
+    paymentStatus: z.string().optional().nullable(),
     total_amount: z.union([z.number(), z.string(), z.null()]).optional(),
     total: z.union([z.number(), z.string(), z.null()]).optional(),
     amount: z.union([z.number(), z.string(), z.null()]).optional(),

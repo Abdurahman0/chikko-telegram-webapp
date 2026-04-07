@@ -88,7 +88,7 @@ function adaptOrder(raw: RawOrder): Order {
           ? String(item.product)
           : `product-${index + 1}`,
     name: item.name ?? item.title ?? item.product_name ?? "Product",
-    quantity: item.quantity,
+    quantity: toNumber(item.quantity, 1),
     price: toNumber(item.price ?? item.unit_price ?? item.line_total, 0),
     currency: item.currency ?? raw.currency ?? "UZS",
     image: item.image || item.image_url || null,
@@ -96,11 +96,11 @@ function adaptOrder(raw: RawOrder): Order {
 
   return {
     id: String(raw.id),
-    status: raw.status,
+    status: (raw.status !== null && raw.status !== undefined) ? raw.status : undefined,
     paymentStatus:
-      raw.payment_status ??
-      raw.paymentStatus ??
-      raw.payments?.[0]?.status,
+      (raw.payment_status !== null && raw.payment_status !== undefined) ? raw.payment_status :
+      (raw.paymentStatus !== null && raw.paymentStatus !== undefined) ? raw.paymentStatus :
+      raw.payments?.[0]?.status || undefined,
     totalAmount: toNumber(raw.total_amount ?? raw.total ?? raw.amount, 0),
     currency: raw.currency ?? "UZS",
     items,
@@ -310,9 +310,9 @@ function adaptReview(raw: RawReview): Review {
     id: String(raw.id),
     orderId: raw.order_id ? String(raw.order_id) : "",
     comment: raw.comment ?? "",
-    requestedAt: raw.requested_at,
-    submittedAt: raw.submitted_at,
-    source: raw.source,
+    requestedAt: raw.requested_at ?? undefined,
+    submittedAt: raw.submitted_at ?? undefined,
+    source: raw.source ?? undefined,
     order: raw.order ? adaptOrder(raw.order) : undefined,
     rating: (raw.rating !== undefined && raw.rating !== null) ? toNumber(raw.rating, 0) : undefined,
   };
