@@ -207,6 +207,7 @@ export const ruMessages: Messages = {
     subtitle: "Товары, которые вам понравились",
     emptyTitle: "В избранном пока пусто",
     emptyDescription: "Сохраняйте понравившиеся товары здесь.",
+    loadFailed: "Не удалось загрузить избранное. Пожалуйста, попробуйте позже.",
   },
   reviews: {
     title: "Отзывы",

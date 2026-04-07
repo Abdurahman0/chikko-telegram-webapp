@@ -200,6 +200,7 @@ export type Messages = {
     subtitle: string;
     emptyTitle: string;
     emptyDescription: string;
+    loadFailed: string;
   };
   reviews: {
     title: string;

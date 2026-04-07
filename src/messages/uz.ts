@@ -208,6 +208,7 @@ export const uzMessages: Messages = {
     subtitle: "Sizga yoqqan mahsulotlar",
     emptyTitle: "Sevimlilar bo'sh",
     emptyDescription: "Yoqtirgan mahsulotlaringizni shu yerda saqlang.",
+    loadFailed: "Sevimlilarni yuklab bo'lmadi. Iltimos, qayta urinib ko'ring.",
   },
   reviews: {
     title: "Fikr-mulohazalar",

@@ -9,7 +9,7 @@ type FavoritesStatus = "idle" | "loading" | "success" | "error";
 
 type FavoritesStore = {
   products: Product[];
-  status: FavoritesStatus;
+  loadStatus: FavoritesStatus;
   errorCode: string | null;
   errorMessage: string | null;
   // Use a counter to track in-flight toggle requests and avoid race conditions
@@ -20,34 +20,34 @@ type FavoritesStore = {
 
 export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
   products: [],
-  status: "idle",
+  loadStatus: "idle",
   errorCode: null,
   errorMessage: null,
   inFlightToggles: 0,
   loadFavorites: async ({ initData }) => {
-    if (get().status === "loading") return;
+    if (get().loadStatus === "loading") return;
     
-    set({ status: "loading", errorCode: null, errorMessage: null });
+    set({ loadStatus: "loading", errorCode: null, errorMessage: null });
     try {
       const data = await getFavorites(initData);
       // Only update if no toggles happened while loading
       if (get().inFlightToggles === 0) {
         set({
           products: data.products,
-          status: "success",
+          loadStatus: "success",
         });
       }
     } catch (error) {
       if (error instanceof TelegramApiError) {
         set({
-          status: "error",
+          loadStatus: "error",
           errorCode: error.code,
           errorMessage: error.message,
         });
         return;
       }
       set({
-        status: "error",
+        loadStatus: "error",
         errorCode: "unknown",
         errorMessage: "Unknown error",
       });
@@ -55,8 +55,8 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
   },
   toggleFavorite: async ({ initData, product }) => {
     // Increment in-flight toggle counter
+    // We don't set loadStatus to 'loading' here because that would trigger full-page skeleton
     set((state) => ({ 
-      status: "loading",
       inFlightToggles: state.inFlightToggles + 1 
     }));
 
@@ -71,7 +71,7 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
           return { 
             products: data.products, 
             inFlightToggles: 0, 
-            status: "success" 
+            loadStatus: "success" 
           };
         }
         return { 
@@ -81,8 +81,9 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
     } catch (error) {
       console.error("Failed to toggle favorite:", error);
       set((state) => ({ 
-        status: "error",
         inFlightToggles: Math.max(0, state.inFlightToggles - 1) 
+        // Important: we DON'T set loadStatus to 'error' here
+        // to avoid hijacking the UI with the 'Order Failed' modal
       }));
     }
   },

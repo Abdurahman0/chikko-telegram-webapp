@@ -28,7 +28,7 @@ function FavoritesScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
   const initData = useBootstrapStore((state) => state.initData);
   const products = useFavoritesStore((state) => state.products);
-  const status = useFavoritesStore((state) => state.status);
+  const loadStatus = useFavoritesStore((state) => state.loadStatus);
   const loadFavorites = useFavoritesStore((state) => state.loadFavorites);
   
   const cartItems = useCartStore((state) => state.items);
@@ -56,11 +56,11 @@ function FavoritesScreen({ locale }: { locale: "uz" | "ru" }) {
         subtitle={messages.favorites.subtitle} 
       />
 
-      {status === "loading" ? <ProductSkeletonGrid /> : null}
+      {loadStatus === "loading" ? <ProductSkeletonGrid /> : null}
 
-      {status === "error" ? (
+      {loadStatus === "error" ? (
         <StateCard
-          title={messages.checkout.failed}
+          title={messages.favorites.loadFailed}
           action={
             <Button onClick={() => loadFavorites({ initData })}>
               {messages.common.retry}
@@ -69,7 +69,7 @@ function FavoritesScreen({ locale }: { locale: "uz" | "ru" }) {
         />
       ) : null}
 
-      {status === "success" && products.length === 0 ? (
+      {loadStatus === "success" && products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-surface-accent text-app-muted">
             <FiHeart className="h-10 w-10" />
@@ -84,7 +84,7 @@ function FavoritesScreen({ locale }: { locale: "uz" | "ru" }) {
         </div>
       ) : null}
 
-      {status === "success" && products.length > 0 ? (
+      {loadStatus === "success" && products.length > 0 ? (
         <div className="grid grid-cols-2 items-stretch gap-3 pb-20">
           {products.map((product) => (
             <ProductCard
