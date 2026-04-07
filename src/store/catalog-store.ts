@@ -76,7 +76,10 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
     priceTo: undefined,
     sort: "popular"
   }),
-  setCategory: (category: string) => set({ activeCategory: category, brand: "" }),
+  setCategory: (category: string) => {
+    const targetCategory = category === "all" ? "" : category;
+    set({ activeCategory: targetCategory, brand: "" });
+  },
   setSearch: (search: string) => set({ search }),
   setBrand: (brand: string) => set({ brand }),
   setSort: (sort: CatalogSortOption) => set({ sort }),
@@ -92,13 +95,15 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
     try {
       if (category && category !== "" && category !== "all") {
         const data = await getCategoryProducts(initData, category, { 
-          brand, 
+          brand: brand || undefined, 
           priceFrom, 
           priceTo, 
           search, 
           sort 
         });
+        
         set((state: CatalogStore) => {
+          // Merge category into categories list if not present
           const hasCategory = state.categories.some(c => c.id === data.category.id);
           const updatedCategories = hasCategory 
             ? state.categories 
@@ -107,7 +112,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           return {
             categories: updatedCategories,
             products: data.products,
-            brands: data.brands,
+            brands: data.brands, // Brands are specific to this category
             status: "success",
             lastQueryKey: queryKey,
             loadingQueryKey: null,
@@ -115,8 +120,9 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           };
         });
       } else {
+        // Load general catalog for "" or "all"
         const data = await getCatalog(initData, { 
-          category, 
+          category: category === "all" ? undefined : category, 
           search,
           brand,
           priceFrom,
@@ -127,7 +133,9 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
           promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
           products: data.products,
-          brands: [],
+          // When in "all", we don't have a specific brand list from the backend for the whole catalog
+          // through the catalog endpoint. We could merge from categories, but that's complex here.
+          brands: [], 
           status: "success",
           lastQueryKey: queryKey,
           loadingQueryKey: null,

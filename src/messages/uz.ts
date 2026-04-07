@@ -55,6 +55,7 @@ export const uzMessages: Messages = {
     priceToLabel: "gacha",
     brand: "Brend",
     allProductsInCategory: "Ushbu toifadagi barcha mahsulotlar",
+    allBrands: "Barcha brendlar",
   },
   product: {
     quantity: "Miqdor",

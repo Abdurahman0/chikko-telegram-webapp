@@ -60,7 +60,7 @@ export async function getCatalog(
   },
 ): Promise<CatalogData> {
   const query = new URLSearchParams();
-  if (params?.category) {
+  if (params?.category && params.category !== "all") {
     query.set("category", params.category);
   }
   if (params?.brand) {
@@ -113,6 +113,10 @@ export async function getCategoryProducts(
   },
 ): Promise<CategoryDetailData> {
   const query = new URLSearchParams();
+  // Include category ID in query params as well for robust filtering
+  if (categoryId && categoryId !== "all") {
+    query.set("category", categoryId);
+  }
   if (params?.brand) {
     query.set("brand", params.brand);
   }

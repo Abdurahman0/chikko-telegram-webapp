@@ -53,6 +53,7 @@ export type Messages = {
     priceToLabel: string;
     brand: string;
     allProductsInCategory: string;
+    allBrands: string;
   };
   product: {
     quantity: string;

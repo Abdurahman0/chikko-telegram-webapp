@@ -91,6 +91,7 @@ export default function CategoryPage({
   const cartItems = useCartStore((state) => state.items);
   const { addItem, decrement } = useCartStore();
 
+  const [showAllProducts, setShowAllProducts] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -107,7 +108,7 @@ export default function CategoryPage({
     const targetId = !id || id === "all" ? "" : id;
     setCategory(targetId);
   }, [id, setCategory]);
-  
+
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
   const activeBrandData = brands.find((b) => b.id === brand);
 
@@ -130,9 +131,17 @@ export default function CategoryPage({
     return search !== "" || brand !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
   }, [search, brand, priceFrom, priceTo, sort]);
 
+  useEffect(() => {
+    // Reset toggle when category changes
+    setShowAllProducts(false);
+  }, [activeCategory]);
+
+  // Main Content logic
+  const isBrandListView = !brand && brands.length > 0 && !showAllProducts;
+
   return (
     <div className="min-h-screen bg-app-bg pb-24">
-      {/* Scrollable Header (Not fixed) */}
+      {/* ... header code same ... */}
       <header className="relative z-10 bg-app-bg px-4 pt-3 pb-2 transition-all duration-300">
         <div className="flex items-center gap-2 mb-2">
           <button
@@ -160,9 +169,12 @@ export default function CategoryPage({
             <p className="text-[11px] font-bold text-app-muted/60 uppercase tracking-wide mt-0.5">{productCount}</p>
           </div>
 
-          {hasActiveFilters && (
+          {(hasActiveFilters || showAllProducts) && (
             <button 
-              onClick={() => resetFilters()}
+              onClick={() => {
+                resetFilters();
+                setShowAllProducts(false);
+              }}
               className="text-[10px] font-black uppercase tracking-widest text-[#FF4B55] active:opacity-60 transition-opacity mb-0.5"
             >
               Tozalash
@@ -170,7 +182,6 @@ export default function CategoryPage({
           )}
         </div>
 
-        {/* Control Bar (Relative) */}
         <div className="mt-3 flex items-center gap-2">
           <button 
             onClick={() => setIsSortOpen(true)}
@@ -187,33 +198,27 @@ export default function CategoryPage({
             {messages.catalog.filterTitle}
           </button>
           
-          {brand && (
+          {(brand || showAllProducts) && (
             <button 
-              onClick={() => setBrand("")}
+              onClick={() => {
+                setBrand("");
+                setShowAllProducts(false);
+              }}
               className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-brand/10 text-[11px] font-black uppercase tracking-wider text-brand transition-all active:bg-brand/20 shadow-sm"
             >
-              All Brands
+              {messages.catalog.allBrands}
             </button>
           )}
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="px-3 pt-4">
         {status === "loading" ? (
           <ProductSkeletonGrid />
-        ) : !brand && brands.length > 0 ? (
-          // Brand List View (Image 1 Style)
+        ) : isBrandListView ? (
           <div className="bg-app-bg rounded-t-3xl ">
-            {/* All items entry */}
             <button
-               onClick={() => {
-                 // In this design, "All products" is just the current view but restricted to category
-                 // Since brand is already empty, we might want to just show the products directly below
-                 // But Image 1 shows it as a clickable item. If clicked, we just show the products.
-                 // We'll use a state to toggle between brand list and product grid if needed, 
-                 // but typically Image 1 is an "Index" view.
-               }}
+               onClick={() => setShowAllProducts(true)}
                className="flex w-full items-center justify-between border-b border-surface-accent/10 py-5 active:bg-surface-accent/5 transition-colors"
             >
               <span className="text-sm font-bold text-app-text">
@@ -251,29 +256,6 @@ export default function CategoryPage({
                 </button>
               ))}
             </div>
-            
-            {/* If no brands but products exist, show products grid automatically */}
-            {brands.length === 0 && products.length > 0 && (
-               <div className="grid grid-cols-2 gap-2.5 items-stretch mt-2">
-                {products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    locale={locale}
-                    product={product}
-                    addToCartLabel={messages.catalog.addToCart}
-                    outOfStockLabel={messages.catalog.outOfStock}
-                    inStockLabel={messages.catalog.inStock}
-                    detailsLabel={messages.catalog.details}
-                    currencyLabel={messages.common.som}
-                    quantity={cartItems[product.id]?.quantity ?? 0}
-                    compact={false}
-                    showStockLabel={true}
-                    onIncrement={(p) => addItem(p)}
-                    onDecrement={(pId) => decrement(pId)}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-2 gap-2.5 items-stretch">
