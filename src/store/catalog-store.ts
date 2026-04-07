@@ -98,14 +98,22 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           search, 
           sort 
         });
-        set((state: CatalogStore) => ({
-          products: data.products,
-          brands: data.brands,
-          status: "success",
-          lastQueryKey: queryKey,
-          loadingQueryKey: null,
-          lastFetchedAt: Date.now(),
-        }));
+        set((state: CatalogStore) => {
+          const hasCategory = state.categories.some(c => c.id === data.category.id);
+          const updatedCategories = hasCategory 
+            ? state.categories 
+            : [...state.categories, data.category];
+          
+          return {
+            categories: updatedCategories,
+            products: data.products,
+            brands: data.brands,
+            status: "success",
+            lastQueryKey: queryKey,
+            loadingQueryKey: null,
+            lastFetchedAt: Date.now(),
+          };
+        });
       } else {
         const data = await getCatalog(initData, { 
           category, 

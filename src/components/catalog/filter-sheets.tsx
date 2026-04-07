@@ -26,6 +26,7 @@ export function FilterSheet({
   const setPriceRange = useCatalogStore((state) => state.setPriceRange);
   const brandId = useCatalogStore((state) => state.brand);
   const brands = useCatalogStore((state) => state.brands);
+  const setBrand = useCatalogStore((state) => state.setBrand);
 
   const [localFrom, setLocalFrom] = useState(priceFrom?.toString() ?? "0");
   const [localTo, setLocalTo] = useState(priceTo?.toString() ?? "10000000");
@@ -58,6 +59,31 @@ export function FilterSheet({
           </div>
           <FiChevronRight className="text-app-muted/60" />
         </button>
+
+        {/* Brand Selection Section */}
+        {brands.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-app-text">
+              {messages.catalog.brand}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {brands.map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => setBrand(b.id === brandId ? "" : b.id)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+                    brandId === b.id
+                      ? "bg-brand border-brand text-white shadow-md shadow-brand/20"
+                      : "bg-surface-accent/10 border-transparent text-app-muted hover:bg-surface-accent/20"
+                  )}
+                >
+                  {b.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Price Range Section */}
         <div className="space-y-6">
