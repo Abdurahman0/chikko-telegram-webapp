@@ -133,7 +133,7 @@ export async function getCategoryProducts(
   const suffix = query.toString().length > 0 ? `?${query}` : "";
 
   const raw = await telegramApiRequest({
-    path: `/api/integrations/telegram/webapp/categories/${categoryId}${suffix}`,
+    path: `/api/integrations/telegram/webapp/categories/${categoryId}/${suffix}`,
     method: "GET",
     initData,
     schema: categoryDetailResponseSchema,

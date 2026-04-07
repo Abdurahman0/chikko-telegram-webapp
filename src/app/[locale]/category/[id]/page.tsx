@@ -87,7 +87,6 @@ export default function CategoryPage({
   const cartItems = useCartStore((state) => state.items);
   const { addItem, decrement } = useCartStore();
 
-  const [showAllProducts, setShowAllProducts] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -124,12 +123,6 @@ export default function CategoryPage({
     return search !== "" || brandId !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
   }, [search, brandId, priceFrom, priceTo, sort]);
 
-  useEffect(() => {
-    setShowAllProducts(false);
-  }, [activeCategory]);
-
-  const isBrandListView = !brandId && brands.length > 0 && !showAllProducts;
-
   return (
     <div className="min-h-screen bg-app-bg pb-24">
       <header className="relative z-10 bg-app-bg px-4 pt-3 pb-2 transition-all duration-300">
@@ -159,11 +152,10 @@ export default function CategoryPage({
             <p className="text-[12px] font-black text-app-muted/50 uppercase tracking-widest mt-1">{productCount}</p>
           </div>
 
-          {(hasActiveFilters || showAllProducts) && (
+          {(hasActiveFilters) && (
             <button 
               onClick={() => {
                 resetFilters();
-                setShowAllProducts(false);
               }}
               className="text-[11px] font-black uppercase tracking-widest text-brand hover:opacity-80 transition-opacity mb-1"
             >
@@ -188,11 +180,10 @@ export default function CategoryPage({
             {messages.catalog.filterTitle}
           </button>
           
-          {(brandId || showAllProducts) && (
+          {(brandId) && (
             <button 
               onClick={() => {
                 setBrand("");
-                setShowAllProducts(false);
               }}
               className="flex h-10 items-center gap-1.5 px-4 rounded-full bg-brand/10 text-[11px] font-black uppercase tracking-widest text-brand transition-all active:scale-95 active:bg-brand/20 shadow-sm border border-brand/5"
             >
@@ -205,57 +196,6 @@ export default function CategoryPage({
       <main className="px-3 pt-4">
         {status === "loading" ? (
           <ProductSkeletonGrid />
-        ) : isBrandListView ? (
-          <div className="bg-app-bg rounded-t-3xl">
-            <button
-               onClick={() => setShowAllProducts(true)}
-               className="flex w-full items-center justify-between border-b border-surface-accent/10 py-5 active:bg-surface-accent/5 transition-colors group"
-            >
-              <div className="flex flex-col text-left">
-                <span className="text-[15px] font-black text-app-text group-hover:text-brand transition-colors">
-                  {messages.catalog.allProductsInCategory}
-                </span>
-                <span className="text-[11px] font-bold text-app-muted/50 uppercase tracking-wide mt-0.5">
-                  {messages.catalog.viewAll || "Hamma mahsulotlar"}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 min-w-[28px] items-center justify-center rounded-full bg-brand/10 px-2.5 text-[11px] font-black text-brand">
-                  {totalCategoryProducts}
-                </span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-accent/10">
-                   <FiChevronRight className="text-app-muted/40 h-4 w-4" />
-                </div>
-              </div>
-            </button>
-
-            <div className="divide-y divide-surface-accent/10">
-              {brands.map((b) => (
-                <button
-                  key={b.id}
-                  onClick={() => setBrand(b.id)}
-                  className="flex w-full items-center justify-between py-5 active:bg-surface-accent/5 transition-colors group"
-                >
-                  <div className="flex items-center gap-4 text-left">
-                    <div className="h-14 w-14 rounded-full bg-surface-accent/15 flex items-center justify-center text-xl font-black text-app-text/30 group-active:bg-brand/10 group-active:text-brand transition-all border border-black/[0.03]">
-                      {b.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[16px] font-bold text-app-text group-active:text-brand transition-colors">
-                        {b.name}
-                      </span>
-                      <span className="text-[11px] font-bold text-app-muted/40 uppercase tracking-tight">{b.productsCount || 0} {messages.common.pieces || "dona"}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-accent/10 group-active:bg-brand/10 group-active:text-brand">
-                       <FiChevronRight className="text-app-muted/40 h-4 w-4 group-active:text-brand" />
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-2 gap-2.5 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500">
             {products.map((product) => (
