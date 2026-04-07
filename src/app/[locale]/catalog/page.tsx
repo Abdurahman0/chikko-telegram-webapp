@@ -41,15 +41,21 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   const { messages } = useI18n();
   const router = useRouter();
 
-  useCatalog();
-  const status = useCatalogStore((state) => state.status);
-  const categories = useCatalogStore((state) => state.categories);
-  const promotedProducts = useCatalogStore((state) => state.promotedProducts);
-  const products = useCatalogStore((state) => state.products);
-  const search = useCatalogStore((state) => state.search);
-  const activeCategory = useCatalogStore((state) => state.activeCategory);
   const setSearch = useCatalogStore((state) => state.setSearch);
   const setCategory = useCatalogStore((state) => state.setCategory);
+  const activeCategory = useCatalogStore((state) => state.activeCategory);
+  const categories = useCatalogStore((state) => state.categories);
+  const products = useCatalogStore((state) => state.products);
+  const promotedProducts = useCatalogStore((state) => state.promotedProducts);
+  const search = useCatalogStore((state) => state.search);
+
+  // Synchronize category to "All" ("") when on the Home page
+  if (activeCategory !== "") {
+    setCategory("");
+  }
+
+  useCatalog();
+  const status = useCatalogStore((state) => state.status);
   const addItem = useCartStore((state) => state.addItem);
   const decrement = useCartStore((state) => state.decrement);
   const cartItems = useCartStore((state) => state.items);
@@ -114,8 +120,10 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
     }, 700);
   };
 
-  // The category is managed by navigation/user-selection; removing the forceful reset on mount 
-  // to prevent race conditions and ensure the UI reflects the current store state.
+  // Synchronize category to "All" ("") when on the Home page
+  if (activeCategory !== "") {
+    setCategory("");
+  }
 
   return (
     <div className="min-h-screen bg-app-bg pb-24">

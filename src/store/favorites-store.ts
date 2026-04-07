@@ -78,7 +78,8 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
         // Only sync the full list from server if this was the LAST in-flight request
         // This prevents intermediate server responses from overwriting newer local states
         if (nextInFlight === 0) {
-          return { products: data.products, inFlightToggles: 0, status: "success" };
+          // Trust the optimistic update; don't overwrite with potentially stale server list
+          return { inFlightToggles: 0, status: "success" };
         }
         return { inFlightToggles: nextInFlight };
       });
