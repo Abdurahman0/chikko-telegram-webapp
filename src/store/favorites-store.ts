@@ -12,6 +12,8 @@ type FavoritesStore = {
   status: FavoritesStatus;
   errorCode: string | null;
   errorMessage: string | null;
+  // Use a counter to track in-flight toggle requests and avoid race conditions
+  inFlightToggles: number;
   loadFavorites: (params: { initData: string }) => Promise<void>;
   toggleFavorite: (params: { initData: string; product: Product }) => Promise<void>;
 };
@@ -21,17 +23,20 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
   status: "idle",
   errorCode: null,
   errorMessage: null,
+  inFlightToggles: 0,
   loadFavorites: async ({ initData }) => {
-    // If already loading or success, we can skip or only refresh if needed
     if (get().status === "loading") return;
     
     set({ status: "loading", errorCode: null, errorMessage: null });
     try {
       const data = await getFavorites(initData);
-      set({
-        products: data.products,
-        status: "success",
-      });
+      // Only update if no toggles happened while loading
+      if (get().inFlightToggles === 0) {
+        set({
+          products: data.products,
+          status: "success",
+        });
+      }
     } catch (error) {
       if (error instanceof TelegramApiError) {
         set({
@@ -50,12 +55,15 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
   },
   toggleFavorite: async ({ initData, product }) => {
     const previousProducts = get().products;
-    const isCurrentlyFavorite = previousProducts.some(p => p.id === product.id);
+    const isCurrentlyFavorite = previousProducts.some(p => String(p.id) === String(product.id));
     
+    // Increment in-flight toggle counter
+    set((state) => ({ inFlightToggles: state.inFlightToggles + 1 }));
+
     // OPTIMISTIC UPDATE
     let nextProducts;
     if (isCurrentlyFavorite) {
-      nextProducts = previousProducts.filter(p => p.id !== product.id);
+      nextProducts = previousProducts.filter(p => String(p.id) !== String(product.id));
     } else {
       nextProducts = [...previousProducts, product];
     }
@@ -64,13 +72,23 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
 
     try {
       const data = await toggleFavorite(initData, product.id);
-      // SYNC WITH SERVER
-      // The server returns the full list of current favorites
-      set({ products: data.products, status: "success" });
+      
+      set((state) => {
+        const nextInFlight = state.inFlightToggles - 1;
+        // Only sync the full list from server if this was the LAST in-flight request
+        // This prevents intermediate server responses from overwriting newer local states
+        if (nextInFlight === 0) {
+          return { products: data.products, inFlightToggles: 0, status: "success" };
+        }
+        return { inFlightToggles: nextInFlight };
+      });
     } catch (error) {
       console.error("Failed to toggle favorite:", error);
-      // ROLLBACK on error
-      set({ products: previousProducts });
+      // Rollback and decrement
+      set((state) => ({ 
+        products: previousProducts, 
+        inFlightToggles: Math.max(0, state.inFlightToggles - 1) 
+      }));
     }
   },
 }));

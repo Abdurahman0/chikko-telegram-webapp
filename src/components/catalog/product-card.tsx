@@ -98,8 +98,8 @@ export function ProductCard({
           className={cn(
             "absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 z-10",
             isFavorite 
-              ? "bg-white text-[#FF4B55] shadow-[0_2px_8px_rgba(255,75,85,0.25)]" 
-              : "bg-black/5 text-app-muted/40 backdrop-blur-sm active:scale-90"
+              ? "bg-white text-[#FF4B55] shadow-[0_4px_12px_rgba(255,75,85,0.25)] scale-110" 
+              : "bg-white/80 text-app-muted shadow-sm backdrop-blur-md active:scale-90"
           )}
         >
           <FiHeart 

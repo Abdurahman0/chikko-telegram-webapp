@@ -30,23 +30,23 @@ export function CategoryChips({
   onSelect: (category: string) => void;
 }) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-5 pt-1 no-scrollbar px-1 snap-x select-none">
+    <div className="flex gap-4 overflow-x-auto pb-5 pt-1 no-scrollbar px-1 snap-x select-none items-end">
       {/* All Categories Item */}
       <div 
-        className="flex shrink-0 flex-col items-center gap-2 cursor-pointer group snap-start"
+        className="flex shrink-0 flex-col items-center gap-1.5 cursor-pointer group snap-start"
         onClick={() => onSelect("")}
       >
         <div className={cn(
-          "flex h-[60px] w-[60px] items-center justify-center rounded-full transition-all duration-300 ease-out relative",
+          "flex h-[52px] w-[52px] items-center justify-center rounded-full transition-all duration-300 ease-out relative",
           activeCategory === "" 
-            ? "bg-brand/10 ring-[2.5px] ring-brand ring-offset-[2px] ring-offset-surface shadow-[0_6px_16px_rgba(255,126,139,0.2)] scale-105" 
+            ? "bg-brand/10 ring-[2.5px] ring-brand ring-offset-[2px] ring-offset-surface shadow-[0_4px_12px_rgba(255,126,139,0.2)] scale-105" 
             : "bg-surface-accent/15 group-hover:bg-surface-accent/25 group-active:scale-95 shadow-sm"
         )}>
           <div className={cn(
-            "h-10 w-10 rounded-full border-[2px] border-dashed flex items-center justify-center transition-colors duration-300",
+            "h-8 w-8 rounded-full border-[1.5px] border-dashed flex items-center justify-center transition-colors duration-300",
             activeCategory === "" ? "border-brand text-brand" : "border-app-muted/20 text-app-muted/40"
           )}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <rect width="7" height="7" x="3" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="3" rx="1.5"/><rect width="7" height="7" x="3" y="14" rx="1.5"/><rect width="7" height="7" x="14" y="14" rx="1.5"/>
             </svg>
           </div>
@@ -56,7 +56,7 @@ export function CategoryChips({
           )}
         </div>
         <span className={cn(
-          "text-[11px] font-black transition-all duration-300 tracking-tight",
+          "text-[10px] font-black transition-all duration-300 tracking-tight",
           activeCategory === "" ? "text-brand" : "text-app-text/50"
         )}>
           {allLabel}
