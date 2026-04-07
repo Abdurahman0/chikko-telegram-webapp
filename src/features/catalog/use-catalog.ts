@@ -27,6 +27,7 @@ export function useCatalog() {
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
   const loadFavorites = useFavoritesStore((state) => state.loadFavorites);
   const favoritesStatus = useFavoritesStore((state) => state.status);
+  const lastSearchRef = useRef(search || "");
 
   // Load Favorites once on bootstrap
   useEffect(() => {
@@ -56,10 +57,26 @@ export function useCatalog() {
       return;
     }
 
-    const timeout = setTimeout(() => {
-      // Re-check inside timeout to ensure we didn't start loading in between
-      if (useCatalogStore.getState().loadingQueryKey === queryKey) return;
-      
+    const isSearchChange = search !== lastSearchRef.current;
+    lastSearchRef.current = search || "";
+
+    if (isSearchChange) {
+      const timeout = setTimeout(() => {
+        if (useCatalogStore.getState().loadingQueryKey === queryKey) return;
+        
+        void loadCatalog({
+          initData,
+          category: activeCategory || undefined,
+          search: search || undefined,
+          brand: brand || undefined,
+          priceFrom,
+          priceTo,
+          sort,
+        });
+      }, 400);
+      return () => clearTimeout(timeout);
+    } else {
+      // Immediate load for category/brand/sort changes
       void loadCatalog({
         initData,
         category: activeCategory || undefined,
@@ -69,9 +86,7 @@ export function useCatalog() {
         priceTo,
         sort,
       });
-    }, 400); // Slightly longer debounce for smoother UX
-
-    return () => clearTimeout(timeout);
+    }
   }, [
     // TRIGGERS (Narrow dependencies)
     activeCategory,

@@ -76,12 +76,13 @@ export async function getCatalog(
     query.set("search", params.search);
   }
   if (params?.sort) {
-    query.set("sort", params.sort);
+    const sortValue = params.sort === "high_rating" ? "popular" : params.sort;
+    query.set("sort", sortValue);
   }
   const suffix = query.toString().length > 0 ? `?${query}` : "";
 
   const raw = await telegramApiRequest({
-    path: `/api/telegram-webapp/catalog/${suffix}`,
+    path: `/api/telegram-webapp/catalog${suffix}`,
     method: "GET",
     initData,
     schema: catalogResponseSchema,
@@ -113,10 +114,6 @@ export async function getCategoryProducts(
   },
 ): Promise<CategoryDetailData> {
   const query = new URLSearchParams();
-  // Include category ID in query params as well for robust filtering
-  if (categoryId && categoryId !== "all") {
-    query.set("category", categoryId);
-  }
   if (params?.brand) {
     query.set("brand", params.brand);
   }
@@ -130,12 +127,13 @@ export async function getCategoryProducts(
     query.set("search", params.search);
   }
   if (params?.sort) {
-    query.set("sort", params.sort);
+    const sortValue = params.sort === "high_rating" ? "popular" : params.sort;
+    query.set("sort", sortValue);
   }
   const suffix = query.toString().length > 0 ? `?${query}` : "";
 
   const raw = await telegramApiRequest({
-    path: `/api/integrations/telegram/webapp/categories/${categoryId}/${suffix}`,
+    path: `/api/integrations/telegram/webapp/categories/${categoryId}${suffix}`,
     method: "GET",
     initData,
     schema: categoryDetailResponseSchema,
