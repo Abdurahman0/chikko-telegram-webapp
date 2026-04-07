@@ -182,8 +182,8 @@ function adaptProduct(
     isFavorite: product.is_favorite ?? false,
     image: product.image_url || product.image || gallery[0] || null,
     images: gallery,
-    rating: product.rating !== undefined ? toNumber(product.rating, 0) : undefined,
-    reviewsCount: product.reviews_count,
+    rating: (product.rating !== undefined && product.rating !== null) ? toNumber(product.rating, 0) : undefined,
+    reviewsCount: (product.reviews_count !== undefined && product.reviews_count !== null) ? toNumber(product.reviews_count, 0) : undefined,
   };
 }
 
@@ -314,7 +314,7 @@ function adaptReview(raw: RawReview): Review {
     submittedAt: raw.submitted_at,
     source: raw.source,
     order: raw.order ? adaptOrder(raw.order) : undefined,
-    rating: raw.rating,
+    rating: (raw.rating !== undefined && raw.rating !== null) ? toNumber(raw.rating, 0) : undefined,
   };
 }
 
