@@ -54,40 +54,34 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
     }
   },
   toggleFavorite: async ({ initData, product }) => {
-    const previousProducts = get().products;
-    const isCurrentlyFavorite = previousProducts.some(p => String(p.id) === String(product.id));
-    
     // Increment in-flight toggle counter
-    set((state) => ({ inFlightToggles: state.inFlightToggles + 1 }));
-
-    // OPTIMISTIC UPDATE
-    let nextProducts;
-    if (isCurrentlyFavorite) {
-      nextProducts = previousProducts.filter(p => String(p.id) !== String(product.id));
-    } else {
-      nextProducts = [...previousProducts, product];
-    }
-    
-    set({ products: nextProducts });
+    set((state) => ({ 
+      status: "loading",
+      inFlightToggles: state.inFlightToggles + 1 
+    }));
 
     try {
-      const data = await toggleFavorite(initData, product.id);
+      const data = await toggleFavorite(initData, String(product.id));
       
       set((state) => {
         const nextInFlight = state.inFlightToggles - 1;
-        // Only sync the full list from server if this was the LAST in-flight request
-        // This prevents intermediate server responses from overwriting newer local states
+        
+        // Only update the products list if this is the latest result
         if (nextInFlight === 0) {
-          // Trust the optimistic update; don't overwrite with potentially stale server list
-          return { inFlightToggles: 0, status: "success" };
+          return { 
+            products: data.products, 
+            inFlightToggles: 0, 
+            status: "success" 
+          };
         }
-        return { inFlightToggles: nextInFlight };
+        return { 
+          inFlightToggles: nextInFlight 
+        };
       });
     } catch (error) {
       console.error("Failed to toggle favorite:", error);
-      // Rollback and decrement
       set((state) => ({ 
-        products: previousProducts, 
+        status: "error",
         inFlightToggles: Math.max(0, state.inFlightToggles - 1) 
       }));
     }
