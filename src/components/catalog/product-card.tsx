@@ -146,46 +146,49 @@ export function ProductCard({
             <span />
           )}
         </div>
-        {quantity > 0 ? (
-          <div className={cn("flex items-center justify-between rounded-2xl bg-brand-soft px-2", compact ? "mt-2 h-8" : "mt-3 h-9")}>
-            <button
-              type="button"
-              aria-label="Decrease quantity"
-              className={cn(
-                "inline-flex items-center justify-center rounded-xl bg-white text-brand-strong",
-                compact ? "h-6 w-6" : "h-7 w-7",
-              )}
-              onClick={() => onDecrement(product.id)}
-            >
-              -
-            </button>
-            <span className="text-sm font-bold text-brand-strong">{quantity}</span>
-            <button
-              type="button"
-              aria-label="Increase quantity"
-              className={cn(
-                "inline-flex items-center justify-center rounded-xl bg-white text-brand-strong",
-                compact ? "h-6 w-6" : "h-7 w-7",
-              )}
+        <div className={cn("relative", compact ? "mt-2 h-8" : "mt-3 h-9")}>
+          {quantity > 0 ? (
+            <div className="absolute inset-0 flex items-center justify-between rounded-2xl bg-brand p-1 shadow-md shadow-brand/20 animate-in fade-in zoom-in-95 duration-300">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                className={cn(
+                  "flex items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30",
+                  compact ? "h-6 w-6" : "h-7 w-7",
+                )}
+                onClick={() => onDecrement(product.id)}
+              >
+                <span className="text-lg font-black leading-none transform -translate-y-[1px]">-</span>
+              </button>
+              <span className="text-sm font-black text-white px-2">{quantity}</span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                className={cn(
+                  "flex items-center justify-center rounded-xl bg-white/20 text-white transition-all active:scale-90 active:bg-white/30",
+                  compact ? "h-6 w-6" : "h-7 w-7",
+                )}
+                onClick={(event) =>
+                  onIncrement(product, event.currentTarget as HTMLElement)
+                }
+              >
+                <span className="text-lg font-black leading-none transform -translate-y-[1px]">+</span>
+              </button>
+            </div>
+          ) : (
+            <Button
+              fullWidth
+              variant="primary"
+              className={cn("rounded-2xl font-black text-[11px] uppercase tracking-wider transition-all active:scale-95", compact ? "h-8" : "h-9")}
               onClick={(event) =>
                 onIncrement(product, event.currentTarget as HTMLElement)
               }
+              disabled={isOut}
             >
-              +
-            </button>
-          </div>
-        ) : (
-          <Button
-            fullWidth
-            className={cn("rounded-2xl", compact ? "mt-2 h-8" : "mt-3 h-9")}
-            onClick={(event) =>
-              onIncrement(product, event.currentTarget as HTMLElement)
-            }
-            disabled={isOut}
-          >
-            {addToCartLabel}
-          </Button>
-        )}
+              {addToCartLabel}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

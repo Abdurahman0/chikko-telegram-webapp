@@ -58,10 +58,10 @@ export function BottomNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-surface-accent bg-surface/95 pb-[max(env(safe-area-inset-bottom),0.4rem)] pt-2 backdrop-blur-md">
-      <div className="grid w-full grid-cols-5 items-stretch px-1 pb-2 pt-1 gap-0">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-surface/80 pb-[max(env(safe-area-inset-bottom),0.6rem)] pt-2 backdrop-blur-xl transition-all duration-500">
+      <div className="grid w-full grid-cols-5 items-stretch px-2 pb-2 pt-1 gap-1">
         {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = pathname === item.href || (item.href !== `/${locale}/catalog` && pathname.startsWith(`${item.href}/`)) || (item.isHome && (pathname === `/${locale}/catalog` || pathname === `/${locale}`));
           const badgeText = item.isCart ? cartBadgeText : favBadgeText;
           const badgeValue = item.isCart ? cartQuantity : favoritesCount;
           const showBadge = (item.isCart || item.isFavorites) && badgeValue > 0;
@@ -77,28 +77,31 @@ export function BottomNav({ locale }: { locale: string }) {
                 }
               }}
               className={cn(
-                "relative flex flex-col items-center justify-start gap-1 p-1 text-[10px] font-bold transition-all duration-300",
+                "relative flex flex-col items-center justify-start gap-1 p-1 text-[10px] font-bold transition-all duration-300 active:scale-95",
                 active ? "text-brand-strong" : "text-app-muted",
               )}
             >
               <div className={cn(
-                "relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300",
-                active ? "bg-brand/10" : "bg-transparent"
+                "relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all duration-300",
+                active ? "bg-brand/10 shadow-inner" : "bg-transparent"
               )}>
-                <NavIcon type={item.icon} />
+                <NavIcon type={item.icon} className={cn("transition-transform duration-300", active && "scale-110")} />
                 {showBadge ? (
                   <span
                     key={badgeValue}
                     className={cn(
-                      "animate-cart-pop absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand px-1 text-[9px] font-black leading-none text-white shadow-md shadow-brand/20",
-                      badgeText.length === 1 ? "w-4" : "px-1",
+                      "animate-cart-pop absolute -right-1 -top-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-black leading-none text-white shadow-lg shadow-brand/40 ring-2 ring-surface",
+                      badgeText.length === 1 ? "w-4.5" : "px-1.5",
                     )}
                   >
                     <span className="block translate-y-[0.5px]">{badgeText}</span>
                   </span>
                 ) : null}
               </div>
-              <span className="w-full text-center leading-[1.1] px-0.5 break-words">
+              <span className={cn(
+                "w-full text-center leading-[1.1] transition-all duration-300",
+                active ? "opacity-100 translate-y-0" : "opacity-70"
+              )}>
                 {item.label}
               </span>
             </Link>
