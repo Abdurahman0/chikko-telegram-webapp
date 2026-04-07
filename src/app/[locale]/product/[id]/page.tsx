@@ -168,9 +168,7 @@ function ProductScreen({
                <FiStar className="h-4 w-4 fill-[#FFC107] text-[#FFC107]" />
                <span className="text-sm font-black text-app-text">{typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}</span>
                <span className="text-[10px] font-bold text-app-muted/50 uppercase tracking-tighter ml-0.5">
-                  {product.reviewsCount && product.reviewsCount > 0 
-                    ? product.reviewsCount 
-                    : messages.reviews.noReviews}
+                  ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
                </span>
             </div>
           </div>

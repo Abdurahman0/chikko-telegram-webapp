@@ -164,6 +164,7 @@ export const rawProductSchema = z
     images: z.array(rawProductImageSchema).optional().nullable().default([]),
     rating: z.union([z.number(), z.string(), z.null()]).optional(),
     reviews_count: z.union([z.number(), z.string(), z.null()]).optional(),
+    review_count: z.union([z.number(), z.string(), z.null()]).optional(),
   })
   .passthrough();
 

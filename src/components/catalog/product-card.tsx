@@ -120,10 +120,8 @@ export function ProductCard({
           <span className="text-[11px] font-black text-app-text">
             {typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}
           </span>
-          <span className="text-[10px] font-bold text-app-muted/50 lowercase tracking-tight">
-            {product.reviewsCount && product.reviewsCount > 0 
-              ? `(${product.reviewsCount})` 
-              : `(${messages.reviews.noReviews})`}
+          <span className="text-[10px] font-bold text-app-muted/50 uppercase tracking-tighter ml-0.5">
+            {typeof product.reviewsCount === "number" ? product.reviewsCount : 0}
           </span>
         </div>
 

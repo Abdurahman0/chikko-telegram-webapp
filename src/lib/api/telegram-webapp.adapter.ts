@@ -183,7 +183,11 @@ function adaptProduct(
     image: product.image_url || product.image || gallery[0] || null,
     images: gallery,
     rating: (product.rating !== undefined && product.rating !== null) ? toNumber(product.rating, 0) : undefined,
-    reviewsCount: (product.reviews_count !== undefined && product.reviews_count !== null) ? toNumber(product.reviews_count, 0) : undefined,
+    reviewsCount: (product.reviews_count !== undefined && product.reviews_count !== null) 
+      ? toNumber(product.reviews_count, 0) 
+      : (product.review_count !== undefined && product.review_count !== null)
+        ? toNumber(product.review_count, 0)
+        : undefined,
   };
 }
 
