@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { getCatalog, getCategoryProducts } from "@/lib/api/telegram-webapp.service";
 import { TelegramApiError } from "@/lib/api/telegram-api-client";
-import type { CatalogCategory, Product, CatalogSortOption } from "@/types/telegram-webapp";
+import type { CatalogCategory, Product, CatalogSortOption, Brand } from "@/types/telegram-webapp";
 
 type CatalogStatus = "idle" | "loading" | "success" | "error";
 
@@ -11,6 +11,7 @@ type CatalogStore = {
   categories: CatalogCategory[];
   promotedProducts: Product[];
   products: Product[];
+  brands: Brand[];
   activeCategory: string;
   search: string;
   brand: string;
@@ -55,6 +56,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
   categories: [],
   promotedProducts: [],
   products: [],
+  brands: [],
   activeCategory: "",
   search: "",
   brand: "",
@@ -74,7 +76,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
     priceTo: undefined,
     sort: "popular"
   }),
-  setCategory: (category: string) => set({ activeCategory: category }),
+  setCategory: (category: string) => set({ activeCategory: category, brand: "" }),
   setSearch: (search: string) => set({ search }),
   setBrand: (brand: string) => set({ brand }),
   setSort: (sort: CatalogSortOption) => set({ sort }),
@@ -88,24 +90,42 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       errorMessage: null,
     });
     try {
-      const data = await getCatalog(initData, { 
-        category, 
-        search,
-        brand,
-        priceFrom,
-        priceTo,
-        sort 
-      });
-
-      set((state: CatalogStore) => ({
-        categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
-        promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
-        products: data.products,
-        status: "success",
-        lastQueryKey: queryKey,
-        loadingQueryKey: null,
-        lastFetchedAt: Date.now(),
-      }));
+      if (category && category !== "" && category !== "all") {
+        const data = await getCategoryProducts(initData, category, { 
+          brand, 
+          priceFrom, 
+          priceTo, 
+          search, 
+          sort 
+        });
+        set((state: CatalogStore) => ({
+          products: data.products,
+          brands: data.brands,
+          status: "success",
+          lastQueryKey: queryKey,
+          loadingQueryKey: null,
+          lastFetchedAt: Date.now(),
+        }));
+      } else {
+        const data = await getCatalog(initData, { 
+          category, 
+          search,
+          brand,
+          priceFrom,
+          priceTo,
+          sort 
+        });
+        set((state: CatalogStore) => ({
+          categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
+          promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
+          products: data.products,
+          brands: [],
+          status: "success",
+          lastQueryKey: queryKey,
+          loadingQueryKey: null,
+          lastFetchedAt: Date.now(),
+        }));
+      }
     } catch (error) {
       if (error instanceof TelegramApiError) {
         set({

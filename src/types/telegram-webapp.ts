@@ -35,6 +35,7 @@ export type Brand = {
   name: string;
   code?: string;
   description?: string;
+  productsCount?: number;
 };
 
 export type Product = {

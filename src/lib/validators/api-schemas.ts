@@ -99,6 +99,7 @@ const rawBrandSchema = z
     name: z.string().optional(),
     code: z.string().optional(),
     description: z.string().optional(),
+    products_count: z.union([z.number(), z.string()]).optional().nullable(),
     is_active: z.boolean().optional(),
   })
   .passthrough();

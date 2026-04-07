@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { FiArrowLeft, FiSearch, FiSliders } from "react-icons/fi";
+import { FiArrowLeft, FiSearch, FiSliders, FiChevronRight } from "react-icons/fi";
 import { TbArrowsSort } from "react-icons/tb";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
@@ -98,17 +98,33 @@ export default function CategoryPage({
   // Initialize and update catalog data
   useCatalog();
 
+  const activeCategory = useCatalogStore((state) => state.activeCategory);
+  const brands = useCatalogStore((state) => state.brands);
+  const setBrand = useCatalogStore((state) => state.setBrand);
+
   useEffect(() => {
     // Default to empty (all) if id is "all" or missing
     const targetId = !id || id === "all" ? "" : id;
     setCategory(targetId);
   }, [id, setCategory]);
-
-  const activeCategory = useCatalogStore((state) => state.activeCategory);
   
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
+  const activeBrandData = brands.find((b) => b.id === brand);
+
   const categoryName = activeCategory === "" ? messages.catalog.allCategories : activeCategoryData?.name ?? messages.common.unknown;
+  
+  // Header title should show Brand if brand filter is active
+  const headerTitle = brand && activeBrandData ? activeBrandData.name : categoryName;
+  
   const productCount = messages.catalog.productCount.replace("{count}", String(products.length));
+
+  const totalCategoryProducts = useMemo(() => {
+    // If we have brands, sum their counts if possible, otherwise use products.length when no brand filter
+    if (brands.length > 0) {
+      return brands.reduce((acc, b) => acc + (b.productsCount ?? 0), 0);
+    }
+    return products.length;
+  }, [brands, products]);
 
   const hasActiveFilters = useMemo(() => {
     return search !== "" || brand !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
@@ -139,7 +155,7 @@ export default function CategoryPage({
         <div className="flex items-end justify-between px-0.5 mt-1">
           <div className="flex-1">
             <h1 className="text-xl font-black text-app-text tracking-tight capitalize leading-tight">
-              {categoryName.toLowerCase()}
+              {headerTitle.toLowerCase()}
             </h1>
             <p className="text-[11px] font-bold text-app-muted/60 uppercase tracking-wide mt-0.5">{productCount}</p>
           </div>
@@ -170,13 +186,95 @@ export default function CategoryPage({
             <FiSliders className="h-3.5 w-3.5" />
             {messages.catalog.filterTitle}
           </button>
+          
+          {brand && (
+            <button 
+              onClick={() => setBrand("")}
+              className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-brand/10 text-[11px] font-black uppercase tracking-wider text-brand transition-all active:bg-brand/20 shadow-sm"
+            >
+              All Brands
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Main Grid */}
+      {/* Main Content */}
       <main className="px-3 pt-4">
         {status === "loading" ? (
           <ProductSkeletonGrid />
+        ) : !brand && brands.length > 0 ? (
+          // Brand List View (Image 1 Style)
+          <div className="bg-app-bg rounded-t-3xl ">
+            {/* All items entry */}
+            <button
+               onClick={() => {
+                 // In this design, "All products" is just the current view but restricted to category
+                 // Since brand is already empty, we might want to just show the products directly below
+                 // But Image 1 shows it as a clickable item. If clicked, we just show the products.
+                 // We'll use a state to toggle between brand list and product grid if needed, 
+                 // but typically Image 1 is an "Index" view.
+               }}
+               className="flex w-full items-center justify-between border-b border-surface-accent/10 py-5 active:bg-surface-accent/5 transition-colors"
+            >
+              <span className="text-sm font-bold text-app-text">
+                {messages.catalog.allProductsInCategory}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-surface-accent/20 px-2 text-[10px] font-black text-brand/80">
+                  {totalCategoryProducts}
+                </span>
+                <FiChevronRight className="text-app-muted/40 h-4 w-4" />
+              </div>
+            </button>
+
+            <div className="divide-y divide-surface-accent/5">
+              {brands.map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => setBrand(b.id)}
+                  className="flex w-full items-center justify-between py-5 active:bg-surface-accent/5 transition-colors group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-surface-accent/10 flex items-center justify-center text-lg font-black text-app-text/30 group-active:bg-brand/10 group-active:text-brand transition-all">
+                      {b.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[15px] font-bold text-app-text group-active:text-brand transition-colors">
+                      {b.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-surface-accent/20 px-2 text-[10px] font-black text-brand/80">
+                      {b.productsCount ?? 0}
+                    </span>
+                    <FiChevronRight className="text-app-muted/40 h-4 w-4" />
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {/* If no brands but products exist, show products grid automatically */}
+            {brands.length === 0 && products.length > 0 && (
+               <div className="grid grid-cols-2 gap-2.5 items-stretch mt-2">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    locale={locale}
+                    product={product}
+                    addToCartLabel={messages.catalog.addToCart}
+                    outOfStockLabel={messages.catalog.outOfStock}
+                    inStockLabel={messages.catalog.inStock}
+                    detailsLabel={messages.catalog.details}
+                    currencyLabel={messages.common.som}
+                    quantity={cartItems[product.id]?.quantity ?? 0}
+                    compact={false}
+                    showStockLabel={true}
+                    onIncrement={(p) => addItem(p)}
+                    onDecrement={(pId) => decrement(pId)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-2 gap-2.5 items-stretch">
             {products.map((product) => (
@@ -192,7 +290,7 @@ export default function CategoryPage({
                 quantity={cartItems[product.id]?.quantity ?? 0}
                 compact={false}
                 showStockLabel={true}
-                onIncrement={(p, el) => addItem(p)}
+                onIncrement={(p) => addItem(p)}
                 onDecrement={(pId) => decrement(pId)}
               />
             ))}

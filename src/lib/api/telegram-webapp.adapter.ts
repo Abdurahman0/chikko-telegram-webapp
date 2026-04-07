@@ -271,6 +271,7 @@ export function adaptCategoryDetailResponse(
     name: b.name ?? "Brand",
     code: b.code,
     description: b.description,
+    productsCount: toNumber(b.products_count, 0),
   }));
 
   const products: Product[] = raw.products.map((p) =>

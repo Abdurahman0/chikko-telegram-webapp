@@ -54,6 +54,7 @@ export const ruMessages: Messages = {
     priceFromLabel: "от",
     priceToLabel: "до",
     brand: "Бренд",
+    allProductsInCategory: "Все товары в этой категории",
   },
   product: {
     quantity: "Количество",

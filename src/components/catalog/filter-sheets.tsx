@@ -24,12 +24,16 @@ export function FilterSheet({
   const priceFrom = useCatalogStore((state) => state.priceFrom);
   const priceTo = useCatalogStore((state) => state.priceTo);
   const setPriceRange = useCatalogStore((state) => state.setPriceRange);
+  const brandId = useCatalogStore((state) => state.brand);
+  const brands = useCatalogStore((state) => state.brands);
 
   const [localFrom, setLocalFrom] = useState(priceFrom?.toString() ?? "0");
   const [localTo, setLocalTo] = useState(priceTo?.toString() ?? "10000000");
 
   const activeCategory = categories.find(c => c.id === activeCategoryId);
+  const activeBrand = brands.find(b => b.id === brandId);
   const categoryName = activeCategoryId === "" ? messages.catalog.allCategories : activeCategory?.name ?? messages.common.unknown;
+  const brandName = activeBrand?.name;
 
   const handleApply = () => {
     const from = localFrom === "" ? 0 : Number(localFrom);
@@ -48,7 +52,9 @@ export function FilterSheet({
         >
           <div className="text-left">
             <span className="block text-sm font-bold text-app-text">{messages.catalog.categoryTitle}</span>
-            <span className="text-sm font-medium text-app-muted">{categoryName}</span>
+            <span className="text-sm font-medium text-app-muted">
+              {categoryName}{brandName ? ` • ${brandName}` : ""}
+            </span>
           </div>
           <FiChevronRight className="text-app-muted/60" />
         </button>
@@ -127,6 +133,9 @@ export function CategoryPickerSheet({
 
   const activeCategory = useCatalogStore((state) => state.activeCategory);
   const categories = useCatalogStore((state) => state.categories);
+  const brands = useCatalogStore((state) => state.brands);
+  const brand = useCatalogStore((state) => state.brand);
+  const setBrand = useCatalogStore((state) => state.setBrand);
 
   const handleSelect = (id: string) => {
     const targetId = id === "" ? "all" : id;
@@ -171,25 +180,55 @@ export function CategoryPickerSheet({
           </button>
 
           {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => handleSelect(category.id)}
-              className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
-            >
-              <span className={cn("text-base font-semibold", activeCategory === category.id ? "text-app-text" : "text-app-muted")}>
-                {category.name}
-              </span>
-              <div className={cn(
-                "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
-                activeCategory === category.id ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
-              )}>
-                {activeCategory === category.id && (
-                   <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-                      <polyline points="20 6 9 17 4 12" />
-                   </svg>
-                )}
-              </div>
-            </button>
+            <div key={category.id}>
+              <button
+                onClick={() => handleSelect(category.id)}
+                className="flex w-full items-center justify-between rounded-xl p-4 transition-colors hover:bg-surface-accent/10"
+              >
+                <span className={cn("text-base font-semibold", activeCategory === category.id ? "text-app-text" : "text-app-muted")}>
+                  {category.name}
+                </span>
+                <div className={cn(
+                  "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
+                  activeCategory === category.id ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
+                )}>
+                  {activeCategory === category.id && (
+                     <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                        <polyline points="20 6 9 17 4 12" />
+                     </svg>
+                  )}
+                </div>
+              </button>
+
+              {activeCategory === category.id && brands.length > 0 && (
+                <div className="ml-4 mt-1 space-y-1 mb-2 border-l-2 border-surface-accent/10 pl-2">
+                  {brands.map((b) => (
+                    <button
+                      key={b.id}
+                      onClick={() => {
+                        setBrand(b.id);
+                        onClose();
+                      }}
+                      className="flex w-full items-center justify-between rounded-xl p-3 transition-colors hover:bg-surface-accent/10"
+                    >
+                      <span className={cn("text-[15px] font-medium", brand === b.id ? "text-brand" : "text-app-muted/80")}>
+                        {b.name}
+                      </span>
+                      <div className={cn(
+                        "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
+                        brand === b.id ? "border-brand bg-brand shadow-sm" : "border-surface-accent bg-transparent"
+                      )}>
+                        {brand === b.id && (
+                           <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5">
+                              <polyline points="20 6 9 17 4 12" />
+                           </svg>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
         

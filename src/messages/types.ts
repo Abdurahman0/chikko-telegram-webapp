@@ -52,6 +52,7 @@ export type Messages = {
     priceFromLabel: string;
     priceToLabel: string;
     brand: string;
+    allProductsInCategory: string;
   };
   product: {
     quantity: string;
