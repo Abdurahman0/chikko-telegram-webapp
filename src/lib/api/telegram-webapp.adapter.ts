@@ -182,6 +182,8 @@ function adaptProduct(
     isFavorite: product.is_favorite ?? false,
     image: product.image_url || product.image || gallery[0] || null,
     images: gallery,
+    rating: product.rating !== undefined ? toNumber(product.rating, 0) : undefined,
+    reviewsCount: product.reviews_count,
   };
 }
 
@@ -312,6 +314,7 @@ function adaptReview(raw: RawReview): Review {
     submittedAt: raw.submitted_at,
     source: raw.source,
     order: raw.order ? adaptOrder(raw.order) : undefined,
+    rating: raw.rating,
   };
 }
 

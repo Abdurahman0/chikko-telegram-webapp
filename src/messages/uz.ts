@@ -214,5 +214,9 @@ export const uzMessages: Messages = {
     submitted: "Rahmat! Fikringiz qabul qilindi.",
     historyTitle: "Mening fikrlarim",
     leaveReview: "Fikr qoldirish",
+    noReviews: "Fikrlar yo'q",
+    ratingTitle: "Sizning bahoingiz",
+    ratingRequired: "Iltimos, baho bering",
+    commentTitle: "Fikringizni qoldiring (ixtiyoriy)",
   },
 };

@@ -14,7 +14,7 @@ type ReviewsStore = {
   errorCode: string | null;
   errorMessage: string | null;
   loadReviews: (params: { initData: string }) => Promise<void>;
-  submitReview: (params: { initData: string; orderId: string; comment: string }) => Promise<void>;
+  submitReview: (params: { initData: string; orderId: string; comment: string; rating: number }) => Promise<void>;
 };
 
 export const useReviewsStore = create<ReviewsStore>((set) => ({
@@ -48,9 +48,9 @@ export const useReviewsStore = create<ReviewsStore>((set) => ({
       });
     }
   },
-  submitReview: async ({ initData, orderId, comment }) => {
+  submitReview: async ({ initData, orderId, comment, rating }) => {
     try {
-      const result = await submitReview(initData, orderId, comment);
+      const result = await submitReview(initData, orderId, comment, rating);
       set((state) => ({
         reviews: [result, ...state.reviews],
         pendingOrders: state.pendingOrders.filter((order) => order.id !== orderId),

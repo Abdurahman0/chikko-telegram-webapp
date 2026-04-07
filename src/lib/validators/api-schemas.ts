@@ -161,6 +161,8 @@ export const rawProductSchema = z
     image: z.string().optional().or(z.literal("")),
     image_url: z.string().optional().or(z.literal("")),
     images: z.array(rawProductImageSchema).optional().default([]),
+    rating: z.union([z.number(), z.string()]).optional(),
+    reviews_count: z.number().optional(),
   })
   .passthrough();
 
@@ -222,6 +224,7 @@ const rawReviewSchema = z
     submitted_at: z.string().optional(),
     source: z.string().optional(),
     order: rawOrderSchema.optional().nullable(),
+    rating: z.number().optional(),
   })
   .passthrough();
 

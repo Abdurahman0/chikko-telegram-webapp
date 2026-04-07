@@ -14,6 +14,7 @@ import { formatCurrency } from "@/lib/formatters/currency";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Product } from "@/types/telegram-webapp";
 import { cn } from "@/lib/utils/cn";
+import { useI18n } from "@/components/shared/locale-provider";
 
 export function ProductCard({
   locale,
@@ -42,6 +43,7 @@ export function ProductCard({
   onIncrement: (product: Product, sourceElement: HTMLElement | null) => void;
   onDecrement: (productId: string) => void;
 }) {
+  const { messages } = useI18n();
   const isOut = typeof product.stock === "number" && product.stock <= 0;
   const initData = useBootstrapStore((state) => state.initData);
   const favoriteProducts = useFavoritesStore((state) => state.products);
@@ -109,15 +111,19 @@ export function ProductCard({
         </Link>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 px-0.5 mt-1 animate-in fade-in slide-in-from-bottom-1 duration-500">
+        <div className="flex items-center gap-1.5 px-0.5 mt-1.5 animate-in fade-in slide-in-from-bottom-1 duration-500">
           <div className="flex items-center text-[#FFC107]">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 transition-transform hover:scale-110">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z" />
             </svg>
           </div>
-          <span className="text-[10px] font-bold text-app-text">5.0</span>
-          <span className="text-[10px] font-medium text-app-muted/60 lowercase">
-            (Sharhlar yo'q)
+          <span className="text-[11px] font-black text-app-text">
+            {product.rating ? product.rating.toFixed(1) : "5.0"}
+          </span>
+          <span className="text-[10px] font-bold text-app-muted/50 lowercase tracking-tight">
+            {product.reviewsCount && product.reviewsCount > 0 
+              ? `(${product.reviewsCount})` 
+              : `(${messages.reviews.noReviews})`}
           </span>
         </div>
 

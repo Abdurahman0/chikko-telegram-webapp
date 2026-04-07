@@ -213,5 +213,9 @@ export const ruMessages: Messages = {
     submitted: "Спасибо! Ваш отзыв принят.",
     historyTitle: "Мои отзывы",
     leaveReview: "Оставить отзыв",
+    noReviews: "Отзывов нет",
+    ratingTitle: "Ваша оценка",
+    ratingRequired: "Пожалуйста, поставьте оценку",
+    commentTitle: "Ваш комментарий (необязательно)",
   },
 };

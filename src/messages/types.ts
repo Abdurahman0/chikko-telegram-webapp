@@ -206,5 +206,9 @@ export type Messages = {
     submitted: string;
     historyTitle: string;
     leaveReview: string;
+    noReviews: string;
+    ratingTitle: string;
+    ratingRequired: string;
+    commentTitle: string;
   };
 };

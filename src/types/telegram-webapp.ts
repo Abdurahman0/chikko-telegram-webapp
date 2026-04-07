@@ -53,6 +53,8 @@ export type Product = {
   isFavorite?: boolean;
   image?: string | null;
   images: string[];
+  rating?: number;
+  reviewsCount?: number;
 };
 
 export type CatalogCategory = {
@@ -149,6 +151,7 @@ export type Review = {
   submittedAt?: string;
   source?: string;
   order?: Order;
+  rating?: number;
 };
 
 export type ReviewsData = {

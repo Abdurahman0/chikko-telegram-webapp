@@ -211,12 +211,13 @@ export async function submitReview(
   initData: string,
   orderId: string,
   comment: string,
+  rating: number,
 ): Promise<Review> {
   const raw = await telegramApiRequest({
     path: "/api/telegram-webapp/reviews/",
     method: "POST",
     initData,
-    body: { order_id: orderId, comment },
+    body: { order_id: orderId, comment, rating },
     schema: submitReviewResponseSchema,
   });
   return adaptSubmitReviewResponse(raw);
