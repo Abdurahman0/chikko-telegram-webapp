@@ -26,7 +26,7 @@ export function useCatalog() {
   
   const loadCatalog = useCatalogStore((state) => state.loadCatalog);
   const loadFavorites = useFavoritesStore((state) => state.loadFavorites);
-  const favoritesStatus = useFavoritesStore((state) => state.status);
+  const favoritesStatus = useFavoritesStore((state) => state.loadStatus);
   const lastSearchRef = useRef(search || "");
 
   // Load Favorites once on bootstrap
