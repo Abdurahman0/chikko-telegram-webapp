@@ -65,7 +65,7 @@ export function CategoryChips({
 
       {/* Category Items */}
       {categories.map((category) => {
-        const imageUrl = resolveImageUrl(category.image);
+        const imageUrl = resolveImageUrl(category.imageUrl || category.image);
         return (
           <div
             key={category.id}

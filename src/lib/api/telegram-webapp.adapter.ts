@@ -226,7 +226,8 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
     name: category.name ?? category.title ?? `Category ${category.id}`,
     code: category.code,
     description: category.description,
-    image: category.image_url || category.image || null,
+    image: category.image || null,
+    imageUrl: category.image_url || null,
   }));
 
   const promotedProducts: Product[] = (raw.promoted_products ?? []).map((p) =>
@@ -251,7 +252,8 @@ export function adaptCategoriesResponse(
     name: category.name ?? category.title ?? `Category ${category.id}`,
     code: category.code,
     description: category.description,
-    image: category.image_url || category.image || null,
+    image: category.image || null,
+    imageUrl: category.image_url || null,
   }));
 }
 
@@ -263,7 +265,8 @@ export function adaptCategoryDetailResponse(
     name: raw.category.name ?? raw.category.title ?? "Category",
     code: raw.category.code,
     description: raw.category.description,
-    image: raw.category.image_url || raw.category.image || null,
+    image: raw.category.image || null,
+    imageUrl: raw.category.image_url || null,
   };
 
   const brands: Brand[] = (raw.brands ?? []).map((b) => ({

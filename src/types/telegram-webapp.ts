@@ -64,6 +64,7 @@ export type CatalogCategory = {
   code?: string;
   description?: string;
   image?: string | null;
+  imageUrl?: string | null;
 };
 
 export type OrderItem = {
