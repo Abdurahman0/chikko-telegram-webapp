@@ -128,42 +128,17 @@ export const rawProductSchema = z
     currency: z.string().optional().default("UZS"),
     stock: z.number().optional().nullable(),
     stock_quantity: z.number().optional().nullable(),
-    has_stock: z.union([z.boolean(), z.string()]).optional(),
-    is_favorite: z.boolean().optional(),
+    has_stock: z.union([z.boolean(), z.string(), z.number()]).optional().nullable(),
+    is_favorite: z.boolean().optional().default(false),
     category_id: z.union([z.string(), z.number()]).optional().nullable(),
-    category: z
-      .union([
-        z.string(),
-        z.number(),
-        z
-          .object({
-            id: z.union([z.string(), z.number()]).optional(),
-            code: z.string().optional(),
-            name: z.string().optional(),
-            title: z.string().optional(),
-          })
-          .passthrough(),
-      ])
-      .optional()
-      .nullable(),
-    brand: z
-      .union([
-        z.string(),
-        z.number(),
-        z
-          .object({
-            id: z.union([z.string(), z.number()]).optional(),
-            name: z.string().optional(),
-            code: z.string().optional(),
-          })
-          .passthrough(),
-      ])
-      .optional()
-      .nullable(),
+    category: z.any().optional().nullable(),
+    brand: z.any().optional().nullable(),
     image: z.string().optional().nullable().or(z.literal("")),
     image_url: z.string().optional().nullable().or(z.literal("")),
     images: z.array(rawProductImageSchema).optional().nullable().default([]),
     rating: z.union([z.number(), z.string(), z.null()]).optional(),
+    rating_average: z.union([z.number(), z.string(), z.null()]).optional(),
+    rating_count: z.union([z.number(), z.string(), z.null()]).optional(),
     reviews_count: z.union([z.number(), z.string(), z.null()]).optional(),
     review_count: z.union([z.number(), z.string(), z.null()]).optional(),
   })

@@ -159,9 +159,11 @@ function adaptProduct(
       ? product.stock
       : product.stock_quantity !== undefined && product.stock_quantity !== null
         ? product.stock_quantity
-        : product.has_stock === false
+        : product.has_stock === false || product.has_stock === 0 || product.has_stock === "0" || product.has_stock === "out_of_stock"
           ? 0
-          : null;
+          : product.has_stock === true || product.has_stock === 1 || product.has_stock === "1" || product.has_stock === "in_stock"
+            ? 1
+            : null;
 
   return {
     id: String(product.id),
@@ -182,12 +184,18 @@ function adaptProduct(
     isFavorite: product.is_favorite ?? false,
     image: product.image_url || product.image || gallery[0] || null,
     images: gallery,
-    rating: (product.rating !== undefined && product.rating !== null) ? toNumber(product.rating, 0) : undefined,
-    reviewsCount: (product.reviews_count !== undefined && product.reviews_count !== null) 
-      ? toNumber(product.reviews_count, 0) 
-      : (product.review_count !== undefined && product.review_count !== null)
-        ? toNumber(product.review_count, 0)
+    rating: (product.rating_average !== undefined && product.rating_average !== null) 
+      ? toNumber(product.rating_average, 0)
+      : (product.rating !== undefined && product.rating !== null) 
+        ? toNumber(product.rating, 0) 
         : undefined,
+    reviewsCount: (product.rating_count !== undefined && product.rating_count !== null)
+      ? toNumber(product.rating_count, 0)
+      : (product.reviews_count !== undefined && product.reviews_count !== null) 
+        ? toNumber(product.reviews_count, 0) 
+        : (product.review_count !== undefined && product.review_count !== null)
+          ? toNumber(product.review_count, 0)
+          : undefined,
   };
 }
 
