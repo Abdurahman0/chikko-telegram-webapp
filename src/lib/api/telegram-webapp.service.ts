@@ -175,7 +175,7 @@ export async function getProfile(initData: string): Promise<ProfileData> {
   return adaptProfileResponse(raw);
 }
 
-export async function getFavorites(initData: string): Promise<FavoritesData> {
+export async function getFavorites(initData: string): Promise<FavoritesData | null> {
   const raw = await telegramApiRequest({
     path: "/api/telegram-webapp/favorites/",
     method: "GET",
@@ -188,7 +188,7 @@ export async function getFavorites(initData: string): Promise<FavoritesData> {
 export async function toggleFavorite(
   initData: string,
   productId: string,
-): Promise<FavoritesData> {
+): Promise<FavoritesData | null> {
   const raw = await telegramApiRequest({
     path: "/api/telegram-webapp/favorites/",
     method: "POST",

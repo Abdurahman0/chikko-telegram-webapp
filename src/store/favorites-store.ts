@@ -30,12 +30,15 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
     set({ loadStatus: "loading", errorCode: null, errorMessage: null });
     try {
       const data = await getFavorites(initData);
-      // Only update if no toggles happened while loading
-      if (get().inFlightToggles === 0) {
+      // Only update if no toggles happened while loading and data is valid
+      if (data && get().inFlightToggles === 0) {
         set({
           products: data.products,
           loadStatus: "success",
         });
+      } else if (data) {
+        // Even if in-flight toggles > 0, we can still set success if we got data
+        set({ loadStatus: "success" });
       }
     } catch (error) {
       if (error instanceof TelegramApiError) {
@@ -75,8 +78,8 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
       set((state) => {
         const nextInFlight = state.inFlightToggles - 1;
         
-        // Only update products list from server if this was the last in-flight request
-        if (nextInFlight === 0) {
+        // Only update products list from server if this was the last in-flight request and we got data
+        if (nextInFlight === 0 && data) {
           return { 
             products: data.products, 
             inFlightToggles: 0, 
