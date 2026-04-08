@@ -244,9 +244,17 @@ export function adaptCatalogResponse(raw: RawCatalog): CatalogData {
   const products: Product[] = raw.products.map((p) =>
     adaptProduct(p, categories),
   );
+  const brands: Brand[] = (raw.brands ?? []).map((b) => ({
+    id: String(b.id),
+    name: b.name ?? "Brand",
+    code: b.code,
+    description: b.description,
+    productsCount: toNumber(b.products_count, 0),
+  }));
 
   return {
     categories,
+    brands,
     promotedProducts,
     products,
   };

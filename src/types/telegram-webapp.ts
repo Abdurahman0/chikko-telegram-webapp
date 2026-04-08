@@ -106,6 +106,7 @@ export type BootstrapData = {
 
 export type CatalogData = {
   categories: CatalogCategory[];
+  brands: Brand[];
   promotedProducts: Product[];
   products: Product[];
 };

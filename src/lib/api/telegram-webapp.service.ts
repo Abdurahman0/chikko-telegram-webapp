@@ -92,9 +92,35 @@ export async function getCatalog(
 
 export async function getCategories(
   initData: string,
+  params?: {
+    brand?: string;
+    priceFrom?: number;
+    priceTo?: number;
+    search?: string;
+    sort?: CatalogSortOption;
+  },
 ): Promise<CatalogCategory[]> {
+  const query = new URLSearchParams();
+  if (params?.brand) {
+    query.set("brand", params.brand);
+  }
+  if (params?.priceFrom !== undefined) {
+    query.set("price_from", String(params.priceFrom));
+  }
+  if (params?.priceTo !== undefined) {
+    query.set("price_to", String(params.priceTo));
+  }
+  if (params?.search) {
+    query.set("search", params.search);
+  }
+  if (params?.sort) {
+    const sortValue = params.sort === "high_rating" ? "popular" : params.sort;
+    query.set("sort", sortValue);
+  }
+  const suffix = query.toString().length > 0 ? `?${query}` : "";
+
   const raw = await telegramApiRequest({
-    path: "/api/telegram-webapp/categories/",
+    path: `/api/telegram-webapp/categories/${suffix}`,
     method: "GET",
     initData,
     schema: categoriesResponseSchema,

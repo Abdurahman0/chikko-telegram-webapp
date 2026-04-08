@@ -52,6 +52,15 @@ function createCatalogQueryKey(params: {
   return `category=${params.category ?? ""};search=${params.search ?? ""};brand=${params.brand ?? ""};from=${params.priceFrom ?? ""};to=${params.priceTo ?? ""};sort=${params.sort ?? ""}`;
 }
 
+function applyClientSort(products: Product[], sort?: CatalogSortOption): Product[] {
+  if (sort !== "high_rating") {
+    return products;
+  }
+  return [...products].sort(
+    (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewsCount ?? 0) - (a.reviewsCount ?? 0),
+  );
+}
+
 export const useCatalogStore = create<CatalogStore>((set) => ({
   categories: [],
   promotedProducts: [],
@@ -111,7 +120,7 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
           
           return {
             categories: updatedCategories,
-            products: data.products,
+            products: applyClientSort(data.products, sort),
             brands: data.brands, // Brands are specific to this category
             status: "success",
             lastQueryKey: queryKey,
@@ -132,9 +141,8 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
         set((state: CatalogStore) => ({
           categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
           promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
-          products: data.products,
-          // Preserve brands from state since getCatalog response doesn't include them
-          brands: state.brands, 
+          products: applyClientSort(data.products, sort),
+          brands: data.brands && data.brands.length > 0 ? data.brands : state.brands,
           status: "success",
           lastQueryKey: queryKey,
           loadingQueryKey: null,

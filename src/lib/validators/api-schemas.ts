@@ -147,6 +147,7 @@ export const rawProductSchema = z
 export const catalogResponseSchema = z
   .object({
     categories: z.array(rawCategorySchema).default([]),
+    brands: z.array(rawBrandSchema).optional().default([]),
     promoted_products: z.array(rawProductSchema).optional().default([]),
     products: z.array(rawProductSchema).default([]),
   })
