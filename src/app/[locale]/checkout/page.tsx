@@ -134,15 +134,12 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
           onChange={(event) => setDraftField("phone", event.target.value)}
           placeholder={messages.checkout.phone}
         />
-        <Input
-          value={draft.address}
-          onChange={(event) => setDraftField("address", event.target.value)}
-          placeholder={messages.checkout.address}
-        />
         <LocationPickerPlaceholder
           locale={locale}
           title={messages.checkout.location}
           hint={messages.checkout.locationHint}
+          addressTitle={messages.checkout.addressTitle}
+          addressPlaceholder={messages.checkout.address}
           actionLabel={messages.checkout.useCurrentLocation}
           pickedLabel={messages.checkout.locationPicked}
           location={draft.location}

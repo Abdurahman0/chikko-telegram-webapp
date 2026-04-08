@@ -126,7 +126,7 @@ function CatalogScreen({ locale }: { locale: "uz" | "ru" }) {
   // (Removed duplicate call from here, now handled by useEffect above)
 
   return (
-    <div className="min-h-screen bg-app-bg pb-24">
+    <div className="min-h-screen bg-app-bg">
       {/* Hero Carousel */}
       <div className="-mx-4 -mt-3 overflow-hidden shadow-md">
         <PromotedCarousel locale={locale} products={promotedProducts} />

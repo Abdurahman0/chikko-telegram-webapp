@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/shared/button";
+import { Input } from "@/components/shared/input";
 import { useI18n } from "@/components/shared/locale-provider";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { LocationPoint } from "@/types/telegram-webapp";
@@ -193,6 +194,8 @@ export function LocationPickerPlaceholder({
   locale,
   title,
   hint,
+  addressTitle,
+  addressPlaceholder,
   actionLabel,
   pickedLabel,
   location,
@@ -204,6 +207,8 @@ export function LocationPickerPlaceholder({
   locale: AppLocale;
   title: string;
   hint: string;
+  addressTitle: string;
+  addressPlaceholder: string;
   actionLabel: string;
   pickedLabel: string;
   location: LocationPoint | null;
@@ -224,6 +229,7 @@ export function LocationPickerPlaceholder({
   const skipNextLocationSyncRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const nearbyAddress = messages.checkout.nearbyAddress;
 
   useEffect(() => {
     onSelectLocationRef.current = onSelectLocation;
@@ -253,7 +259,7 @@ export function LocationPickerPlaceholder({
           return;
         }
         if (!address) {
-          const fallbackAddress = messages.checkout.nearbyAddress;
+          const fallbackAddress = nearbyAddress;
           onAddressChangeRef.current(fallbackAddress);
           lastGeocodedAddressRef.current = fallbackAddress.toLowerCase();
           setMapError(true);
@@ -266,7 +272,7 @@ export function LocationPickerPlaceholder({
         setMapError(true);
       }
     },
-    [locale],
+    [locale, nearbyAddress],
   );
 
   useEffect(() => {
@@ -477,6 +483,14 @@ export function LocationPickerPlaceholder({
     <div className="rounded-2xl bg-surface-soft p-4">
       <p className="text-sm font-semibold">{title}</p>
       <p className="mt-1 text-xs text-app-muted">{hint}</p>
+      <div className="mt-3 space-y-2">
+        <p className="text-xs font-semibold text-app-muted">{addressTitle}</p>
+        <Input
+          value={addressValue}
+          onChange={(event) => onAddressChange(event.target.value)}
+          placeholder={addressPlaceholder}
+        />
+      </div>
       <div
         ref={mapContainerRef}
         className="mt-3 h-56 w-full overflow-hidden rounded-2xl border border-surface-accent bg-surface"

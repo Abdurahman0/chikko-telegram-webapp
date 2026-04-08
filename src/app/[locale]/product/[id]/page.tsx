@@ -197,7 +197,7 @@ function ProductScreen({
         </div>
       </div>
 
-      <div className="mt-2 space-y-2 px-4 pb-32">
+      <div className="mt-2 space-y-2 px-4">
         <div className="rounded-[2.5rem] bg-surface p-6 shadow-soft">
           <h2 className="text-lg font-bold mb-3">{messages.product.details}</h2>
           <div className="prose prose-sm max-w-none text-app-muted leading-relaxed">
