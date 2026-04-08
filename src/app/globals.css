@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg: #fbf9f9;
-  --app-text: #3c2a32;
-  --app-muted: #9e8590;
+  --app-bg: #ecf9fb;
+  --app-text: #0d47a1;
+  --app-muted: #546e7a;
   --surface: #ffffff;
-  --surface-soft: #fcf4f5;
-  --surface-accent: #f7e6ea;
-  --brand: #e88ba4;
-  --brand-strong: #c96b86;
-  --brand-soft: #fdebef;
+  --surface-soft: #f1fbfc;
+  --surface-accent: #e0f7fa;
+  --brand: #42a5f5;
+  --brand-strong: #1976d2;
+  --brand-soft: #e3f2fd;
   --danger: #d95c5c;
-  --ring: #f3c2cf;
+  --ring: #90caf9;
 }
 
 @theme inline {
@@ -41,8 +41,8 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 20% -10%, #fef3f5 0%, rgba(254, 243, 245, 0) 40%),
-    radial-gradient(circle at 80% -20%, #fef0ea 0%, rgba(254, 240, 234, 0) 30%),
+    radial-gradient(circle at 20% -10%, #e1f5fe 0%, rgba(225, 245, 254, 0) 40%),
+    radial-gradient(circle at 80% -20%, #e0f2f1 0%, rgba(224, 242, 241, 0) 30%),
     var(--app-bg);
   color: var(--app-text);
   font-family: var(--font-manrope), sans-serif;
@@ -62,7 +62,7 @@ a {
 }
 
 .shadow-soft {
-  box-shadow: 0 20px 48px -24px rgba(115, 65, 83, 0.25);
+  box-shadow: 0 20px 48px -24px rgba(66, 165, 245, 0.25);
 }
 
 .ring-soft {
