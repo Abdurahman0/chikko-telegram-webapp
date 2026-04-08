@@ -16,7 +16,8 @@ import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCatalogStore } from "@/store/catalog-store";
 import { useFavoritesStore } from "@/store/favorites-store";
-import { FiHeart, FiShoppingCart, FiMinus, FiPlus, FiStar } from "react-icons/fi";
+import { useReviewsStore } from "@/store/reviews-store";
+import { FiHeart, FiShoppingCart, FiMinus, FiPlus, FiStar, FiMessageSquare } from "react-icons/fi";
 
 export default function ProductPage() {
   const params = useParams<{ locale: string; id: string }>();
@@ -49,6 +50,9 @@ function ProductScreen({
   const cartItems = useCartStore((state) => state.items);
   const favoriteProducts = useFavoritesStore((state) => state.products);
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const reviews = useReviewsStore((state) => state.reviews);
+  const reviewsStatus = useReviewsStore((state) => state.status);
+  const loadReviews = useReviewsStore((state) => state.loadReviews);
   
   const isFavorite = useMemo(
     () => favoriteProducts.some((p) => p.id === productId),
@@ -59,6 +63,14 @@ function ProductScreen({
     () => products.find((item) => item.id === productId) ?? null,
     [products, productId],
   );
+  const productReviews = useMemo(
+    () =>
+      reviews.filter((review) =>
+        review.order?.items?.some((item) => String(item.productId) === String(productId)),
+      ),
+    [reviews, productId],
+  );
+  const hasProductReviews = productReviews.length > 0;
 
   useEffect(() => {
     if (product) {
@@ -66,6 +78,13 @@ function ProductScreen({
     }
     void loadCatalog({ initData });
   }, [product, loadCatalog, initData]);
+
+  useEffect(() => {
+    if (!initData || reviewsStatus !== "idle") {
+      return;
+    }
+    void loadReviews({ initData });
+  }, [initData, loadReviews, reviewsStatus]);
 
   if (status === "loading" && !product) {
     return <StateCard title={messages.common.loading} />;
@@ -184,6 +203,66 @@ function ProductScreen({
           <div className="prose prose-sm max-w-none text-app-muted leading-relaxed">
             {product.description || product.shortDescription || messages.product.noDescription}
           </div>
+        </div>
+
+        <div className="rounded-[2.5rem] bg-surface p-6 shadow-soft">
+          <div className="mb-4 flex items-center gap-2">
+            <FiMessageSquare className="h-4 w-4 text-brand-strong" />
+            <h2 className="text-lg font-bold">{messages.reviews.productSectionTitle}</h2>
+          </div>
+
+          {reviewsStatus === "loading" && (
+            <div className="space-y-3">
+              <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
+              <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
+            </div>
+          )}
+
+          {reviewsStatus === "success" && !hasProductReviews && (
+            <p className="text-sm font-medium text-app-muted">{messages.reviews.noProductReviews}</p>
+          )}
+
+          {hasProductReviews && (
+            <div className="space-y-3">
+              {productReviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="rounded-2xl border border-surface-accent/40 bg-surface-soft p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FiStar
+                          key={star}
+                          className={cn(
+                            "h-4 w-4",
+                            (review.rating ?? 0) >= star
+                              ? "fill-[#FFC107] text-[#FFC107]"
+                              : "text-app-muted/30",
+                          )}
+                        />
+                      ))}
+                      {review.rating ? (
+                        <span className="ml-1 text-xs font-black text-[#FFC107]">
+                          {review.rating.toFixed(1)}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {review.submittedAt ? (
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-app-muted/50">
+                        {new Date(review.submittedAt).toLocaleDateString()}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-app-text">
+                    {review.comment || "..."}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {product.brandName && (

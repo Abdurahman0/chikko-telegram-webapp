@@ -211,8 +211,10 @@ export type Messages = {
     submit: string;
     submitted: string;
     historyTitle: string;
+    productSectionTitle: string;
     leaveReview: string;
     noReviews: string;
+    noProductReviews: string;
     ratingTitle: string;
     ratingRequired: string;
     commentTitle: string;
