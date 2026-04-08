@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState, useMemo } from "react";
+import { use, useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiSearch, FiSliders, FiChevronRight } from "react-icons/fi";
 import { TbArrowsSort } from "react-icons/tb";
@@ -93,6 +93,9 @@ export default function CategoryPage({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isBrandPickerOpen, setIsBrandPickerOpen] = useState(false);
+  const [showFloatingHeader, setShowFloatingHeader] = useState(false);
+  const pageRootRef = useRef<HTMLDivElement | null>(null);
+  const lastScrollTopRef = useRef(0);
   
   useCatalog();
 
@@ -126,8 +129,84 @@ export default function CategoryPage({
     return search !== "" || brandId !== "" || priceFrom !== undefined || priceTo !== undefined || sort !== "popular";
   }, [search, brandId, priceFrom, priceTo, sort]);
 
+  useEffect(() => {
+    const root = pageRootRef.current;
+    const scrollHost = root?.closest("main");
+    if (!scrollHost) {
+      return;
+    }
+
+    lastScrollTopRef.current = scrollHost.scrollTop;
+
+    const onScroll = () => {
+      const currentTop = scrollHost.scrollTop;
+      const prevTop = lastScrollTopRef.current;
+      const delta = currentTop - prevTop;
+
+      if (currentTop < 80) {
+        setShowFloatingHeader(false);
+      } else if (delta < -8) {
+        setShowFloatingHeader(true);
+      } else if (delta > 8) {
+        setShowFloatingHeader(false);
+      }
+
+      lastScrollTopRef.current = currentTop;
+    };
+
+    scrollHost.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      scrollHost.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-app-bg pb-24">
+    <div ref={pageRootRef} className="min-h-screen bg-app-bg pb-24">
+      <div
+        className={cn(
+          "fixed left-1/2 top-3 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 transition-all duration-300",
+          showFloatingHeader
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-3 opacity-0 pointer-events-none",
+        )}
+      >
+        <div className="rounded-2xl border border-black/5 bg-surface/95 p-2 shadow-[0_10px_25px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(`/${locale}/catalog`)}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-95"
+              aria-label="Go to home"
+            >
+              <FiArrowLeft className="h-5 w-5 stroke-[2.2px]" />
+            </button>
+            <div className="relative flex-1 group">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={messages.catalog.searchPlaceholder}
+                className="h-10 rounded-xl border-none bg-surface-accent/25 pl-10 text-[12px] font-bold focus:ring-2 focus:ring-brand/10 transition-all"
+              />
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-app-muted/40 h-4 w-4" />
+            </div>
+
+            <button
+              onClick={() => setIsSortOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-95"
+              aria-label="Sort"
+            >
+              <TbArrowsSort className="h-5 w-5" />
+            </button>
+
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-accent/20 text-app-text transition-all active:scale-95"
+              aria-label="Filter"
+            >
+              <FiSliders className="h-4 w-4 text-brand" />
+            </button>
+          </div>
+        </div>
+      </div>
       <header className="relative z-10 bg-app-bg px-4 pt-3 pb-2 transition-all duration-300">
         <div className="flex items-center gap-2 mb-2">
           <button
