@@ -6,7 +6,7 @@ import type { CatalogCategory } from "@/types/telegram-webapp";
 
 // Helper to ensure image URLs are absolute if they are relative
 const resolveImageUrl = (url: string | null | undefined) => {
-  if (!url) return null;
+  if (!url || url === "string") return null;
   if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
     return url;
   }
