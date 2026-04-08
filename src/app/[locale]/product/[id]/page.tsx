@@ -114,7 +114,7 @@ function ProductScreen({
   const inCartQuantity = cartItems[product.id]?.quantity || 0;
 
   return (
-    <div className="pb-32">
+    <div>
       {/* Header Actions */}
       <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 pt-4 pointer-events-none">
         <div className="pointer-events-auto">
