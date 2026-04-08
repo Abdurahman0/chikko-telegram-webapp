@@ -189,7 +189,8 @@ export const ordersResponseSchema = z
 
 export const favoritesResponseSchema = z
   .object({
-    products: z.array(rawProductSchema).default([]),
+    products: z.array(rawProductSchema).optional(),
+    favorites: z.array(rawProductSchema).optional(),
   })
   .passthrough();
 

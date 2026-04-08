@@ -316,11 +316,12 @@ export function adaptOrdersResponse(raw: RawOrders): OrdersData {
 }
 
 export function adaptFavoritesResponse(raw: RawFavorites): FavoritesData | null {
-  if (!raw || !raw.products) {
+  if (!raw) {
     return null;
   }
+  const rawProducts = raw.products ?? raw.favorites ?? [];
   return {
-    products: (raw.products ?? []).map((p) => adaptProduct(p)),
+    products: rawProducts.map((p) => adaptProduct(p)),
   };
 }
 
