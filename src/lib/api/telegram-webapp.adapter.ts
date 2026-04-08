@@ -315,7 +315,10 @@ export function adaptOrdersResponse(raw: RawOrders): OrdersData {
   };
 }
 
-export function adaptFavoritesResponse(raw: RawFavorites): FavoritesData {
+export function adaptFavoritesResponse(raw: RawFavorites): FavoritesData | null {
+  if (!raw || !raw.products) {
+    return null;
+  }
   return {
     products: (raw.products ?? []).map((p) => adaptProduct(p)),
   };
