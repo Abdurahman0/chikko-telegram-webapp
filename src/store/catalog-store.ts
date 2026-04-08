@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { getCatalog, getCategoryProducts } from "@/lib/api/telegram-webapp.service";
+import { getCatalog } from "@/lib/api/telegram-webapp.service";
 import { TelegramApiError } from "@/lib/api/telegram-api-client";
 import type { CatalogCategory, Product, CatalogSortOption, Brand } from "@/types/telegram-webapp";
 
@@ -41,6 +41,27 @@ type CatalogStore = {
   }) => Promise<void>;
 };
 
+function resolveCategoryToId(
+  category: string | undefined,
+  categories: CatalogCategory[],
+): string | undefined {
+  if (!category || category === "all") {
+    return undefined;
+  }
+
+  const directMatch = categories.find((c) => c.id === category);
+  if (directMatch) {
+    return directMatch.id;
+  }
+
+  const codeMatch = categories.find((c) => c.code === category);
+  if (codeMatch) {
+    return codeMatch.id;
+  }
+
+  return category;
+}
+
 function createCatalogQueryKey(params: {
   category?: string;
   search?: string;
@@ -61,7 +82,7 @@ function applyClientSort(products: Product[], sort?: CatalogSortOption): Product
   );
 }
 
-export const useCatalogStore = create<CatalogStore>((set) => ({
+export const useCatalogStore = create<CatalogStore>((set, get) => ({
   categories: [],
   promotedProducts: [],
   products: [],
@@ -87,7 +108,8 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
   }),
   setCategory: (category: string) => {
     const targetCategory = category === "all" ? "" : category;
-    set({ activeCategory: targetCategory, brand: "" });
+    const categoryId = resolveCategoryToId(targetCategory, get().categories);
+    set({ activeCategory: categoryId ?? "", brand: "" });
   },
   setSearch: (search: string) => set({ search }),
   setBrand: (brand: string) => set({ brand }),
@@ -102,53 +124,27 @@ export const useCatalogStore = create<CatalogStore>((set) => ({
       errorMessage: null,
     });
     try {
-      if (category && category !== "" && category !== "all") {
-        const data = await getCategoryProducts(initData, category, { 
-          brand: brand || undefined, 
-          priceFrom, 
-          priceTo, 
-          search, 
-          sort 
-        });
-        
-        set((state: CatalogStore) => {
-          // Merge category into categories list if not present
-          const hasCategory = state.categories.some(c => c.id === data.category.id);
-          const updatedCategories = hasCategory 
-            ? state.categories 
-            : [...state.categories, data.category];
-          
-          return {
-            categories: updatedCategories,
-            products: applyClientSort(data.products, sort),
-            brands: data.brands, // Brands are specific to this category
-            status: "success",
-            lastQueryKey: queryKey,
-            loadingQueryKey: null,
-            lastFetchedAt: Date.now(),
-          };
-        });
-      } else {
-        // Load general catalog for "" or "all"
-        const data = await getCatalog(initData, { 
-          category: category === "all" ? undefined : category, 
-          search,
-          brand,
-          priceFrom,
-          priceTo,
-          sort 
-        });
-        set((state: CatalogStore) => ({
-          categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
-          promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
-          products: applyClientSort(data.products, sort),
-          brands: data.brands && data.brands.length > 0 ? data.brands : state.brands,
-          status: "success",
-          lastQueryKey: queryKey,
-          loadingQueryKey: null,
-          lastFetchedAt: Date.now(),
-        }));
-      }
+      // Use catalog endpoint consistently since it supports filtering by category UUID or code.
+      const normalizedCategory = resolveCategoryToId(category, get().categories);
+      const data = await getCatalog(initData, {
+        category: normalizedCategory,
+        search,
+        brand,
+        priceFrom,
+        priceTo,
+        sort,
+      });
+
+      set((state: CatalogStore) => ({
+        categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
+        promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
+        products: applyClientSort(data.products, sort),
+        brands: data.brands && data.brands.length > 0 ? data.brands : state.brands,
+        status: "success",
+        lastQueryKey: queryKey,
+        loadingQueryKey: null,
+        lastFetchedAt: Date.now(),
+      }));
     } catch (error) {
       if (error instanceof TelegramApiError) {
         set({
