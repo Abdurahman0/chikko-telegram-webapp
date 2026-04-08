@@ -24,6 +24,7 @@ type CatalogStore = {
   lastFetchedAt: number;
   errorCode: "forbidden" | "bad_request" | "network" | "unknown" | null;
   errorMessage: string | null;
+  lastRequestId: number;
   resetFilters: () => void;
   setCategory: (category: string) => void;
   setSearch: (search: string) => void;
@@ -99,6 +100,7 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
   lastFetchedAt: 0,
   errorCode: null,
   errorMessage: null,
+  lastRequestId: 0,
   resetFilters: () => set({
     search: "",
     brand: "",
@@ -117,11 +119,13 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
   setPriceRange: (from?: number, to?: number) => set({ priceFrom: from, priceTo: to }),
   loadCatalog: async ({ initData, category, search, brand, priceFrom, priceTo, sort }) => {
     const queryKey = createCatalogQueryKey({ category, search, brand, priceFrom, priceTo, sort });
+    const requestId = get().lastRequestId + 1;
     set({
       status: "loading",
       loadingQueryKey: queryKey,
       errorCode: null,
       errorMessage: null,
+      lastRequestId: requestId,
     });
     try {
       // Use catalog endpoint consistently since it supports filtering by category UUID or code.
@@ -136,6 +140,9 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
       });
 
       set((state: CatalogStore) => ({
+        ...(state.lastRequestId !== requestId
+          ? {}
+          : {
         categories: data.categories && data.categories.length > 0 ? data.categories : state.categories,
         promotedProducts: data.promotedProducts && data.promotedProducts.length > 0 ? data.promotedProducts : state.promotedProducts,
         products: applyClientSort(data.products, sort),
@@ -144,8 +151,12 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
         lastQueryKey: queryKey,
         loadingQueryKey: null,
         lastFetchedAt: Date.now(),
+          }),
       }));
     } catch (error) {
+      if (get().lastRequestId !== requestId) {
+        return;
+      }
       if (error instanceof TelegramApiError) {
         set({
           status: "error",

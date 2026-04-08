@@ -30,20 +30,20 @@ export function CategoryChips({
   onSelect: (category: string) => void;
 }) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-5 pt-1 no-scrollbar px-1 snap-x select-none items-end">
+    <div className="flex gap-4 overflow-x-auto pb-5 pt-1 no-scrollbar px-2.5 snap-x select-none items-end">
       {/* All Categories Item */}
       <div 
         className="flex shrink-0 flex-col items-center gap-1.5 cursor-pointer group snap-start"
         onClick={() => onSelect("")}
       >
         <div className={cn(
-          "flex h-[52px] w-[52px] items-center justify-center rounded-full transition-all duration-300 ease-out relative",
+          "flex h-[60px] w-[60px] items-center justify-center rounded-full transition-all duration-300 ease-out relative",
           activeCategory === "" 
             ? "bg-brand/10 ring-[2.5px] ring-brand ring-offset-[2px] ring-offset-surface shadow-[0_4px_12px_rgba(255,126,139,0.2)] scale-105" 
             : "bg-surface-accent/15 group-hover:bg-surface-accent/25 group-active:scale-95 shadow-sm"
         )}>
           <div className={cn(
-            "h-8 w-8 rounded-full border-[1.5px] border-dashed flex items-center justify-center transition-colors duration-300",
+            "h-9 w-9 rounded-full border-[1.5px] border-dashed flex items-center justify-center transition-colors duration-300",
             activeCategory === "" ? "border-brand text-brand" : "border-app-muted/20 text-app-muted/40"
           )}>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
