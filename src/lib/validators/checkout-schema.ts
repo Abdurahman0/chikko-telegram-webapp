@@ -10,6 +10,7 @@ export const checkoutPayloadSchema = z
     full_name: z.string().min(2, "full_name_required"),
     phone: z.string().min(7, "phone_required"),
     payment_method: z.enum(["payme", "click"]),
+    fulfillment_method: z.enum(["delivery", "pickup"]),
     address: z.string().optional(),
     location: z
       .object({
@@ -20,10 +21,14 @@ export const checkoutPayloadSchema = z
     items: z.array(checkoutItemSchema).min(1),
   })
   .superRefine((value, ctx) => {
+    if (value.fulfillment_method === "pickup") {
+      return;
+    }
+
     if (!value.address?.trim() && !value.location) {
       ctx.addIssue({
         code: "custom",
-        message: "address_or_location_required",
+        message: "delivery_address_or_location_required",
         path: ["address"],
       });
     }

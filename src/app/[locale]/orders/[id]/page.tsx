@@ -8,7 +8,11 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/components/shared/locale-provider";
 import { useOrdersData } from "@/features/orders/use-orders-data";
 import { formatCurrency } from "@/lib/formatters/currency";
-import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-status";
+import {
+  formatFulfillmentMethod,
+  formatOrderStatus,
+  formatPaymentStatus,
+} from "@/lib/formatters/order-status";
 import { StateCard } from "@/components/shared/state-card";
 import { useReviewsStore } from "@/store/reviews-store";
 import { useBootstrapStore } from "@/store/bootstrap-store";
@@ -21,7 +25,6 @@ function getStatusColor(status?: string) {
   if (["new", "pending", "processing"].includes(normalized)) return "amber";
   return "brand";
 }
-
 export default function OrderDetailPage({
   params: paramsPromise,
 }: {
@@ -32,7 +35,7 @@ export default function OrderDetailPage({
   const router = useRouter();
   const { orders, status } = useOrdersData();
   const initData = useBootstrapStore((state) => state.initData);
-  const { pendingOrders, reviews, loadReviews } = useReviewsStore();
+  const { pendingOrders, loadReviews } = useReviewsStore();
 
   useEffect(() => {
     if (initData) {
@@ -42,15 +45,10 @@ export default function OrderDetailPage({
 
   const order = useMemo(() => orders.find((o) => o.id === id), [orders, id]);
   
-  const isPendingReview = useMemo(() => {
-    if (pendingOrders.some(p => p.id === id)) return true;
-    if (!order || !order.status) return false;
-    const s = order.status.toLowerCase();
-    const isCompleted = s.includes('completed') || s.includes('delivered') || s.includes('success') || s.includes('завершен') || s.includes('yەتkazib') || s.includes('yetkazib');
-    if (!isCompleted) return false;
-    const hasReview = reviews.some(r => r.orderId === order.id);
-    return !hasReview;
-  }, [pendingOrders, id, order, reviews]);
+  const isPendingReview = useMemo(
+    () => pendingOrders.some((pendingOrder) => pendingOrder.id === id),
+    [pendingOrders, id],
+  );
 
   if (status === "loading") {
     return (
@@ -116,7 +114,7 @@ export default function OrderDetailPage({
         </div>
 
         {/* Customer & Delivery Section */}
-        {(order.contactName || order.shippingAddress) && (
+        {(order.contactName || order.shippingAddress || order.fulfillmentMethod) && (
           <div className="rounded-[32px] bg-surface p-6 shadow-soft space-y-5">
             <div className="flex items-center gap-3 border-b border-surface-accent/20 pb-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-soft/30 text-brand">
@@ -150,6 +148,17 @@ export default function OrderDetailPage({
                   <div>
                     <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">{messages.orders.address}</p>
                     <p className="text-sm font-bold text-app-text leading-relaxed">{order.shippingAddress}</p>
+                  </div>
+                </div>
+              )}
+              {order.fulfillmentMethod && (
+                <div className="flex items-start gap-3">
+                  <FiTruck className="mt-0.5 h-4 w-4 text-app-muted/40" />
+                  <div>
+                    <p className="text-[10px] font-bold text-app-muted/60 uppercase tracking-wide">{messages.orders.fulfillmentMethod}</p>
+                    <p className="text-sm font-bold text-app-text">
+                      {formatFulfillmentMethod(order.fulfillmentMethod, locale)}
+                    </p>
                   </div>
                 </div>
               )}
@@ -242,3 +251,4 @@ export default function OrderDetailPage({
     </div>
   );
 }
+

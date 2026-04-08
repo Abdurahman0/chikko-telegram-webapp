@@ -8,6 +8,7 @@ import { StateCard } from "@/components/shared/state-card";
 import { useI18n } from "@/components/shared/locale-provider";
 import { formatCurrency } from "@/lib/formatters/currency";
 import {
+  formatFulfillmentMethod,
   formatOrderStatus,
   formatPaymentMethod,
   formatPaymentStatus,
@@ -82,6 +83,14 @@ function SuccessScreen({ locale }: { locale: "uz" | "ru" }) {
               {formatPaymentMethod(checkoutResult.payment.method, locale)}
             </span>
           </div>
+          {checkoutResult.order.fulfillmentMethod ? (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-app-muted">{messages.orders.fulfillmentMethod}</span>
+              <span className="rounded-full bg-surface px-2.5 py-1 text-xs font-semibold text-app-text">
+                {formatFulfillmentMethod(checkoutResult.order.fulfillmentMethod, locale)}
+              </span>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between text-sm">
             <span className="text-app-muted">{messages.success.status}</span>
             <span className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-strong">

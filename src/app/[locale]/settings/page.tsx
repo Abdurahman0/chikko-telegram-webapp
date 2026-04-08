@@ -45,6 +45,7 @@ function SettingsScreen({ locale }: { locale: AppLocale }) {
     setDraftField("address", "");
     setDraftField("location", null);
     setDraftField("paymentMethod", "payme");
+    setDraftField("fulfillmentMethod", "delivery");
     clearCheckoutResult();
   };
 

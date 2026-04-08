@@ -1,4 +1,5 @@
 export type PaymentMethod = "payme" | "click";
+export type FulfillmentMethod = "delivery" | "pickup";
 
 export type TelegramThemeParams = {
   bg_color?: string;
@@ -56,6 +57,7 @@ export type Product = {
   images: string[];
   rating?: number;
   reviewsCount?: number;
+  reviewsEnabled?: boolean;
 };
 
 export type CatalogCategory = {
@@ -88,6 +90,7 @@ export type Order = {
   contactName?: string;
   contactPhone?: string;
   shippingAddress?: string;
+  fulfillmentMethod?: FulfillmentMethod;
 };
 
 export type Payment = {
@@ -121,6 +124,7 @@ export type CheckoutPayload = {
   full_name: string;
   phone: string;
   payment_method: PaymentMethod;
+  fulfillment_method: FulfillmentMethod;
   address?: string;
   location?: {
     latitude: number;

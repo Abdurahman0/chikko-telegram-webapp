@@ -55,6 +55,7 @@ function OrdersScreen({ locale }: { locale: "uz" | "ru" }) {
           order={order}
           orderItemsLabel={messages.orders.orderItems}
           paymentStatusLabel={messages.success.paymentStatus}
+          fulfillmentMethodLabel={messages.orders.fulfillmentMethod}
           currencyLabel={messages.common.som}
         />
           ))

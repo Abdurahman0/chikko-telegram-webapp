@@ -71,6 +71,10 @@ function ProductScreen({
     [reviews, productId],
   );
   const hasProductReviews = productReviews.length > 0;
+  const showRatingBadge =
+    product?.reviewsEnabled !== false &&
+    (typeof product?.rating === "number" || typeof product?.reviewsCount === "number");
+  const showReviewSection = product?.reviewsEnabled !== false;
 
   useEffect(() => {
     if (product) {
@@ -80,11 +84,11 @@ function ProductScreen({
   }, [product, loadCatalog, initData]);
 
   useEffect(() => {
-    if (!initData || reviewsStatus !== "idle") {
+    if (!initData || reviewsStatus !== "idle" || product?.reviewsEnabled === false) {
       return;
     }
     void loadReviews({ initData });
-  }, [initData, loadReviews, reviewsStatus]);
+  }, [initData, loadReviews, product?.reviewsEnabled, reviewsStatus]);
 
   if (status === "loading" && !product) {
     return <StateCard title={messages.common.loading} />;
@@ -183,13 +187,17 @@ function ProductScreen({
         <div className="mt-4 px-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-black text-app-text tracking-tight">{product.name}</h1>
-            <div className="flex items-center gap-1.5 rounded-2xl bg-surface-soft px-3 py-1.5 border border-surface-accent/30 shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
-               <FiStar className="h-4 w-4 fill-[#FFC107] text-[#FFC107]" />
-               <span className="text-sm font-black text-app-text">{typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}</span>
-               <span className="text-[10px] font-bold text-app-muted/50 uppercase tracking-tighter ml-0.5">
-                  ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
-               </span>
-            </div>
+            {showRatingBadge ? (
+              <div className="animate-in slide-in-from-right-4 flex items-center gap-1.5 rounded-2xl border border-surface-accent/30 bg-surface-soft px-3 py-1.5 shadow-sm fade-in duration-500">
+                 <FiStar className="h-4 w-4 fill-[#FFC107] text-[#FFC107]" />
+                 <span className="text-sm font-black text-app-text">
+                   {typeof product.rating === "number" ? product.rating.toFixed(1) : "0.0"}
+                 </span>
+                 <span className="ml-0.5 text-[10px] font-bold uppercase tracking-tighter text-app-muted/50">
+                    ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
+                 </span>
+              </div>
+            ) : null}
           </div>
           {product.description || product.shortDescription ? (
             <p className="mt-3 text-sm font-medium text-app-muted leading-relaxed">{product.description || product.shortDescription}</p>
@@ -205,65 +213,67 @@ function ProductScreen({
           </div>
         </div>
 
-        <div className="rounded-[2.5rem] bg-surface p-6 shadow-soft">
-          <div className="mb-4 flex items-center gap-2">
-            <FiMessageSquare className="h-4 w-4 text-brand-strong" />
-            <h2 className="text-lg font-bold">{messages.reviews.productSectionTitle}</h2>
-          </div>
-
-          {reviewsStatus === "loading" && (
-            <div className="space-y-3">
-              <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
-              <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
+        {showReviewSection ? (
+          <div className="rounded-[2.5rem] bg-surface p-6 shadow-soft">
+            <div className="mb-4 flex items-center gap-2">
+              <FiMessageSquare className="h-4 w-4 text-brand-strong" />
+              <h2 className="text-lg font-bold">{messages.reviews.productSectionTitle}</h2>
             </div>
-          )}
 
-          {reviewsStatus === "success" && !hasProductReviews && (
-            <p className="text-sm font-medium text-app-muted">{messages.reviews.noProductReviews}</p>
-          )}
+            {reviewsStatus === "loading" && (
+              <div className="space-y-3">
+                <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
+                <div className="h-16 animate-pulse rounded-2xl bg-surface-accent" />
+              </div>
+            )}
 
-          {hasProductReviews && (
-            <div className="space-y-3">
-              {productReviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="rounded-2xl border border-surface-accent/40 bg-surface-soft p-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FiStar
-                          key={star}
-                          className={cn(
-                            "h-4 w-4",
-                            (review.rating ?? 0) >= star
-                              ? "fill-[#FFC107] text-[#FFC107]"
-                              : "text-app-muted/30",
-                          )}
-                        />
-                      ))}
-                      {review.rating ? (
-                        <span className="ml-1 text-xs font-black text-[#FFC107]">
-                          {review.rating.toFixed(1)}
+            {reviewsStatus === "success" && !hasProductReviews && (
+              <p className="text-sm font-medium text-app-muted">{messages.reviews.noProductReviews}</p>
+            )}
+
+            {hasProductReviews && (
+              <div className="space-y-3">
+                {productReviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="rounded-2xl border border-surface-accent/40 bg-surface-soft p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FiStar
+                            key={star}
+                            className={cn(
+                              "h-4 w-4",
+                              (review.rating ?? 0) >= star
+                                ? "fill-[#FFC107] text-[#FFC107]"
+                                : "text-app-muted/30",
+                            )}
+                          />
+                        ))}
+                        {review.rating ? (
+                          <span className="ml-1 text-xs font-black text-[#FFC107]">
+                            {review.rating.toFixed(1)}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {review.submittedAt ? (
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-app-muted/50">
+                          {new Date(review.submittedAt).toLocaleDateString()}
                         </span>
                       ) : null}
                     </div>
 
-                    {review.submittedAt ? (
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-app-muted/50">
-                        {new Date(review.submittedAt).toLocaleDateString()}
-                      </span>
-                    ) : null}
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-app-text">
+                      {review.comment || "..."}
+                    </p>
                   </div>
-
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-app-text">
-                    {review.comment || "..."}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null}
 
         {product.brandName && (
           <div className="rounded-3xl bg-surface px-6 py-4 shadow-soft flex items-center justify-between">

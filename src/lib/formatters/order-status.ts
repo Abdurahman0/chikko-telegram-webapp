@@ -72,3 +72,20 @@ export function formatPaymentMethod(method: string | undefined, locale: AppLocal
   }
   return fallbackLabel(method);
 }
+
+export function formatFulfillmentMethod(
+  method: string | undefined,
+  locale: AppLocale,
+) {
+  if (!method) {
+    return "";
+  }
+  const normalized = method.toLowerCase();
+  if (normalized === "delivery") {
+    return locale === "uz" ? "Yetkazib berish" : "Доставка";
+  }
+  if (normalized === "pickup") {
+    return locale === "uz" ? "Olib ketish" : "Самовывоз";
+  }
+  return fallbackLabel(method);
+}

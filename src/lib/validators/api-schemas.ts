@@ -31,6 +31,8 @@ export const rawOrderSchema = z
     contact_name: z.string().optional(),
     contact_phone: z.string().optional(),
     shipping_address: z.string().optional(),
+    fulfillment_method: z.enum(["delivery", "pickup"]).optional().nullable(),
+    fulfillmentMethod: z.enum(["delivery", "pickup"]).optional().nullable(),
     created_at: z.string().optional(),
     payments: z
       .array(
@@ -141,6 +143,8 @@ export const rawProductSchema = z
     rating_count: z.union([z.number(), z.string(), z.null()]).optional(),
     reviews_count: z.union([z.number(), z.string(), z.null()]).optional(),
     review_count: z.union([z.number(), z.string(), z.null()]).optional(),
+    reviews_enabled: z.boolean().optional().nullable(),
+    reviewsEnabled: z.boolean().optional().nullable(),
   })
   .passthrough();
 

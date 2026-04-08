@@ -5,6 +5,7 @@ import { persist } from "zustand/middleware";
 import type {
   CheckoutData,
   Customer,
+  FulfillmentMethod,
   LocationPoint,
   PaymentMethod,
 } from "@/types/telegram-webapp";
@@ -14,6 +15,7 @@ type CheckoutDraft = {
   phone: string;
   address: string;
   paymentMethod: PaymentMethod;
+  fulfillmentMethod: FulfillmentMethod;
   location: LocationPoint | null;
 };
 
@@ -34,6 +36,7 @@ const defaultDraft: CheckoutDraft = {
   phone: "",
   address: "",
   paymentMethod: "payme",
+  fulfillmentMethod: "delivery",
   location: null,
 };
 
@@ -75,6 +78,17 @@ export const useCheckoutStore = create<CheckoutStore>()(
       partialize: (state) => ({
         draft: state.draft,
       }),
+      merge: (persistedState, currentState) => {
+        const typedPersisted = persistedState as Partial<CheckoutStore> | undefined;
+        return {
+          ...currentState,
+          ...typedPersisted,
+          draft: {
+            ...defaultDraft,
+            ...(typedPersisted?.draft ?? {}),
+          },
+        };
+      },
     },
   ),
 );

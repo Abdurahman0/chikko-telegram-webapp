@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { formatCurrency } from "@/lib/formatters/currency";
-import { formatOrderStatus, formatPaymentStatus } from "@/lib/formatters/order-status";
+import {
+  formatFulfillmentMethod,
+  formatOrderStatus,
+  formatPaymentStatus,
+} from "@/lib/formatters/order-status";
 import { cn } from "@/lib/utils/cn";
 import type { AppLocale } from "@/lib/i18n/config";
 import type { Order } from "@/types/telegram-webapp";
@@ -29,6 +33,7 @@ export function OrderCard({
   order,
   orderItemsLabel,
   paymentStatusLabel,
+  fulfillmentMethodLabel,
   currencyLabel,
 }: {
   locale: AppLocale;
@@ -36,6 +41,7 @@ export function OrderCard({
   order: Order;
   orderItemsLabel: string;
   paymentStatusLabel: string;
+  fulfillmentMethodLabel: string;
   currencyLabel: string;
 }) {
   const orderStatusClasses = getStatusColorClasses(order.status);
@@ -66,6 +72,14 @@ export function OrderCard({
       <p className="mt-2 text-xs text-app-muted">
         {orderItemsLabel}: {order.items.length}
       </p>
+      {order.fulfillmentMethod ? (
+        <p className="mt-1 text-xs text-app-muted">
+          {fulfillmentMethodLabel}:{" "}
+          <span className="font-semibold text-app-text">
+            {formatFulfillmentMethod(order.fulfillmentMethod, locale)}
+          </span>
+        </p>
+      ) : null}
       {order.paymentStatus ? (
         <p className="mt-1 text-xs text-app-muted">
           {paymentStatusLabel}:{" "}

@@ -92,6 +92,7 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
       phone: draft.phone,
       address: draft.address,
       paymentMethod: draft.paymentMethod,
+      fulfillmentMethod: draft.fulfillmentMethod,
       location: draft.location,
       items: payloadItems,
     });
@@ -134,21 +135,57 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
           onChange={(event) => setDraftField("phone", event.target.value)}
           placeholder={messages.checkout.phone}
         />
-        <LocationPickerPlaceholder
-          locale={locale}
-          title={messages.checkout.location}
-          hint={messages.checkout.locationHint}
-          addressTitle={messages.checkout.addressTitle}
-          addressPlaceholder={messages.checkout.address}
-          actionLabel={messages.checkout.useCurrentLocation}
-          pickedLabel={messages.checkout.locationPicked}
-          location={draft.location}
-          addressValue={draft.address}
-          onAddressChange={(nextAddress) => setDraftField("address", nextAddress)}
-          onSelectLocation={(nextLocation) => setDraftField("location", nextLocation)}
-          onPickLocation={onPickLocation}
-        />
-        {locationError ? <p className="text-xs text-app-muted">{locationError}</p> : null}
+
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">{messages.checkout.fulfillmentMethod}</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                draft.fulfillmentMethod === "delivery"
+                  ? "bg-brand text-white"
+                  : "bg-surface-soft text-app-text"
+              }`}
+              onClick={() => setDraftField("fulfillmentMethod", "delivery")}
+            >
+              {messages.checkout.delivery}
+            </button>
+            <button
+              type="button"
+              className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                draft.fulfillmentMethod === "pickup"
+                  ? "bg-brand text-white"
+                  : "bg-surface-soft text-app-text"
+              }`}
+              onClick={() => {
+                setLocationError(null);
+                setDraftField("fulfillmentMethod", "pickup");
+              }}
+            >
+              {messages.checkout.pickup}
+            </button>
+          </div>
+        </div>
+
+        {draft.fulfillmentMethod === "delivery" ? (
+          <>
+            <LocationPickerPlaceholder
+              locale={locale}
+              title={messages.checkout.location}
+              hint={messages.checkout.locationHint}
+              addressTitle={messages.checkout.addressTitle}
+              addressPlaceholder={messages.checkout.address}
+              actionLabel={messages.checkout.useCurrentLocation}
+              pickedLabel={messages.checkout.locationPicked}
+              location={draft.location}
+              addressValue={draft.address}
+              onAddressChange={(nextAddress) => setDraftField("address", nextAddress)}
+              onSelectLocation={(nextLocation) => setDraftField("location", nextLocation)}
+              onPickLocation={onPickLocation}
+            />
+            {locationError ? <p className="text-xs text-app-muted">{locationError}</p> : null}
+          </>
+        ) : null}
       </div>
 
       <div className="rounded-3xl bg-surface p-4 shadow-soft space-y-2">
@@ -187,8 +224,8 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
         <StateCard
           title={messages.checkout.validationTitle}
           description={
-            submitError === "address_or_location_required"
-              ? messages.checkout.addressOrLocation
+            submitError === "delivery_address_or_location_required"
+              ? messages.checkout.deliveryAddressOrLocation
               : submitError === "empty_cart"
                 ? messages.checkout.requiredCart
                 : submitError === "full_name_required"

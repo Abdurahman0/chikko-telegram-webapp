@@ -53,6 +53,9 @@ export function ProductCard({
     () => favoriteProducts.some((p) => String(p.id) === String(product.id)),
     [favoriteProducts, product.id],
   );
+  const showRating =
+    product.reviewsEnabled !== false &&
+    (typeof product.rating === "number" || typeof product.reviewsCount === "number");
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -122,20 +125,21 @@ export function ProductCard({
           </p>
         </Link>
 
-        {/* Rating */}
-        <div className="flex items-center gap-0.5 mt-1">
-          <div className="flex items-center text-[#FFC107]">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
-              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z" />
-            </svg>
+        {showRating ? (
+          <div className="mt-1 flex items-center gap-0.5">
+            <div className="flex items-center text-[#FFC107]">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            </div>
+            <span className="text-[10px] font-black text-app-text/70">
+              {typeof product.rating === "number" ? product.rating.toFixed(1) : "0.0"}
+            </span>
+            <span className="ml-0.5 text-[9px] font-bold text-app-muted/30">
+              ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
+            </span>
           </div>
-          <span className="text-[10px] font-black text-app-text/70">
-            {typeof product.rating === "number" ? product.rating.toFixed(1) : "5.0"}
-          </span>
-          <span className="text-[9px] font-bold text-app-muted/30 ml-0.5">
-            ({typeof product.reviewsCount === "number" ? product.reviewsCount : 0})
-          </span>
-        </div>
+        ) : null}
 
         <div className="mt-auto pt-2.5">
           <div className="flex items-baseline gap-1">

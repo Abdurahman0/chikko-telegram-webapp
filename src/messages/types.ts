@@ -91,12 +91,15 @@ export type Messages = {
     locationHint: string;
     useCurrentLocation: string;
     locationPicked: string;
+    fulfillmentMethod: string;
+    delivery: string;
+    pickup: string;
     paymentMethod: string;
     orderSummary: string;
     submit: string;
     submitting: string;
     validationTitle: string;
-    addressOrLocation: string;
+    deliveryAddressOrLocation: string;
     requiredCart: string;
     click: string;
     payme: string;
@@ -124,6 +127,7 @@ export type Messages = {
     recipient: string;
     phone: string;
     address: string;
+    fulfillmentMethod: string;
     total: string;
     orderTime: string;
     items: string;
@@ -219,5 +223,6 @@ export type Messages = {
     ratingRequired: string;
     commentTitle: string;
     loadFailed: string;
+    disabled: string;
   };
 };

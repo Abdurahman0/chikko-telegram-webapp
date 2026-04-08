@@ -6,13 +6,14 @@ import { checkoutPayloadSchema } from "@/lib/validators/checkout-schema";
 import { useBootstrapStore } from "@/store/bootstrap-store";
 import { useCheckoutStore } from "@/store/checkout-store";
 import { TelegramApiError } from "@/lib/api/telegram-api-client";
-import type { PaymentMethod } from "@/types/telegram-webapp";
+import type { FulfillmentMethod, PaymentMethod } from "@/types/telegram-webapp";
 
 type SubmitPayload = {
   fullName: string;
   phone: string;
   address: string;
   paymentMethod: PaymentMethod;
+  fulfillmentMethod: FulfillmentMethod;
   location: { latitude: number; longitude: number } | null;
   items: Array<{ product_id: string; quantity: number }>;
 };
@@ -31,6 +32,7 @@ export function useSubmitCheckout() {
       full_name: payload.fullName,
       phone: payload.phone,
       payment_method: payload.paymentMethod,
+      fulfillment_method: payload.fulfillmentMethod,
       address: payload.address,
       location: payload.location ?? undefined,
       items: payload.items,

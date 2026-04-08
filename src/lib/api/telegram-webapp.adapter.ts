@@ -6,6 +6,7 @@ import type {
   CategoryDetailData,
   CheckoutData,
   FavoritesData,
+  FulfillmentMethod,
   Order,
   OrderItem,
   OrdersData,
@@ -76,6 +77,16 @@ function toPaymentMethod(value: unknown): PaymentMethod | null {
   return null;
 }
 
+function toFulfillmentMethod(value: unknown): FulfillmentMethod | undefined {
+  if (typeof value === "string") {
+    const normalized = value.toLowerCase();
+    if (normalized === "delivery" || normalized === "pickup") {
+      return normalized;
+    }
+  }
+  return undefined;
+}
+
 function adaptOrder(raw: RawOrder): Order {
   const items: OrderItem[] = (raw.items ?? []).map((item, index) => ({
     id:
@@ -108,6 +119,7 @@ function adaptOrder(raw: RawOrder): Order {
     contactName: raw.contact_name,
     contactPhone: raw.contact_phone,
     shippingAddress: raw.shipping_address,
+    fulfillmentMethod: toFulfillmentMethod(raw.fulfillment_method ?? raw.fulfillmentMethod),
   };
 }
 
@@ -195,6 +207,12 @@ function adaptProduct(
         ? toNumber(product.reviews_count, 0) 
         : (product.review_count !== undefined && product.review_count !== null)
           ? toNumber(product.review_count, 0)
+          : undefined,
+    reviewsEnabled:
+      typeof product.reviews_enabled === "boolean"
+        ? product.reviews_enabled
+        : typeof product.reviewsEnabled === "boolean"
+          ? product.reviewsEnabled
           : undefined,
   };
 }
