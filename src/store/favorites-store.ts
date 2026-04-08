@@ -54,19 +54,28 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
     }
   },
   toggleFavorite: async ({ initData, product }) => {
-    // Increment in-flight toggle counter
-    // We don't set loadStatus to 'loading' here because that would trigger full-page skeleton
-    set((state) => ({ 
-      inFlightToggles: state.inFlightToggles + 1 
-    }));
+    const productId = String(product.id);
+    
+    // Optimistic update
+    set((state) => {
+      const isFavorite = state.products.some((p) => String(p.id) === productId);
+      const nextProducts = isFavorite
+        ? state.products.filter((p) => String(p.id) !== productId)
+        : [...state.products, product];
+        
+      return {
+        products: nextProducts,
+        inFlightToggles: state.inFlightToggles + 1,
+      };
+    });
 
     try {
-      const data = await toggleFavorite(initData, String(product.id));
+      const data = await toggleFavorite(initData, productId);
       
       set((state) => {
         const nextInFlight = state.inFlightToggles - 1;
         
-        // Only update the products list if this is the latest result
+        // Only update products list from server if this was the last in-flight request
         if (nextInFlight === 0) {
           return { 
             products: data.products, 
@@ -80,11 +89,19 @@ export const useFavoritesStore = create<FavoritesStore>((set, get) => ({
       });
     } catch (error) {
       console.error("Failed to toggle favorite:", error);
-      set((state) => ({ 
-        inFlightToggles: Math.max(0, state.inFlightToggles - 1) 
-        // Important: we DON'T set loadStatus to 'error' here
-        // to avoid hijacking the UI with the 'Order Failed' modal
-      }));
+      
+      // Revert optimistic update
+      set((state) => {
+        const isFavorite = state.products.some((p) => String(p.id) === productId);
+        const nextProducts = isFavorite
+          ? state.products.filter((p) => String(p.id) !== productId)
+          : [...state.products, product];
+          
+        return {
+          products: nextProducts,
+          inFlightToggles: Math.max(0, state.inFlightToggles - 1),
+        };
+      });
     }
   },
 }));
