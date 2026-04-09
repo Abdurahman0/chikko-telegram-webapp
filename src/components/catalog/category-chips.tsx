@@ -1,21 +1,50 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
 import type { CatalogCategory } from "@/types/telegram-webapp";
 
-// Helper to ensure image URLs are absolute if they are relative
+const ABSOLUTE_URL_PATTERN = /^[a-z][a-z\d+\-.]*:/i;
+
+// Normalize category image URLs for Telegram Android WebView compatibility.
 const resolveImageUrl = (url: string | null | undefined) => {
-  if (!url || url === "string") return null;
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
-    return url;
+  if (typeof url !== "string") return null;
+
+  const normalized = url.trim().replace(/\\/g, "/");
+  if (!normalized || normalized === "string") return null;
+
+  if (normalized.startsWith("data:") || normalized.startsWith("blob:")) {
+    return normalized;
   }
-  // Remove leading slash then prepend base URL if it's relative
-  const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  // Ensure we don't have double slashes
-  const sep = baseUrl.endsWith("/") ? "" : "/";
-  return `${baseUrl}${sep}${cleanUrl}`;
+
+  if (normalized.startsWith("//")) {
+    return `https:${normalized}`;
+  }
+
+  if (ABSOLUTE_URL_PATTERN.test(normalized)) {
+    if (
+      typeof window !== "undefined" &&
+      window.location.protocol === "https:" &&
+      normalized.startsWith("http://")
+    ) {
+      return `https://${normalized.slice("http://".length)}`;
+    }
+    return normalized;
+  }
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+
+  if (!baseUrl) {
+    return normalized.startsWith("/") ? normalized : `/${normalized}`;
+  }
+
+  try {
+    const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+    return new URL(normalized, base).toString();
+  } catch {
+    return normalized.startsWith("/") ? normalized : `/${normalized}`;
+  }
 };
 
 export function CategoryChips({
@@ -79,13 +108,13 @@ export function CategoryChips({
                 : "ring-[1px] ring-black/[0.03] group-hover:ring-black/[0.08] group-active:scale-95 shadow-sm bg-surface-accent/10"
             )}>
               {imageUrl ? (
-                <Image 
+                <img
                   src={imageUrl} 
                   alt={category.name} 
-                  fill
-                  unoptimized
+                  loading="eager"
+                  decoding="async"
                   className={cn(
-                    "object-cover transition-all duration-500",
+                    "absolute inset-0 h-full w-full object-cover transition-all duration-500",
                     activeCategory === category.id ? "scale-110" : "group-hover:scale-105"
                   )}
                 />
