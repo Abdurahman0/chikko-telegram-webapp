@@ -9,7 +9,7 @@ export const checkoutPayloadSchema = z
   .object({
     full_name: z.string().min(2, "full_name_required"),
     phone: z.string().min(7, "phone_required"),
-    payment_method: z.enum(["payme", "click"]),
+    payment_method: z.enum(["payme", "click", "manual"]),
     fulfillment_method: z.enum(["delivery", "pickup"]),
     address: z.string().optional(),
     location: z

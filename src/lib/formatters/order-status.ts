@@ -70,6 +70,9 @@ export function formatPaymentMethod(method: string | undefined, locale: AppLocal
   if (normalized === "click") {
     return "Click";
   }
+  if (normalized === "manual" || normalized === "naqd") {
+    return "Naqd";
+  }
   return fallbackLabel(method);
 }
 

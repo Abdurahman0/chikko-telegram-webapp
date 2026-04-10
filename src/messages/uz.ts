@@ -105,6 +105,7 @@ export const uzMessages: Messages = {
     deliveryAddressOrLocation: "Yetkazib berish uchun manzil yoki lokatsiya kiritilishi shart",
     requiredCart: "Savat bo'sh bo'lmasligi kerak",
     click: "Click",
+    naqd: "Naqd",
     payme: "Payme",
     fallbackPaymentMethods: "To'lov usullari bootstrapdan olinmadi, standartlar ishlatilmoqda.",
     failed: "Buyurtma yuborilmadi. Ma'lumotlarni tekshirib qayta urinib ko'ring.",

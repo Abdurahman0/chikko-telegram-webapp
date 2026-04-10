@@ -46,12 +46,13 @@ function CheckoutScreen({ locale }: { locale: "uz" | "ru" }) {
   }, [prefillFromCustomer, customer]);
 
   const availablePaymentMethods = useMemo<PaymentMethod[]>(
-    () => (paymentMethods.length > 0 ? paymentMethods : ["payme", "click"]),
+    () => (paymentMethods.length > 0 ? paymentMethods : ["payme", "click", "manual"]),
     [paymentMethods],
   );
 
   const paymentLabels: Record<PaymentMethod, string> = {
     click: messages.checkout.click,
+    manual: messages.checkout.naqd,
     payme: messages.checkout.payme,
   };
 

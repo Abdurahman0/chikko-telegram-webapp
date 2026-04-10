@@ -102,6 +102,7 @@ export type Messages = {
     deliveryAddressOrLocation: string;
     requiredCart: string;
     click: string;
+    naqd: string;
     payme: string;
     fallbackPaymentMethods: string;
     failed: string;

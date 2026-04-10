@@ -62,8 +62,11 @@ function toNumber(value: unknown, fallback = 0) {
 function toPaymentMethod(value: unknown): PaymentMethod | null {
   if (typeof value === "string") {
     const normalized = value.toLowerCase();
-    if (normalized === "payme" || normalized === "click") {
+    if (normalized === "payme" || normalized === "click" || normalized === "manual") {
       return normalized;
+    }
+    if (normalized === "naqd") {
+      return "manual";
     }
   }
   if (
@@ -242,7 +245,7 @@ export function adaptBootstrapResponse(raw: RawBootstrap): BootstrapData {
         }
       : null,
     activeOrder: raw.active_order ? adaptOrder(raw.active_order) : null,
-    paymentMethods: methods.length > 0 ? methods : ["payme", "click"],
+    paymentMethods: methods.length > 0 ? methods : ["payme", "click", "manual"],
   };
 }
 

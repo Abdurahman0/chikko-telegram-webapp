@@ -80,12 +80,24 @@ export const useCheckoutStore = create<CheckoutStore>()(
       }),
       merge: (persistedState, currentState) => {
         const typedPersisted = persistedState as Partial<CheckoutStore> | undefined;
+        const persistedPaymentMethod = typedPersisted?.draft?.paymentMethod as
+          | string
+          | undefined;
+        const normalizedPaymentMethod =
+          persistedPaymentMethod === "naqd"
+            ? "manual"
+            : persistedPaymentMethod === "payme" ||
+                persistedPaymentMethod === "click" ||
+                persistedPaymentMethod === "manual"
+              ? persistedPaymentMethod
+              : undefined;
         return {
           ...currentState,
           ...typedPersisted,
           draft: {
             ...defaultDraft,
             ...(typedPersisted?.draft ?? {}),
+            ...(normalizedPaymentMethod ? { paymentMethod: normalizedPaymentMethod } : {}),
           },
         };
       },

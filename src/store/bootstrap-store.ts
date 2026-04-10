@@ -41,7 +41,7 @@ export const useBootstrapStore = create<BootstrapStore>((set, get) => ({
   theme: null,
   customer: null,
   activeOrder: null,
-  paymentMethods: ["payme", "click"],
+  paymentMethods: ["payme", "click", "manual"],
   status: "idle",
   errorCode: null,
   errorMessage: null,

@@ -105,6 +105,7 @@ export const ruMessages: Messages = {
     deliveryAddressOrLocation: "Для доставки нужно указать адрес или геолокацию",
     requiredCart: "Корзина не должна быть пустой",
     click: "Click",
+    naqd: "Naqd",
     payme: "Payme",
     fallbackPaymentMethods:
       "Способы оплаты из bootstrap не получены, используются стандартные.",

@@ -1,4 +1,4 @@
-export type PaymentMethod = "payme" | "click";
+export type PaymentMethod = "payme" | "click" | "manual";
 export type FulfillmentMethod = "delivery" | "pickup";
 
 export type TelegramThemeParams = {
